@@ -9,6 +9,8 @@ from PySide6.QtGui import QIcon, QPixmap
 
 import sys
 
+from pathlib import Path
+
 class UI_Busqueda(QWidget):
     def __init__(self):
         super().__init__()
@@ -300,16 +302,13 @@ class UI_Busqueda(QWidget):
 if __name__ == "__main__":
    app = QApplication(sys.argv)
    ventana = QMainWindow()
-   ventana.setWindowTitle("🔎 BÚSQUEDA DE EMPLAZAMIENTOS O SOLICITUDES")
-      
+   ventana.setWindowTitle("BÚSQUEDA DE EMPLAZAMIENTOS O SOLICITUDES")
+   
+   base_dir = Path(__file__).resolve().parent
+   ruta_icono = base_dir.parent / "assets" / "app_icon.ico"
+        
    ui = UI_Busqueda()
    ventana.setCentralWidget(ui)
-   ventana.setWindowIcon(QIcon("appicon.png"))
+   ventana.setWindowIcon(QIcon(str(ruta_icono)))
    ventana.show()
    sys.exit(app.exec())
-
-       
-
-
-
-
