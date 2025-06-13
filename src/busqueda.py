@@ -1,9 +1,9 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QFrame, QLabel, QPushButton, QRadioButton, QComboBox, QTableWidget,
-    QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem,
+    QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QSize
 
 from PySide6.QtGui import QIcon, QPixmap
 
@@ -239,23 +239,59 @@ class UI_Busqueda(QWidget):
         layout_principal.addWidget(self.frame_inferior, alignment=Qt.AlignRight)
 
 
-        self.reporte_btn = QPushButton("Ver Reporte")
-        self.reporte_btn.setStyleSheet("font-weight: bold; font-size: 12px")
-        self.reporte_btn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        icono_reporte = base_dir.parent / "assets" /"pdf_icon.png"
+
+
+        self.reporte_btn = QToolButton()
+        self.reporte_btn.setText("Ver Reporte")
+        self.reporte_btn.setIcon(QIcon(str(icono_reporte)))
+        self.reporte_btn.setIconSize(QSize(64, 64))
+        self.reporte_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.reporte_btn.setFixedSize(100, 100)        
+        self.reporte_btn.setFixedSize(100, 100)
+        self.reporte_btn.setIconSize(QSize(64, 64))
         self.frame_inferior.setLayout(self.layout_inferior)
         self.layout_inferior.addWidget(self.reporte_btn)
-        self.reporte_btn.setFixedSize(100, 100)
+        self.reporte_btn.setStyleSheet("""
+        QToolButton {
+            font-weight: bold;
+            font-size: 12px;
+            border: none;
+            background-color: transparent;
+            padding: 0;
+            }
+            QToolButton:hover {
+            background-color: #333;
+            }
+            """)
+       
 
-        self.notificacion_btn = QPushButton("Ver Notificación")
-        self.notificacion_btn.setStyleSheet("font-weight: bold; font-size: 12px")
-        self.notificacion_btn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        icono_notificacion = base_dir.parent / "assets" /"notificacion_icon.png"
+        
+       
+        self.notificacion_btn = QToolButton()
+        self.notificacion_btn.setText("Ver Notificación")
+        self.notificacion_btn.setIcon(QIcon(str(icono_notificacion)))
+        self.notificacion_btn.setIconSize(QSize(64, 64))
+        self.notificacion_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)  # 👈 Muestra texto debajo del ícono
+        self.notificacion_btn.setFixedSize(100, 100)
         self.frame_inferior.setLayout(self.layout_inferior)
         self.layout_inferior.addWidget(self.notificacion_btn)
-        self.notificacion_btn.setFixedSize(100, 100)
+        self.notificacion_btn.setStyleSheet("""
+        QToolButton {
+            font-weight: bold;
+            font-size: 12px;
+            border: none;
+            background-color: transparent;
+            padding: 0;
+            }
+            QToolButton:hover {
+            background-color: #333;
+            }
+            """)
 
-         
-
-
+        
+        
 
         # Diccionario de sectores
 
@@ -290,12 +326,16 @@ class UI_Busqueda(QWidget):
     def etiqueta_descripcion(self):
         if self.botonEmp.isChecked():
             tipo_item = "DESCRIPCIÓN DEL EMPLAZAMIENTO:"
+            
         elif self.botonSF.isChecked():
             tipo_item = "DESCRIPCIÓN DE LA SOLICITUD DE FABRICACIÓN:"
+            
         else:
             tipo_item = "DESCRIPCIÓN:"
+           
 
         self.etiqueta_item.setText(tipo_item)
+       
            
 
     
@@ -305,10 +345,10 @@ if __name__ == "__main__":
    ventana.setWindowTitle("BÚSQUEDA DE EMPLAZAMIENTOS O SOLICITUDES")
    
    base_dir = Path(__file__).resolve().parent
-   ruta_icono = base_dir.parent / "assets" / "app_icon.ico"
+   icono_ventana = base_dir.parent / "assets" / "app_icon.ico"
         
    ui = UI_Busqueda()
    ventana.setCentralWidget(ui)
-   ventana.setWindowIcon(QIcon(str(ruta_icono)))
+   ventana.setWindowIcon(QIcon(str(icono_ventana)))
    ventana.show()
    sys.exit(app.exec())
