@@ -25,7 +25,7 @@ class UI_Nuevo(QWidget):
         seleccion_layout = QHBoxLayout()
         base_dir = Path(__file__).resolve().parent
         
-
+        # Agregando botones de seleccion emp y sf
         self.boton_emp = QRadioButton("EMPLAZAMIENTO")
         self.boton_sf = QRadioButton("SOLICITUD DE FABRICACIÓN")
         self.logo = QLabel()
@@ -44,17 +44,24 @@ class UI_Nuevo(QWidget):
 
         self.frame_inferior = QFrame()
         self.layout_inferior = QGridLayout()
-        self.layout_inferior.setAlignment(Qt.AlignLeft)
         self.frame_inferior.setLayout(self.layout_inferior)
         layout_principal.addWidget(self.frame_inferior)
+        self.layout_inferior.setAlignment(Qt.AlignTop | Qt.AlignLeft)
 
 
         self.ID = QLineEdit()
         self.layout_inferior.addWidget(QLabel("ID:"), 0, 0)
-        self.layout_inferior.addWidget(self.ID, 0, 1)
+        self.layout_inferior.addWidget(self.ID, 1, 0)
         self.ID.setFixedWidth(50)
 
+        sectores = ("1", "2,", "3", "4", "5", "6", "7", "8")
+
         self.sector = QComboBox()
+        self.sector.addItems(sectores)
+        self.layout_inferior.addWidget(QLabel("SECTOR:"), 2, 0)
+        self.sector.setFixedWidth(50)
+        self.layout_inferior.addWidget(self.sector, 3, 0)
+
         self.planta = QComboBox()
         self.circuito = QLineEdit()
         self.fecha_elab = QDateEdit()
