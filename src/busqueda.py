@@ -254,7 +254,7 @@ class UI_Busqueda(QWidget):
         self.layout_inferior.addWidget(self.reporte_btn)
         self.reporte_btn.setStyleSheet("""
         QToolButton {
-            font-weight: bold;
+            font-weight: normal;
             font-size: 12px;
             border: none;
             background-color: transparent;
@@ -273,13 +273,13 @@ class UI_Busqueda(QWidget):
         self.notificacion_btn.setText("Ver Notificación")
         self.notificacion_btn.setIcon(QIcon(str(icono_notificacion)))
         self.notificacion_btn.setIconSize(QSize(64, 64))
-        self.notificacion_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)  # 👈 Muestra texto debajo del ícono
+        self.notificacion_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         self.notificacion_btn.setFixedSize(100, 100)
         self.frame_inferior.setLayout(self.layout_inferior)
         self.layout_inferior.addWidget(self.notificacion_btn)
         self.notificacion_btn.setStyleSheet("""
         QToolButton {
-            font-weight: bold;
+            font-weight: normal;
             font-size: 12px;
             border: none;
             background-color: transparent;
@@ -290,7 +290,25 @@ class UI_Busqueda(QWidget):
             }
             """)
 
+        logo_inspeccion = QLabel()
+        logo_inspeccion.setFixedSize(200, 150)
+        logo_inspeccion.setScaledContents(True)
+        logo = base_dir.parent / "assets" / "inspeccion_logo_dark.png"
+        pixmap = QPixmap(str(logo))
+        logo_inspeccion.setPixmap(pixmap)
+
+        self.logo_frame = QFrame()
+        self.logo_layout = QHBoxLayout()
+        self.logo_frame.setLayout(self.logo_layout)
         
+
+        layout_principal.addWidget(self.logo_frame, alignment=Qt.AlignLeft)
+        self.logo_layout.addWidget(logo_inspeccion)
+
+
+
+       
+
         
 
         # Diccionario de sectores
