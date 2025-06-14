@@ -44,8 +44,16 @@ class UI_Nuevo(QWidget):
 
         self.frame_inferior = QFrame()
         self.layout_inferior = QGridLayout()
+        self.layout_inferior.setAlignment(Qt.AlignLeft)
+        self.frame_inferior.setLayout(self.layout_inferior)
+        layout_principal.addWidget(self.frame_inferior)
+
 
         self.ID = QLineEdit()
+        self.layout_inferior.addWidget(QLabel("ID:"), 0, 0)
+        self.layout_inferior.addWidget(self.ID, 0, 1)
+        self.ID.setFixedWidth(50)
+
         self.sector = QComboBox()
         self.planta = QComboBox()
         self.circuito = QLineEdit()
@@ -83,4 +91,4 @@ if __name__ == "__main__":
     window.setWindowIcon(QIcon(str(icono_ventana)))
 
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
