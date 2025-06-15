@@ -16,7 +16,7 @@ class UI_Nuevo(QWidget):
         super().__init__()
 
         self.setWindowTitle("Registrar Nuevo")
-        self.setMinimumSize(1100, 930)
+        self.setMinimumSize(400, 600)
 
         #Layoput de la ventana
         layout_principal = QVBoxLayout(self)
@@ -52,17 +52,21 @@ class UI_Nuevo(QWidget):
         self.ID = QLineEdit()
         self.layout_inferior.addWidget(QLabel("ID:"), 0, 0)
         self.layout_inferior.addWidget(self.ID, 1, 0)
-        self.ID.setFixedWidth(50)
+        self.ID.setFixedWidth(150)
 
-        sectores = ("1", "2,", "3", "4", "5", "6", "7", "8")
+        sectores = (" ", "1", "2", "3", "4", "5", "6", "7", "8")
 
         self.sector = QComboBox()
         self.sector.addItems(sectores)
         self.layout_inferior.addWidget(QLabel("SECTOR:"), 2, 0)
-        self.sector.setFixedWidth(50)
+        self.sector.setFixedWidth(150)
         self.layout_inferior.addWidget(self.sector, 3, 0)
 
         self.planta = QComboBox()
+        self.layout_inferior.addWidget(QLabel("PLANTA:"), 4, 0)
+        self.layout_inferior.addWidget(self.planta, 5, 0)
+        self.planta.setFixedWidth(150)
+
         self.circuito = QLineEdit()
         self.fecha_elab = QDateEdit()
         self.fecha_ven = QDateEdit()
@@ -81,7 +85,33 @@ class UI_Nuevo(QWidget):
         
 
 
+        # Diccionario de sectores
 
+        self.sectores_dict = {
+            "1": ["", "BA", "MC", "FCC1", "MT2"],
+            "2": ["", "U-502", "U-801", "U-901"],
+            "3": ["", "U-300","U-500", "U-501", "U-600", "U-900"],
+            "4": ["", "ALQUILACION", "TAME A", "TAME B", "MTBE A", "MTBE B", "ULSG A", "ULSG B", "CH", "U-100", "U-200"],
+            "5": ["", "MD/MDJ", "PRETRATAMIENTO", "CL", "CT-1000N", "CT-1001N", "CT-1002N", "CT-1003N", "CT-1004N",
+                  "DE-100", "DE-101", "DE-102", "DE-103", "MP", "CB2N", "CB3", "CB5", "CB6", "CB7", "CB8",
+                  "ACUEDUCTO 3", "CHAIREL", "PATOS"],
+            "6": ["", "MJA", "MJW", "MJN", "MFA", "MZ"],
+            "7": ["", "MAYA", "FCC2"],
+            "8": ["", "COQUER", "AMINA", "MT3", "AZUFRE", "AZUFRE 100", "AZUFRE 200", "AZUFRE 300", "AZUFRE 400"]
+        }
+        
+
+       # Para conectar combo boxes, SECTOR y PLANTA se define la función:
+
+        self.sector.currentTextChanged.connect(self.actualizar_planta_Cbox)
+
+        layout_principal.addStretch()
+
+    def actualizar_planta_Cbox(self, sector):
+        self.planta.clear()
+        planta = self.sectores_dict.get(sector)
+        if planta:
+            self.planta.addItems(planta)
         
 
 
