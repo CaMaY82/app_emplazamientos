@@ -101,7 +101,7 @@ class UI_Busqueda(QWidget):
 
         # caja de texto para buscar emp o sf
         self.ID_busqueda = QLineEdit()
-        self.ID_busqueda.setPlaceholderText("o Ingresa ID del EMP o SF")
+        self.ID_busqueda.setPlaceholderText("Rayito")
         self.ID_busqueda.setToolTip("Ingresa el número del EMP o SF que quieres buscar")
         self.ID_busqueda.setStyleSheet("""
          QToolTip {
@@ -291,7 +291,7 @@ class UI_Busqueda(QWidget):
             """)
 
         logo_inspeccion = QLabel()
-        logo_inspeccion.setFixedSize(200, 150)
+        logo_inspeccion.setFixedSize(150, 75)
         logo_inspeccion.setScaledContents(True)
         logo = base_dir.parent / "assets" / "inspeccion_logo_dark.png"
         pixmap = QPixmap(str(logo))

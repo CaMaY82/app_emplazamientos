@@ -159,19 +159,19 @@ class UI_Nuevo(QWidget):
         self.descripcion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.layout_inferior2.addWidget(QLabel("DESCRIPCIÓN:"))
         self.layout_inferior2.addWidget(self.descripcion)
-        self.descripcion.setFixedHeight(50)
+        self.descripcion.setFixedHeight(45)
         
         self.mitigacion = QTextEdit()
         self.mitigacion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.layout_inferior2.addWidget(QLabel("MEDIDA DE MITIGACION:"))
         self.layout_inferior2.addWidget(self.mitigacion)
-        self.mitigacion.setFixedHeight(50)
+        self.mitigacion.setFixedHeight(45)
 
         self.comentarios = QTextEdit()
         self.comentarios.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.layout_inferior2.addWidget(QLabel("COMENTARIOS:"))
         self.layout_inferior2.addWidget(self.comentarios)
-        self.comentarios.setFixedHeight(50)
+        self.comentarios.setFixedHeight(45)
         
         
         self.enlace = QLineEdit()
@@ -201,7 +201,9 @@ class UI_Nuevo(QWidget):
             }
             """)
         
-
+        self.guardar2 = QPushButton("GUARDAR")
+        self.layout_inferior2.addWidget(self.guardar2)
+        self.guardar2.setFixedSize(50, 50)
         
         
         # Lista Mecanismos de Daño
