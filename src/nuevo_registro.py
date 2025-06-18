@@ -1,11 +1,13 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QFrame, QLabel, QPushButton, QRadioButton, QComboBox, QTableWidget,
-    QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton, QGroupBox, QDateEdit, QTextEdit
+    QFrame, QLabel, QPushButton, QRadioButton, QComboBox,
+    QSizePolicy, QGridLayout, QLineEdit, QSpacerItem, QGroupBox, QDateEdit, QTextEdit
 )
 from PySide6.QtCore import Qt, QSize, QDate
 
 from PySide6.QtGui import QIcon, QPixmap
+
+import darkdetect
 
 import sys
 
@@ -15,6 +17,42 @@ class UI_Nuevo(QWidget):
     def __init__(self):
         super().__init__()
 
+        if darkdetect.isDark():
+         modo = "oscuro"
+       
+        else:
+         modo = "claro"
+
+        if darkdetect.isDark():
+         app.setStyleSheet("""
+            QLineEdit, QTextEdit, QComboBox {
+            background-color: #2e2e2e;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 5px;
+              }
+                QPushButton:pressed {
+                 padding-right: 2px;
+                 padding-bottom: 2px;
+                 border: 1px inset gray;
+                  }
+                
+             """)
+        else:
+            app.setStyleSheet("""
+            QLineEdit, QTextEdit, QComboBox, QDateEdit, QPushButton {
+            background-color: #eceff1;
+            color: #000000;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+                }
+                  QPushButton:pressed {
+                    padding-right: 2px;
+                    padding-bottom: 2px;
+                    border: 1px inset gray;
+        }
+            """)
+            
         self.setWindowTitle("Registrar Nuevo")
         self.setMinimumSize(800, 850)
 
@@ -24,13 +62,19 @@ class UI_Nuevo(QWidget):
         seleccion_box.setFixedHeight(100)
         seleccion_layout = QHBoxLayout()
         base_dir = Path(__file__).resolve().parent
+
+        if darkdetect.isDark():
+         logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo_dark.png")
+        else:
+         logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo.png")
+
         
         # Agregando botones de seleccion emp y sf
         self.boton_emp = QRadioButton("EMPLAZAMIENTO")
         self.boton_sf = QRadioButton("SOLICITUD DE FABRICACIÓN")
         self.logo = QLabel()
-        self.logo.setFixedSize(100, 50)
-        logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo_dark.png")
+        self.logo.setFixedSize(170, 70)
+        
         self.logo.setPixmap(logoIT)
         self.logo.setScaledContents(True)
 
@@ -40,7 +84,7 @@ class UI_Nuevo(QWidget):
         seleccion_layout.addWidget(self.boton_emp)
         seleccion_layout.addWidget(self.boton_sf)
         seleccion_layout.addSpacerItem(QSpacerItem(50, 0, QSizePolicy.Expanding, QSizePolicy.Minimum))
-        seleccion_layout.addWidget(self.logo)
+        seleccion_layout.addWidget(self.logo, alignment=Qt.AlignTop)
 
         self.frame_inferior = QFrame()
         self.layout_inferior = QGridLayout()
@@ -179,33 +223,17 @@ class UI_Nuevo(QWidget):
         self.layout_inferior2.addWidget(self.enlace)
         self.layout_inferior2.addSpacing(30)
 
-        icono_guardar = base_dir.parent /"assets"/"save_icon.png"
+        
 
-        self.guardar_btn = QToolButton()
-        self.guardar_btn.setFixedSize(64, 64)
+        self.guardar_btn = QPushButton("Guardar")
         self.layout_inferior2.addStretch()
         self.layout_inferior2.addWidget(self.guardar_btn, alignment=Qt.AlignRight)
-        self.guardar_btn.setIcon(QIcon(str(icono_guardar)))
-        self.guardar_btn.setIconSize(QSize(64, 64))
-        self.guardar_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self.guardar_btn.setStyleSheet("""
-        QToolButton {
-            font-weight: normal;
-            font-size: 12px;
-            border: none;
-            background-color: transparent;
-            padding: 0;
-            }
-            QToolButton:hover {
-            background-color: #333;
-            }
-            """)
+        self.guardar_btn.setFixedSize(150, 50)
         
-        self.guardar2 = QPushButton("GUARDAR")
-        self.layout_inferior2.addWidget(self.guardar2)
-        self.guardar2.setFixedSize(50, 50)
+
         
         
+       
         # Lista Mecanismos de Daño
 
         mecanismos = [" ",

@@ -1,11 +1,13 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QFrame, QLabel, QPushButton, QRadioButton, QComboBox, QTableWidget,
-    QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton
+    QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton, QTextEdit
 )
 from PySide6.QtCore import Qt, QSize
 
 from PySide6.QtGui import QIcon, QPixmap
+
+import darkdetect
 
 import sys
 
@@ -15,8 +17,46 @@ class UI_Busqueda(QWidget):
     def __init__(self):
         super().__init__()
 
+        # Con el uso de DarkDetect se hace la condicional y se da el estilo a los widgets para una mejor UI
+        
+        if darkdetect.isDark():
+         modo = "oscuro"
+       
+        else:
+         modo = "claro"
+
+        if darkdetect.isDark():
+         app.setStyleSheet("""
+            QLineEdit, QTextEdit, QComboBox {
+            background-color: #2e2e2e;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 5px;
+              }
+                QPushButton:pressed {
+                    padding-left: 2px;
+                    padding-top: 2px;
+                    border: 1px inset gray;
+                    }
+                     """)
+             
+        else:
+            app.setStyleSheet("""
+            QLineEdit, QTextEdit, QComboBox, QDateEdit, QPushButton, QTableWidget  {
+            background-color: #eceff1;
+            color: #000000;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+                }
+                 QPushButton:pressed {
+                    padding-left: 2px;
+                    padding-top: 2px;
+                    border: 1px inset gray;
+        }
+            """)
+
         self.setWindowTitle("Buscar")
-        self.setMinimumSize(1100, 930)
+        self.setMinimumSize(1100, 800)
 
         #Layoput de la ventana
         layout_principal = QVBoxLayout(self)
@@ -24,7 +64,7 @@ class UI_Busqueda(QWidget):
         layout_principal.setSpacing(3)  
 
         #Título
-        titulo = QLabel("QUE DESEAS BUSCAR?")
+        titulo = QLabel("¿QUÉ DESEAS BUSCAR?")
         titulo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         titulo.setStyleSheet("font-weight: bold; font-size: 16px")
         layout_principal.addWidget(titulo)
@@ -101,7 +141,7 @@ class UI_Busqueda(QWidget):
 
         # caja de texto para buscar emp o sf
         self.ID_busqueda = QLineEdit()
-        self.ID_busqueda.setPlaceholderText("Rayito")
+        self.ID_busqueda.setPlaceholderText("Ingresa el ID")
         self.ID_busqueda.setToolTip("Ingresa el número del EMP o SF que quieres buscar")
         self.ID_busqueda.setStyleSheet("""
          QToolTip {
@@ -215,7 +255,7 @@ class UI_Busqueda(QWidget):
         self.datos_layout.addWidget(QLabel("CLASE DE RIESGO:"), 2, 6)
         self.datos_layout.addWidget(self.riesgo_resultado, 3, 6)
 
-        self.descripcion_resultado = QLineEdit()
+        self.descripcion_resultado = QTextEdit()
         self.descripcion_resultado.setReadOnly(True)
         self.etiqueta_item = QLabel("DESCRIPCIÓN:")
         self.datos_layout.addWidget(self.etiqueta_item, 4, 0, 1, 6)
@@ -236,12 +276,32 @@ class UI_Busqueda(QWidget):
         self.frame_inferior = QFrame()
         self.layout_inferior = QHBoxLayout()
         
-        layout_principal.addWidget(self.frame_inferior, alignment=Qt.AlignRight)
+        layout_principal.addWidget(self.frame_inferior)
 
+        # Cuando el usuario cambie el tema de Windows, se detecta y se cambia el logo de IT adecuado con lo siguiente:
+
+
+        if darkdetect.isDark():
+         logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo_dark.png")
+         logoIT = base_dir.parent / "assets" / "inspeccion_logo_dark.png"
+        else:
+         logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo.png")
+         logoIT = base_dir.parent / "assets" / "inspeccion_logo.png"
+         
+        logo_inspeccion = QLabel()
+        logo_inspeccion.setFixedSize(150, 75)
+        logo_inspeccion.setScaledContents(True)
+        
+        pixmap = QPixmap(str(logoIT))
+        logo_inspeccion.setPixmap(pixmap)
+
+        self.frame_inferior.setLayout(self.layout_inferior)
+        self.layout_inferior.addWidget(logo_inspeccion)
+        self.layout_inferior.addStretch()
+       
+        # Agreganbdo botones con icono para ver el archivo del emplazamiento y las notificaciones de ejecución:
 
         icono_reporte = base_dir.parent / "assets" /"pdf_icon.png"
-
-
         self.reporte_btn = QToolButton()
         self.reporte_btn.setText("Ver Reporte")
         self.reporte_btn.setIcon(QIcon(str(icono_reporte)))
@@ -260,15 +320,10 @@ class UI_Busqueda(QWidget):
             background-color: transparent;
             padding: 0;
             }
-            QToolButton:hover {
-            background-color: #333;
-            }
+            
             """)
        
-
         icono_notificacion = base_dir.parent / "assets" /"notificacion_icon.png"
-        
-       
         self.notificacion_btn = QToolButton()
         self.notificacion_btn.setText("Ver Notificación")
         self.notificacion_btn.setIcon(QIcon(str(icono_notificacion)))
@@ -285,34 +340,10 @@ class UI_Busqueda(QWidget):
             background-color: transparent;
             padding: 0;
             }
-            QToolButton:hover {
-            background-color: #333;
-            }
+           
             """)
 
-        logo_inspeccion = QLabel()
-        logo_inspeccion.setFixedSize(150, 75)
-        logo_inspeccion.setScaledContents(True)
-        logo = base_dir.parent / "assets" / "inspeccion_logo_dark.png"
-        pixmap = QPixmap(str(logo))
-        logo_inspeccion.setPixmap(pixmap)
-
-        self.logo_frame = QFrame()
-        self.logo_layout = QHBoxLayout()
-        self.logo_frame.setLayout(self.logo_layout)
-        
-
-        layout_principal.addWidget(self.logo_frame, alignment=Qt.AlignLeft)
-        self.logo_layout.addWidget(logo_inspeccion)
-
-
-
-       
-
-        
-
         # Diccionario de sectores
-
         self.sectores_dict = {
             "1": ["", "BA", "MC", "FCC1", "MT2"],
             "2": ["", "U-502", "U-801", "U-901"],
