@@ -104,49 +104,49 @@ class UI_editar(QWidget):
         #self.botonSF.toggled.connect(self.etiqueta_descripcion)
         
         # Combobox Sector
-        self.sector_cb = QComboBox()
-        self.sector_cb.addItem("SECTOR")
-        self.sector_cb.model().item(0).setEnabled(False)
-        sectores = ["1", "2", "3", "4", "5", "6", "7", "8"]
-        self.sector_cb.addItems(sectores)
+        self.sector_fl = QComboBox()
+        self.sector_fl.addItem("SECTOR")
+        self.sector_fl.model().item(0).setEnabled(False)
+        sectores = [" ", "1", "2", "3", "4", "5", "6", "7", "8"]
+        self.sector_fl.addItems(sectores)
         
-        filtros_layout.addWidget(self.sector_cb, 0, 2)
+        filtros_layout.addWidget(self.sector_fl, 0, 2)
        
         # Combobox Planta
-        self.planta_cb = QComboBox()
-        self.planta_cb.addItem("PLANTA")
-        self.planta_cb.model().item(0).setEnabled(False)
+        self.planta_fl = QComboBox()
+        self.planta_fl.addItem("PLANTA")
+        self.planta_fl.model().item(0).setEnabled(False)
 
         
         layout_principal.addWidget(grupo_filtros)
-        filtros_layout.addWidget(self.planta_cb, 1, 2)
+        filtros_layout.addWidget(self.planta_fl, 1, 2)
 
         # ComboBox estado
-        self.estado_cb = QComboBox()
-        self.estado_cb.addItem("ESTADO ACTUAL")
-        self.estado_cb.addItem("")
-        self.estado_cb.addItem("VIGENTE")
-        self.estado_cb.addItem("VENCIDO")
-        self.estado_cb.addItem("ATENDIDO")
-        self.estado_cb.model().item(0).setEnabled(False)
-        filtros_layout.addWidget(self.estado_cb, 0, 3)
+        self.estado_fl = QComboBox()
+        self.estado_fl.addItem("ESTADO ACTUAL")
+        self.estado_fl.addItem("")
+        self.estado_fl.addItem("VIGENTE")
+        self.estado_fl.addItem("VENCIDO")
+        self.estado_fl.addItem("ATENDIDO")
+        self.estado_fl.model().item(0).setEnabled(False)
+        filtros_layout.addWidget(self.estado_fl, 0, 3)
 
         # Combobox Status operativo
-        self.status_cb = QComboBox()
-        self.status_cb.addItem("STATUS OPERATIVO")
-        self.status_cb.addItem("OPERANDO")
-        self.status_cb.addItem("FUERA DE OPERACIÓN")
-        self.status_cb.model().item(0).setEnabled(False)
-        filtros_layout.addWidget(self.status_cb, 1, 3)
+        self.status_fl = QComboBox()
+        self.status_fl.addItem("STATUS OPERATIVO")
+        self.status_fl.addItem("OPERANDO")
+        self.status_fl.addItem("FUERA DE OPERACIÓN")
+        self.status_fl.model().item(0).setEnabled(False)
+        filtros_layout.addWidget(self.status_fl, 1, 3)
 
         # Combobox Riesgo
-        self.riesgo_cb = QComboBox()
-        self.riesgo_cb.addItem("RIESGO")
+        self.riesgo_fl = QComboBox()
+        self.riesgo_fl.addItem("RIESGO")
         riesgos = ["A", "B", "C", "D"]
-        self.riesgo_cb.addItems(riesgos)
-        self.riesgo_cb.model().item(0).setEnabled(False)
-        filtros_layout.addWidget(self.riesgo_cb, 0, 4)
-        self.riesgo_cb.setFixedWidth(200)
+        self.riesgo_fl.addItems(riesgos)
+        self.riesgo_fl.model().item(0).setEnabled(False)
+        filtros_layout.addWidget(self.riesgo_fl, 0, 4)
+        self.riesgo_fl.setFixedWidth(200)
 
         # Boton buscar
         self.buscar_btn = QPushButton("Buscar 🔎")
@@ -166,6 +166,56 @@ class UI_editar(QWidget):
         resultados_layout.addWidget(self.tabla_resultados)
         self.resultados.setLayout(resultados_layout)
         layout_principal.addWidget(self.resultados)
+
+        # Layout de edición
+        self.frame_edicion = QFrame()
+        edicion_layout = QGridLayout()
+        edicion_layout.setAlignment(Qt.AlignLeft)
+        self.frame_edicion.setLayout(edicion_layout)
+        layout_principal.addWidget(self.frame_edicion)
+        
+        # Agregando controles de edición (widgets)
+
+        self.ID = QLineEdit()
+        self.ID.setReadOnly(True)
+        self.ID.setFixedWidth(60)
+        edicion_layout.addWidget(QLabel("ID:"), 0, 0)
+        edicion_layout.addWidget(self.ID, 1, 0)
+
+        self.sector = QComboBox()
+        self.sector.addItems(sectores)
+        self.sector.setFixedWidth(70)
+        self.sector.model().item(0).setEnabled(False)
+        edicion_layout.addWidget(QLabel("SECTOR:"), 0, 1)
+        edicion_layout.addWidget(self.sector, 1, 1)
+
+        self.planta = QComboBox()
+        self.planta.setFixedWidth(80)
+        #self.planta.model().item(0).setEnabled(False)
+        edicion_layout.addWidget(QLabel("PLANTA:"), 0, 3)
+        edicion_layout.addWidget(self.planta, 1, 3)
+
+
+        # Diccionario de sectores
+        self.sectores_dict = {
+            "1": ["", "BA", "MC", "FCC1", "MT2"],
+            "2": ["", "U-502", "U-801", "U-901"],
+            "3": ["", "U-300","U-500", "U-501", "U-600", "U-900"],
+            "4": ["", "ALQUILACION", "TAME A", "TAME B", "MTBE A", "MTBE B", "ULSG A", "ULSG B", "CH", "U-100", "U-200"],
+            "5": ["", "MD/MDJ", "PRETRATAMIENTO", "CL", "CT-1000N", "CT-1001N", "CT-1002N", "CT-1003N", "CT-1004N",
+                  "DE-100", "DE-101", "DE-102", "DE-103", "MP", "CB2N", "CB3", "CB5", "CB6", "CB7", "CB8",
+                  "ACUEDUCTO 3", "CHAIREL", "PATOS"],
+            "6": ["", "MJA", "MJW", "MJN", "MFA", "MZ"],
+            "7": ["", "MAYA", "FCC2"],
+            "8": ["", "COQUER", "AMINA", "MT3", "AZUFRE", "AZUFRE 100", "AZUFRE 200", "AZUFRE 300", "AZUFRE 400"]
+            }
+
+        
+        
+
+
+        
+
 
 
 
