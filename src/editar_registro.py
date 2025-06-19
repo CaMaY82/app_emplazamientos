@@ -1,7 +1,8 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QFrame, QLabel, QPushButton, QRadioButton, QComboBox, QTableWidget,
-    QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton, QTextEdit, QGroupBox
+    QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton, QTextEdit, QGroupBox, QDateEdit
+
 )
 from PySide6.QtCore import Qt, QSize, QDate
 
@@ -54,7 +55,7 @@ class UI_editar(QWidget):
             """)
             
         self.setWindowTitle("Editar Registro")
-        self.setMinimumSize(800, 850)
+        self.setMinimumSize(1150, 800)
 
          #Layoput de la ventana
         layout_principal = QVBoxLayout(self)
@@ -62,11 +63,11 @@ class UI_editar(QWidget):
         layout_principal.setSpacing(3)  
 
         #Título
-        titulo = QLabel("¿QUÉ DESEAS EDITAR?")
-        titulo.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
-        titulo.setStyleSheet("font-weight: bold; font-size: 16px")
-        layout_principal.addWidget(titulo)
-        layout_principal.addSpacerItem(QSpacerItem(10, 20, QSizePolicy.Minimum, QSizePolicy.Fixed))
+        #titulo = QLabel("¿QUÉ DESEAS EDITAR?")
+        #titulo.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        #titulo.setStyleSheet("font-weight: bold; font-size: 16px")
+        #layout_principal.addWidget(titulo)
+        #layout_principal.addSpacerItem(QSpacerItem(10, 20, QSizePolicy.Minimum, QSizePolicy.Fixed))
 
 
         # Layout de los filtros
@@ -88,10 +89,10 @@ class UI_editar(QWidget):
        
 
         # Botones de opción
-        self.botonEmp = QRadioButton("Emplazamientos")
+        self.botonEmp = QRadioButton("EMPLAZAMIENTO")
         self.botonEmp.setLayoutDirection(Qt.RightToLeft)
        
-        self.botonSF = QRadioButton("Solicitudes de Fabricaión")
+        self.botonSF = QRadioButton("SOLICITUD DE FABRICACIÓN")
         self.botonSF.setLayoutDirection(Qt.RightToLeft)
 
         filtros_layout.addWidget(self.botonEmp, 0, 0, alignment=Qt.AlignLeft)
@@ -170,7 +171,7 @@ class UI_editar(QWidget):
         # Layout de edición
         self.frame_edicion = QFrame()
         edicion_layout = QGridLayout()
-        edicion_layout.setAlignment(Qt.AlignLeft)
+        edicion_layout.setAlignment(Qt.AlignCenter)
         self.frame_edicion.setLayout(edicion_layout)
         layout_principal.addWidget(self.frame_edicion)
         
@@ -178,23 +179,211 @@ class UI_editar(QWidget):
 
         self.ID = QLineEdit()
         self.ID.setReadOnly(True)
-        self.ID.setFixedWidth(60)
+        self.ID.setFixedWidth(90)
         edicion_layout.addWidget(QLabel("ID:"), 0, 0)
         edicion_layout.addWidget(self.ID, 1, 0)
-
+        
         self.sector = QComboBox()
         self.sector.addItems(sectores)
-        self.sector.setFixedWidth(70)
+        self.sector.setFixedWidth(100)
         self.sector.model().item(0).setEnabled(False)
-        edicion_layout.addWidget(QLabel("SECTOR:"), 0, 1)
+        edicion_layout.addWidget(QLabel("SECTOR:"), 0, 1)  
         edicion_layout.addWidget(self.sector, 1, 1)
 
         self.planta = QComboBox()
-        self.planta.setFixedWidth(80)
+        self.planta.setFixedWidth(200)
         #self.planta.model().item(0).setEnabled(False)
-        edicion_layout.addWidget(QLabel("PLANTA:"), 0, 3)
-        edicion_layout.addWidget(self.planta, 1, 3)
+        edicion_layout.addWidget(QLabel("PLANTA:"), 0, 2)
+        edicion_layout.addWidget(self.planta, 1, 2)
 
+        self.reevaluacion = QDateEdit()
+        self.reevaluacion.setCalendarPopup(True)
+        edicion_layout.addWidget(QLabel("REEVALUACION:"),0, 3)
+        edicion_layout.addWidget(self.reevaluacion, 1, 3)
+        self.reevaluacion.setFixedWidth(150)
+
+        self.vigencia = QDateEdit()
+        self.vigencia.setCalendarPopup(True)
+        edicion_layout.addWidget(QLabel("VIGENCIA:"), 0, 4)
+        edicion_layout.addWidget(self.vigencia, 1, 4)
+        #self.vigencia.setFixedWidth(90)
+
+        self.atencion = QDateEdit()
+        self.atencion.setCalendarPopup(True)
+        edicion_layout.addWidget(QLabel("ATENCION:"), 0, 5)
+        edicion_layout.addWidget(self.atencion, 1, 5)
+        #self.atencion.setFixedWidth(90)
+
+        edicion_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed), 2, 0, 1, 5)
+
+        self.estado = QLineEdit()
+        self.estado.setReadOnly(True)
+        edicion_layout.addWidget(QLabel("ESTADO:"), 3, 0)
+        edicion_layout.addWidget(self.estado, 4, 0)
+        self.estado.setFixedWidth(90)
+
+        SI_NO = ("NO" ,"SI")
+
+        self.paro_planta = QComboBox()
+        self.paro_planta.addItems((SI_NO))
+        edicion_layout.addWidget(QLabel("PARO DE PLANTA:"), 3, 1)
+        edicion_layout.addWidget(self.paro_planta, 4, 1)
+        #self.paro_planta.setFixedWidth(100)
+        
+        self.iniciativa = QComboBox()
+        self.iniciativa.addItems((SI_NO))
+        edicion_layout.addWidget(QLabel("INICIATIVA:"), 3, 2)
+        edicion_layout.addWidget(self.iniciativa, 4, 2)
+        #self.iniciativa.setFixedWidth(100)
+
+        self.programa = QComboBox()
+        self.programa.addItems(SI_NO)
+        edicion_layout.addWidget(QLabel("PROGRAMA:"), 3, 3)
+        edicion_layout.addWidget(self.programa, 4, 3)
+        
+        self.status = QComboBox()
+        self.status.addItems(["OPERANDO", "FUERA DE OPERACIÓN"])
+        edicion_layout.addWidget(QLabel("STATUS OPERATIVO:"), 3, 4)
+        edicion_layout.addWidget(self.status, 4, 4)
+
+        self.sap = QLineEdit()
+        edicion_layout.addWidget(QLabel("AVISO SAP:"), 3, 5)
+        edicion_layout.addWidget(self.sap, 4, 5)
+        #self.sap.setFixedWidth(100)
+
+        # Layout de edición 2
+        self.frame_edicion2 = QFrame()
+        edicion2_layout = QGridLayout()
+        edicion2_layout.setAlignment(Qt.AlignLeft)
+        self.frame_edicion2.setLayout(edicion2_layout)
+        layout_principal.addWidget(self.frame_edicion2)
+
+        self.mecanismo = QComboBox()
+        edicion2_layout.addWidget(QLabel("MECANISMO DE DAÑO:"), 0, 0)
+        edicion2_layout.addWidget(self.mecanismo, 1, 0,)
+
+        self.material = QLineEdit()
+        edicion2_layout.addWidget(QLabel("MATERIAL"), 0, 1)
+        edicion2_layout.addWidget(self.material, 1, 1)
+
+        self.mitigacion = QTextEdit()
+        self.mitigacion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.mitigacion.setFixedHeight(50)
+        edicion2_layout.addWidget(QLabel("MEDIDA DE MITIGACIÓN:"), 2, 0, 1, 1)
+        edicion2_layout.addWidget(self.mitigacion, 3, 0, 2, 2)
+
+        self.descripcion = QTextEdit()
+        self.descripcion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.descripcion.setFixedHeight(50)
+        edicion2_layout.addWidget(QLabel("DESCRIPCION:"), 5, 0, 1, 1)
+        edicion2_layout.addWidget(self.descripcion, 6, 0, 2, 1)
+
+        self.comentarios = QTextEdit()
+        self.comentarios.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.comentarios.setFixedHeight(50)
+        edicion2_layout.addWidget(QLabel("COMENTARIOS:"), 5, 1, 1, 1)
+        edicion2_layout.addWidget(self.comentarios, 6, 1, 2, 1)
+
+        grupo_enlaces = QGroupBox("AGREGAR ENLACES DE LOS ARCHIVOS")
+        enlaces_layout = QGridLayout()
+        grupo_enlaces.setLayout(enlaces_layout)
+        layout_principal.addWidget(grupo_enlaces)
+
+        archivo_link = QLineEdit()
+        enlaces_layout.addWidget(QLabel("ENLACE AL ARCHIVO:"), 0, 1, alignment=Qt.AlignRight)        
+        enlaces_layout.addWidget(archivo_link, 0, 2)
+
+        notificacion_link = QLineEdit()
+        enlaces_layout.addWidget(QLabel("ENLACE A NOTIFICACION DE EJECUCION:"), 1, 1)
+        enlaces_layout.addWidget(notificacion_link, 1, 2)
+
+        botones_frame = QFrame()
+        botones_layout = QHBoxLayout()
+        botones_layout.setAlignment(Qt.AlignRight)
+        botones_frame.setLayout(botones_layout)        
+        layout_principal.addWidget(botones_frame)
+
+        self.actualizar = QPushButton("ACTUALIZAR")
+        self.actualizar.setFixedSize(200, 30)
+        botones_layout.addWidget(self.actualizar)
+        
+
+
+        
+
+        # Lista Mecanismos de Daño
+
+        mecanismos = [" ",
+         "FRAGILIZACIÓN A 885 °F (475 °C)",
+         "AGRIETAMIENTO POR CORROSIÓN BAJO TENSIÓN CÁUSTICA",
+         "AGRIETAMIENTO POR CORROSIÓN BAJO TENSIÓN POR ÁCIDO FLUORHÍDRICO EN ALEACIONES DE NÍQUEL",
+         "AGRIETAMIENTO POR CORROSIÓN BAJO TENSIÓN POR ÁCIDO POLITIONICO",
+         "AGRIETAMIENTO POR CORROSIÓN BAJO TENSIÓN POR AMINA",
+         "AGRIETAMIENTO POR CORROSIÓN BAJO TENSIÓN POR AMONÍACO",
+         "AGRIETAMIENTO POR CORROSIÓN BAJO TENSIÓN POR CARBONATOS",
+         "AGRIETAMIENTO POR CORROSIÓN BAJO TENSIÓN POR CLORUROS",
+         "AGRIETAMIENTO POR CORROSIÓN BAJO TENSIÓN POR ETANOL",
+         "AGRIETAMIENTO POR CORROSIÓN BAJO TENSIÓN POR HIDRÓGENO EN ÁCIDO FLUORHÍDRICO",
+         "AGRIETAMIENTO POR RELAJACIÓN DE ESFUERZOS (AGRIETAMIENTO POR RECALENTAMIENTO)",
+         "AGRIETAMIENTO POR SOLDADURA DE METALES DISÍMILES",
+         "ATAQUE POR HIDRÓGENO A ALTA TEMPERATURA",
+         "CARBURIZACIÓN",
+         "CAVITACIÓN",
+         "CHOQUE TÉRMICO",
+         "CORROSIÓN ATMOSFÉRICA",
+         "CORROSIÓN BAJO AISLAMIENTO",
+         "CORROSIÓN CÁUSTICA",
+         "CORROSIÓN EN SUELO",
+         "CORROSIÓN GALVÁNICA",
+         "CORROSIÓN GRÁFICA DE HIERROS FUNDIDOS",
+         "CORROSIÓN H2/H2S A ALTA TEMPERATURA",
+         "CORROSIÓN INFLUENCIADA MICROBIOLÓGICAMENTE",
+         "CORROSIÓN POR ÁCIDO CLORHÍDRICO",
+         "CORROSIÓN POR ÁCIDO FLUORHÍDRICO",
+         "CORROSIÓN POR ÁCIDO FOSFÓRICO",
+         "CORROSIÓN POR ÁCIDO NAFTÉNICO",
+         "CORROSIÓN POR ÁCIDO ORGÁNICO ACUOSO",
+         "CORROSIÓN POR ÁCIDO SULFÚRICO",
+         "CORROSIÓN POR AGUA AMARGA (ÁCIDA)",
+         "CORROSIÓN POR AGUA DE CALDERA Y CONDENSADO DE VAPOR",
+         "CORROSIÓN POR AGUA DE ENFRIAMIENTO",
+         "CORROSIÓN POR AGUA DE PROCESO OXIGENADA",
+         "CORROSIÓN POR AMINA",
+         "CORROSIÓN POR BISULFURO DE AMONIO (AGUA AMARGA)",
+         "CORROSIÓN POR CELDAS DE CONCENTRACIÓN",
+         "CORROSIÓN POR CENIZAS DE COMBUSTIÓN",
+         "CORROSIÓN POR CLORURO DE AMONIO Y CLORHIDRATO DE AMINA",
+         "CORROSIÓN POR CO2",
+         "CORROSIÓN POR FENOL (ÁCIDO CARBÓLICO)",
+         "CORROSIÓN POR PUNTO DE ROCÍO DE GASES COMBUSTÓN",
+         "CORROSIÓN POR SALMUERA",
+         "DAÑO POR H2S HÚMEDO",
+         "DEGRADACIÓN DE REFRACTARIO",
+         "DESALEACIÓN",
+         "DESCARBURIZACIÓN",
+         "ENVEJECIMIENTO POR DEFORMACIÓN",
+         "EROSIÓN/EROSIÓN-CORROSIÓN",
+         "ESFEROIDIZACIÓN (ABLANDAMIENTO)",
+         "FATIGA MECÁNICA (INCLUYENDO FATIGA INDUCIDA POR VIBRACIÓN)",
+         "FATIGA POR CORROSIÓN",
+         "FATIGA TÉRMICA",
+         "FLUENCIA Y RUPTURA POR ESFUERZO",
+         "FRACTURA FRÁGIL",
+         "FRAGILIZACIÓN POR FASE SIGMA",
+         "FRAGILIZACIÓN POR HIDRÓGENO",
+         "FRAGILIZACIÓN POR LÍQUIDOS METÁLICOS",
+         "FRAGILIZACIÓN POR TEMPLE",
+         "GRAFITIZACIÓN",
+         "HIDRURACIÓN DE TITANIO",
+         "IGNICIÓN Y COMBUSTIÓN MEJORADAS POR OXÍGENO GASEOSO",
+         "NITROCARBURACIÓN",
+         "OXIDACIÓN",
+         "PULVERIZACIÓN DE METALES",
+         "RUPTURA POR SOBRECALENTAMIENTO A CORTO PLAZO",
+         "SULFURACIÓN",
+        "OTROS"]  
+
+        self.mecanismo.addItems(mecanismos) 
 
         # Diccionario de sectores
         self.sectores_dict = {
