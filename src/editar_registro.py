@@ -25,7 +25,7 @@ class UI_editar(QWidget):
 
         if darkdetect.isDark():
          app.setStyleSheet("""
-            QLineEdit, QTextEdit, QComboBox {
+            QLineEdit, QTextEdit, QComboBox, QTableWidget {
             background-color: #2e2e2e;
             color: #ffffff;
             border: 1px solid #555;
@@ -40,7 +40,7 @@ class UI_editar(QWidget):
              """)
         else:
             app.setStyleSheet("""
-            QLineEdit, QTextEdit, QComboBox, QDateEdit, QPushButton {
+            QLineEdit, QTextEdit, QComboBox, QDateEdit, QPushButton, QTableWidget {
             background-color: #eceff1;
             color: #000000;
             border: 1px solid #ccc;
