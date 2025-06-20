@@ -198,7 +198,7 @@ class UI_editar(QWidget):
 
         self.reevaluacion = QDateEdit()
         self.reevaluacion.setCalendarPopup(True)
-        edicion_layout.addWidget(QLabel("REEVALUACION:"),0, 3)
+        edicion_layout.addWidget(QLabel("REEVALUACIÓN:"),0, 3)
         edicion_layout.addWidget(self.reevaluacion, 1, 3)
         self.reevaluacion.setFixedWidth(150)
 
@@ -210,7 +210,7 @@ class UI_editar(QWidget):
 
         self.atencion = QDateEdit()
         self.atencion.setCalendarPopup(True)
-        edicion_layout.addWidget(QLabel("ATENCION:"), 0, 5)
+        edicion_layout.addWidget(QLabel("ATENCIÓN:"), 0, 5)
         edicion_layout.addWidget(self.atencion, 1, 5)
         #self.atencion.setFixedWidth(90)
 
@@ -275,7 +275,7 @@ class UI_editar(QWidget):
         self.descripcion = QTextEdit()
         self.descripcion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.descripcion.setFixedHeight(50)
-        edicion2_layout.addWidget(QLabel("DESCRIPCION:"), 5, 0, 1, 1)
+        edicion2_layout.addWidget(QLabel("DESCRIPCIÓN:"), 5, 0, 1, 1)
         edicion2_layout.addWidget(self.descripcion, 6, 0, 2, 1)
 
         self.comentarios = QTextEdit()
@@ -294,7 +294,7 @@ class UI_editar(QWidget):
         enlaces_layout.addWidget(archivo_link, 0, 2)
 
         notificacion_link = QLineEdit()
-        enlaces_layout.addWidget(QLabel("ENLACE A NOTIFICACION DE EJECUCION:"), 1, 1)
+        enlaces_layout.addWidget(QLabel("ENLACE A NOTIFICACION DE EJECUCIÓN:"), 1, 1)
         enlaces_layout.addWidget(notificacion_link, 1, 2)
 
         botones_frame = QFrame()
@@ -306,6 +306,8 @@ class UI_editar(QWidget):
         self.actualizar = QPushButton("ACTUALIZAR")
         self.actualizar.setFixedSize(200, 30)
         botones_layout.addWidget(self.actualizar)
+
+        
         
 
 
@@ -403,16 +405,24 @@ class UI_editar(QWidget):
         
 
 
-        
-
+    
 
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = UI_editar()
-    base_dir = Path(__file__).resolve().parent
-    icono_ventana = base_dir.parent / "assets" / "app_icon.ico"
+    #base_dir = Path(__file__).resolve().parent
+    #icono_ventana = base_dir.parent / "assets" / "app_icon.ico"
+    
+    base_dir = Path(__file__).resolve().parent   
+
+    if darkdetect.isDark():
+        
+        icono_ventana = base_dir.parent / "assets" / "edit_icon_dark.ico"
+    else:
+        
+        icono_ventana = base_dir.parent / "assets" / "edit_icon_light.ico"    
     window.setWindowIcon(QIcon(str(icono_ventana)))
 
     window.show()
