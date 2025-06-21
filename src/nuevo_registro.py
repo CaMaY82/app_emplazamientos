@@ -347,8 +347,18 @@ class UI_Nuevo(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = UI_Nuevo()
-    base_dir = Path(__file__).resolve().parent
-    icono_ventana = base_dir.parent / "assets" / "app_icon.ico"
+    base_dir = Path(__file__).resolve().parent   
+
+    if darkdetect.isDark():
+        
+        icono_ventana = base_dir.parent / "assets" / "new_file_icon_light.ico"
+    else:
+        
+        icono_ventana = base_dir.parent / "assets" / "new_file_icon_light.ico"    
+    
+    window.setWindowIcon(QIcon(str(icono_ventana)))
+
+    
     window.setWindowIcon(QIcon(str(icono_ventana)))
 
     window.show()
