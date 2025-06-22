@@ -54,7 +54,7 @@ class UI_editar(QWidget):
         }
             """)
             
-        self.setWindowTitle("Editar Registro")
+        self.setWindowTitle("EDITAR REGISTRO")
         self.setMinimumSize(1150, 800)
 
          #Layoput de la ventana
@@ -71,7 +71,7 @@ class UI_editar(QWidget):
 
 
         # Layout de los filtros
-        grupo_filtros = QGroupBox("SELECCIONA")
+        grupo_filtros = QGroupBox("Selecciona")
         grupo_filtros.setFixedHeight(100)
         
         
@@ -89,10 +89,10 @@ class UI_editar(QWidget):
        
 
         # Botones de opción
-        self.botonEmp = QRadioButton("EMPLAZAMIENTO")
+        self.botonEmp = QRadioButton("Emplazamiento")
         self.botonEmp.setLayoutDirection(Qt.RightToLeft)
        
-        self.botonSF = QRadioButton("SOLICITUD DE FABRICACIÓN")
+        self.botonSF = QRadioButton("Solicitud de Fabricación")
         self.botonSF.setLayoutDirection(Qt.RightToLeft)
 
         filtros_layout.addWidget(self.botonEmp, 0, 0, alignment=Qt.AlignLeft)
@@ -106,7 +106,7 @@ class UI_editar(QWidget):
         
         # Combobox Sector
         self.sector_fl = QComboBox()
-        self.sector_fl.addItem("SECTOR")
+        self.sector_fl.addItem("Sector")
         self.sector_fl.model().item(0).setEnabled(False)
         sectores = [" ", "1", "2", "3", "4", "5", "6", "7", "8"]
         self.sector_fl.addItems(sectores)
@@ -115,7 +115,7 @@ class UI_editar(QWidget):
        
         # Combobox Planta
         self.planta_fl = QComboBox()
-        self.planta_fl.addItem("PLANTA")
+        self.planta_fl.addItem("Planta")
         self.planta_fl.model().item(0).setEnabled(False)
 
         
@@ -124,25 +124,25 @@ class UI_editar(QWidget):
 
         # ComboBox estado
         self.estado_fl = QComboBox()
-        self.estado_fl.addItem("ESTADO ACTUAL")
+        self.estado_fl.addItem("Estado Actual")
         self.estado_fl.addItem("")
-        self.estado_fl.addItem("VIGENTE")
-        self.estado_fl.addItem("VENCIDO")
-        self.estado_fl.addItem("ATENDIDO")
+        self.estado_fl.addItem("Vigente")
+        self.estado_fl.addItem("Vencido")
+        self.estado_fl.addItem("Atendido")
         self.estado_fl.model().item(0).setEnabled(False)
         filtros_layout.addWidget(self.estado_fl, 0, 3)
 
         # Combobox Status operativo
         self.status_fl = QComboBox()
-        self.status_fl.addItem("STATUS OPERATIVO")
-        self.status_fl.addItem("OPERANDO")
-        self.status_fl.addItem("FUERA DE OPERACIÓN")
+        self.status_fl.addItem("Status Operativo")
+        self.status_fl.addItem("Operando")
+        self.status_fl.addItem("Fuera de Operación")
         self.status_fl.model().item(0).setEnabled(False)
         filtros_layout.addWidget(self.status_fl, 1, 3)
 
         # Combobox Riesgo
         self.riesgo_fl = QComboBox()
-        self.riesgo_fl.addItem("RIESGO")
+        self.riesgo_fl.addItem("Riesgo")
         riesgos = ["A", "B", "C", "D"]
         self.riesgo_fl.addItems(riesgos)
         self.riesgo_fl.model().item(0).setEnabled(False)
@@ -150,7 +150,7 @@ class UI_editar(QWidget):
         self.riesgo_fl.setFixedWidth(200)
 
         # Boton buscar
-        self.buscar_btn = QPushButton("Buscar 🔎")
+        self.buscar_btn = QPushButton("BUSCAR 🔎")
         self.buscar_btn.setStyleSheet("font-weight: bold; font-size: 16px")
         self.buscar_btn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         filtros_layout.addWidget(self.buscar_btn, 0, 5, 2, 1)
@@ -187,30 +187,30 @@ class UI_editar(QWidget):
         self.sector.addItems(sectores)
         self.sector.setFixedWidth(100)
         self.sector.model().item(0).setEnabled(False)
-        edicion_layout.addWidget(QLabel("SECTOR:"), 0, 1)  
+        edicion_layout.addWidget(QLabel("Sector:"), 0, 1)  
         edicion_layout.addWidget(self.sector, 1, 1)
 
         self.planta = QComboBox()
         self.planta.setFixedWidth(200)
         #self.planta.model().item(0).setEnabled(False)
-        edicion_layout.addWidget(QLabel("PLANTA:"), 0, 2)
+        edicion_layout.addWidget(QLabel("Planta:"), 0, 2)
         edicion_layout.addWidget(self.planta, 1, 2)
 
         self.reevaluacion = QDateEdit()
         self.reevaluacion.setCalendarPopup(True)
-        edicion_layout.addWidget(QLabel("REEVALUACIÓN:"),0, 3)
+        edicion_layout.addWidget(QLabel("Reevaluación:"),0, 3)
         edicion_layout.addWidget(self.reevaluacion, 1, 3)
         self.reevaluacion.setFixedWidth(150)
 
         self.vigencia = QDateEdit()
         self.vigencia.setCalendarPopup(True)
-        edicion_layout.addWidget(QLabel("VIGENCIA:"), 0, 4)
+        edicion_layout.addWidget(QLabel("Vigencia:"), 0, 4)
         edicion_layout.addWidget(self.vigencia, 1, 4)
         #self.vigencia.setFixedWidth(90)
 
         self.atencion = QDateEdit()
         self.atencion.setCalendarPopup(True)
-        edicion_layout.addWidget(QLabel("ATENCIÓN:"), 0, 5)
+        edicion_layout.addWidget(QLabel("Atención:"), 0, 5)
         edicion_layout.addWidget(self.atencion, 1, 5)
         #self.atencion.setFixedWidth(90)
 
@@ -218,7 +218,7 @@ class UI_editar(QWidget):
 
         self.estado = QLineEdit()
         self.estado.setReadOnly(True)
-        edicion_layout.addWidget(QLabel("ESTADO:"), 3, 0)
+        edicion_layout.addWidget(QLabel("Estado:"), 3, 0)
         edicion_layout.addWidget(self.estado, 4, 0)
         self.estado.setFixedWidth(90)
 
@@ -226,28 +226,28 @@ class UI_editar(QWidget):
 
         self.paro_planta = QComboBox()
         self.paro_planta.addItems((SI_NO))
-        edicion_layout.addWidget(QLabel("PARO DE PLANTA:"), 3, 1)
+        edicion_layout.addWidget(QLabel("Paro de Planta:"), 3, 1)
         edicion_layout.addWidget(self.paro_planta, 4, 1)
         #self.paro_planta.setFixedWidth(100)
         
         self.iniciativa = QComboBox()
         self.iniciativa.addItems((SI_NO))
-        edicion_layout.addWidget(QLabel("INICIATIVA:"), 3, 2)
+        edicion_layout.addWidget(QLabel("Iniciativa:"), 3, 2)
         edicion_layout.addWidget(self.iniciativa, 4, 2)
         #self.iniciativa.setFixedWidth(100)
 
         self.programa = QComboBox()
         self.programa.addItems(SI_NO)
-        edicion_layout.addWidget(QLabel("PROGRAMA:"), 3, 3)
+        edicion_layout.addWidget(QLabel("Programa:"), 3, 3)
         edicion_layout.addWidget(self.programa, 4, 3)
         
         self.status = QComboBox()
         self.status.addItems(["OPERANDO", "FUERA DE OPERACIÓN"])
-        edicion_layout.addWidget(QLabel("STATUS OPERATIVO:"), 3, 4)
+        edicion_layout.addWidget(QLabel("status Operativo:"), 3, 4)
         edicion_layout.addWidget(self.status, 4, 4)
 
         self.sap = QLineEdit()
-        edicion_layout.addWidget(QLabel("AVISO SAP:"), 3, 5)
+        edicion_layout.addWidget(QLabel("Aviso SAP:"), 3, 5)
         edicion_layout.addWidget(self.sap, 4, 5)
         #self.sap.setFixedWidth(100)
 
@@ -259,43 +259,80 @@ class UI_editar(QWidget):
         layout_principal.addWidget(self.frame_edicion2)
 
         self.mecanismo = QComboBox()
-        edicion2_layout.addWidget(QLabel("MECANISMO DE DAÑO:"), 0, 0)
+        edicion2_layout.addWidget(QLabel("Mecanismo de Daño:"), 0, 0)
         edicion2_layout.addWidget(self.mecanismo, 1, 0,)
 
         self.material = QLineEdit()
-        edicion2_layout.addWidget(QLabel("MATERIAL"), 0, 1)
+        edicion2_layout.addWidget(QLabel("Material"), 0, 1)
         edicion2_layout.addWidget(self.material, 1, 1)
 
         self.mitigacion = QTextEdit()
         self.mitigacion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.mitigacion.setFixedHeight(50)
-        edicion2_layout.addWidget(QLabel("MEDIDA DE MITIGACIÓN:"), 2, 0, 1, 1)
+        edicion2_layout.addWidget(QLabel("Medida de Mitigación:"), 2, 0, 1, 1)
         edicion2_layout.addWidget(self.mitigacion, 3, 0, 2, 2)
 
         self.descripcion = QTextEdit()
         self.descripcion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.descripcion.setFixedHeight(50)
-        edicion2_layout.addWidget(QLabel("DESCRIPCIÓN:"), 5, 0, 1, 1)
+        edicion2_layout.addWidget(QLabel("Descripción:"), 5, 0, 1, 1)
         edicion2_layout.addWidget(self.descripcion, 6, 0, 2, 1)
 
         self.comentarios = QTextEdit()
         self.comentarios.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.comentarios.setFixedHeight(50)
-        edicion2_layout.addWidget(QLabel("COMENTARIOS:"), 5, 1, 1, 1)
+        edicion2_layout.addWidget(QLabel("Comentarios:"), 5, 1, 1, 1)
         edicion2_layout.addWidget(self.comentarios, 6, 1, 2, 1)
 
-        grupo_enlaces = QGroupBox("AGREGAR ENLACES DE LOS ARCHIVOS")
+        grupo_enlaces = QGroupBox("Agregar enlaces a archivo:")
         enlaces_layout = QGridLayout()
         grupo_enlaces.setLayout(enlaces_layout)
         layout_principal.addWidget(grupo_enlaces)
 
-        archivo_link = QLineEdit()
-        enlaces_layout.addWidget(QLabel("ENLACE AL ARCHIVO:"), 0, 1, alignment=Qt.AlignRight)        
-        enlaces_layout.addWidget(archivo_link, 0, 2)
+        self.archivo_link = QLineEdit()
+        enlaces_layout.addWidget(QLabel("Enlace a Archivo:"), 0, 1, alignment=Qt.AlignRight)        
+        enlaces_layout.addWidget(self.archivo_link, 0, 2)
 
-        notificacion_link = QLineEdit()
-        enlaces_layout.addWidget(QLabel("ENLACE A NOTIFICACION DE EJECUCIÓN:"), 1, 1)
-        enlaces_layout.addWidget(notificacion_link, 1, 2)
+        self.notificacion_link = QLineEdit()
+        enlaces_layout.addWidget(QLabel("Enlace a la Notificación de Ejecución:"), 1, 1)
+        enlaces_layout.addWidget(self.notificacion_link, 1, 2)
+
+        icono_archivo = base_dir.parent / "assets" /"new_file.png"
+        icono_notificacion = base_dir.parent / "assets" /"notificacion2_icon.png"
+
+        self.archivo_btn = QToolButton()
+        self.archivo_btn.setIcon(QIcon(str(icono_archivo)))
+        self.archivo_btn.setIconSize(QSize(35, 35))
+        self.archivo_btn.setFixedSize(35, 35)
+        enlaces_layout.addWidget(self.archivo_btn, 0, 3)
+        self.archivo_btn.setStyleSheet("""
+        QToolButton {
+            font-weight: normal;
+            font-size: 12px;
+            border: none;
+            background-color: transparent;
+            padding: 0;
+            }
+           
+            """)
+        
+        self.notificacion_btn = QToolButton()
+        self.notificacion_btn.setIcon(QIcon(str(icono_notificacion)))
+        self.notificacion_btn.setIconSize(QSize(35, 35))
+        self.notificacion_btn.setFixedSize(35, 35)
+        enlaces_layout.addWidget(self.notificacion_btn, 1, 3)
+        self.notificacion_btn.setStyleSheet("""
+        QToolButton {
+            font-weight: normal;
+            font-size: 12px;
+            border: none;
+            background-color: transparent;
+            padding: 0;
+            }
+           
+            """)
+
+        
 
         botones_frame = QFrame()
         botones_layout = QHBoxLayout()
@@ -304,7 +341,7 @@ class UI_editar(QWidget):
         layout_principal.addWidget(botones_frame)
 
         self.actualizar = QPushButton("ACTUALIZAR")
-        self.actualizar.setFixedSize(200, 30)
+        self.actualizar.setFixedSize(150, 40)
         botones_layout.addWidget(self.actualizar)
 
         
@@ -401,13 +438,24 @@ class UI_editar(QWidget):
             "8": ["", "COQUER", "AMINA", "MT3", "AZUFRE", "AZUFRE 100", "AZUFRE 200", "AZUFRE 300", "AZUFRE 400"]
             }
 
-        
-        
+        # Conexión entre casmbio de comboboxes y funciones 
+        self.sector_fl.currentTextChanged.connect(self.actualizar_planta_filtro)
+        self.sector.currentTextChanged.connect(self.actualizar_planta_edicion)
 
 
-    
+    # Funciones para hacer que los comboboxes sector y planta en filtros y edicion cambnien
 
+    def actualizar_planta_filtro(self, sector):
+        self.planta_fl.clear()
+        plantas = self.sectores_dict.get(sector, [])
+        if plantas:
+            self.planta_fl.addItems(plantas)
 
+    def actualizar_planta_edicion(self, sector):
+        self.planta.clear()
+        plantas = self.sectores_dict.get(sector, [])
+        if plantas:
+            self.planta.addItems(plantas)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

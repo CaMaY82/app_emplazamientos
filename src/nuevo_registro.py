@@ -53,12 +53,12 @@ class UI_Nuevo(QWidget):
         }
             """)
             
-        self.setWindowTitle("Registrar Nuevo")
+        self.setWindowTitle("REGISTRAR NUEVO")
         self.setMinimumSize(800, 850)
 
         #Layoput de la ventana
         layout_principal = QVBoxLayout(self)
-        seleccion_box = QGroupBox("SELECCIONA")
+        seleccion_box = QGroupBox("Selecciona")
         seleccion_box.setFixedHeight(100)
         seleccion_layout = QHBoxLayout()
         base_dir = Path(__file__).resolve().parent
@@ -70,8 +70,8 @@ class UI_Nuevo(QWidget):
 
         
         # Agregando botones de seleccion emp y sf
-        self.boton_emp = QRadioButton("EMPLAZAMIENTO")
-        self.boton_sf = QRadioButton("SOLICITUD DE FABRICACIÓN")
+        self.boton_emp = QRadioButton("Emplazamiento")
+        self.boton_sf = QRadioButton("Solicitud de Fabricación")
         self.logo = QLabel()
         self.logo.setFixedSize(170, 70)
         
@@ -116,32 +116,33 @@ class UI_Nuevo(QWidget):
 
         self.sector = QComboBox()
         self.sector.addItems(sectores)
-        self.layout_inferior.addWidget(QLabel("SECTOR:"), 2, 0)
+        self.sector.model().item(0).setEnabled(False)
+        self.layout_inferior.addWidget(QLabel("Sector:"), 2, 0)
         self.sector.setFixedHeight(25)
         self.layout_inferior.addWidget(self.sector, 3, 0)
 
         self.planta = QComboBox()
-        self.layout_inferior.addWidget(QLabel("PLANTA:"), 4, 0)
+        self.layout_inferior.addWidget(QLabel("Planta:"), 4, 0)
         self.layout_inferior.addWidget(self.planta, 5, 0)
         self.planta.setFixedHeight(25)
 
         self.circuito = QLineEdit()
-        self.layout_inferior.addWidget(QLabel("CIRCUITO:"), 6, 0)
+        self.layout_inferior.addWidget(QLabel("Circuito:"), 6, 0)
         self.layout_inferior.addWidget(self.circuito,7, 0,)
         self.circuito.setFixedHeight(25)
 
         self.UC = QLineEdit()
-        self.layout_inferior.addWidget(QLabel("UNIDAD DE CONTROL:"),8 ,0)
+        self.layout_inferior.addWidget(QLabel("Unidad de Control:"),8 ,0)
         self.layout_inferior.addWidget(self.UC, 9, 0)
         self.UC.setFixedHeight(25)
 
         self.material = QLineEdit()
-        self.layout_inferior.addWidget(QLabel("MATERIAL:"), 0, 1)
+        self.layout_inferior.addWidget(QLabel("Material:"), 0, 1)
         self.layout_inferior.addWidget(self.material, 1, 1)
         self.material.setFixedHeight(25)
 
         self.fecha_elab = QDateEdit()
-        self.etiqueta_elab = QLabel("FECHA DE ELABORACIÓN:")
+        self.etiqueta_elab = QLabel("Fecha de Elaboración:")
         self.etiqueta_elab.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         self.etiqueta_elab.setFixedWidth(150)
         self.layout_inferior.addWidget(self.etiqueta_elab, 2, 1)
@@ -152,7 +153,7 @@ class UI_Nuevo(QWidget):
         self.fecha_elab.setDisplayFormat("dd/MM/yyyy")
 
         self.fecha_ven = QDateEdit()
-        self.layout_inferior.addWidget(QLabel("FECHA DE VENCIMIENTO:"), 4, 1)
+        self.layout_inferior.addWidget(QLabel("Fecha de Vencimiento:"), 4, 1)
         self.layout_inferior.addWidget(self.fecha_ven, 5, 1)
         self.fecha_ven.setFixedHeight(25)
         self.fecha_ven.setCalendarPopup(True)
@@ -160,72 +161,77 @@ class UI_Nuevo(QWidget):
         self.fecha_ven.setDisplayFormat("dd/MM/yyyy")
         
         self.SAP = QLineEdit()
-        self.layout_inferior.addWidget(QLabel("AVISO SAP:"), 6, 1)
+        self.layout_inferior.addWidget(QLabel("Aviso SAP:"), 6, 1)
         self.layout_inferior.addWidget(self.SAP, 7, 1)
         self.SAP.setFixedHeight(25)
               
         self.programa = QComboBox()
-        self.programa.addItems(("NO", "SI"))
-        self.layout_inferior.addWidget(QLabel("PROGRAMA DE ATENCIÓN:"), 8, 1)
+        self.programa.addItems((" ", "NO", "SÍ"))
+        self.programa.model().item(0).setEnabled(False)
+        self.layout_inferior.addWidget(QLabel("Programa de atención:"), 8, 1)
         self.layout_inferior.addWidget(self.programa, 9, 1)
         self.programa.setFixedHeight(25)
 
         self.iniciativa = QComboBox()
-        self.iniciativa.addItems(("No", "SI"))
-        self.layout_inferior.addWidget(QLabel("INICIATIVA:"), 0, 2)
+        self.iniciativa.addItems((" ", "No", "SÍ"))
+        self.iniciativa.model().item(0).setEnabled(False)
+        self.layout_inferior.addWidget(QLabel("Iniciativa:"), 0, 2)
         self.layout_inferior.addWidget(self.iniciativa, 1, 2)
         self.iniciativa.setFixedHeight(25)
 
         self.paro_planta = QComboBox()
-        self.paro_planta.addItems((" ", "SI", "NO"))
-        self.layout_inferior.addWidget(QLabel("PARO DE PLANTA:"), 2, 2)
+        self.paro_planta.addItems((" ", "SÍ", "NO"))
+        self.paro_planta.model().item(0).setEnabled(False)
+        self.layout_inferior.addWidget(QLabel("Paro de Planta:"), 2, 2)
         self.layout_inferior.addWidget(self.paro_planta, 3, 2)
         self.paro_planta.setFixedHeight(25)
 
         self.status = QComboBox()
         self.status.addItems((" ", "OPERANDO", "FUERA DE OPERACIÓN"))
-        self.layout_inferior.addWidget(QLabel("ESTADO OPERATIVO:"), 4, 2)
+        self.status.model().item(0).setEnabled(False)
+        self.layout_inferior.addWidget(QLabel("Estado Operativo:"), 4, 2)
         self.layout_inferior.addWidget(self.status, 5, 2)
         self.status.setFixedHeight(25)
         
         self.riesgo = QComboBox()
         self.riesgo.addItems((" ","A", "B", "C", "D"))
-        self.layout_inferior.addWidget(QLabel("CLASE DE RIESGO:"), 6, 2)
+        self.riesgo.model().item(0).setEnabled(False)
+        self.layout_inferior.addWidget(QLabel("Clase de Riesgo:"), 6, 2)
         self.layout_inferior.addWidget(self.riesgo, 7, 2)
         self.riesgo.setFixedHeight(25)
 
         self.mecanismo = QComboBox()
-        self.layout_inferior2.addWidget(QLabel("MECANISMO DE DAÑO:"))
+        self.layout_inferior2.addWidget(QLabel("Mecanismo de Daño:"))
         self.layout_inferior2.addWidget(self.mecanismo)
         self.mecanismo.setFixedHeight(25)        
 
         self.descripcion = QTextEdit()
         self.descripcion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        self.layout_inferior2.addWidget(QLabel("DESCRIPCIÓN:"))
+        self.layout_inferior2.addWidget(QLabel("Descripción:"))
         self.layout_inferior2.addWidget(self.descripcion)
         self.descripcion.setFixedHeight(45)
         
         self.mitigacion = QTextEdit()
         self.mitigacion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        self.layout_inferior2.addWidget(QLabel("MEDIDA DE MITIGACION:"))
+        self.layout_inferior2.addWidget(QLabel("Medida de Mitigación:"))
         self.layout_inferior2.addWidget(self.mitigacion)
         self.mitigacion.setFixedHeight(45)
 
         self.comentarios = QTextEdit()
         self.comentarios.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        self.layout_inferior2.addWidget(QLabel("COMENTARIOS:"))
+        self.layout_inferior2.addWidget(QLabel("Comentarios:"))
         self.layout_inferior2.addWidget(self.comentarios)
         self.comentarios.setFixedHeight(45)
         
         
         self.enlace = QLineEdit()
-        self.layout_inferior2.addWidget(QLabel("ENLACE AL ARCHIVO:"))
+        self.layout_inferior2.addWidget(QLabel("Enlace al Archivo:"))
         self.layout_inferior2.addWidget(self.enlace)
         self.layout_inferior2.addSpacing(30)
 
         
 
-        self.guardar_btn = QPushButton("Guardar")
+        self.guardar_btn = QPushButton("GUARDAR")
         self.layout_inferior2.addStretch()
         self.layout_inferior2.addWidget(self.guardar_btn, alignment=Qt.AlignRight)
         self.guardar_btn.setFixedSize(150, 50)
@@ -328,6 +334,7 @@ class UI_Nuevo(QWidget):
        # Para conectar combo boxes, SECTOR y PLANTA se define la función:
 
         self.sector.currentTextChanged.connect(self.actualizar_planta_Cbox)
+        
 
         layout_principal.addStretch()
 
@@ -355,9 +362,6 @@ if __name__ == "__main__":
     else:
         
         icono_ventana = base_dir.parent / "assets" / "new_file_icon_light.ico"    
-    
-    window.setWindowIcon(QIcon(str(icono_ventana)))
-
     
     window.setWindowIcon(QIcon(str(icono_ventana)))
 

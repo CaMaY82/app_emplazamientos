@@ -64,7 +64,7 @@ class UI_Busqueda(QWidget):
         layout_principal.setSpacing(3)  
 
         #Título
-        titulo = QLabel("¿QUÉ DESEAS BUSCAR?")
+        titulo = QLabel("¿Qué Deseas Buscar?")
         titulo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         titulo.setStyleSheet("font-weight: bold; font-size: 16px")
         layout_principal.addWidget(titulo)
@@ -81,7 +81,7 @@ class UI_Busqueda(QWidget):
         self.botonEmp = QRadioButton("Emplazamientos")
         self.botonEmp.setLayoutDirection(Qt.RightToLeft)
        
-        self.botonSF = QRadioButton("Solicitudes de Fabricaión")
+        self.botonSF = QRadioButton("Solicitudes de Fabricación")
         self.botonSF.setLayoutDirection(Qt.RightToLeft)
 
         filtros_layout.addWidget(self.botonEmp, 0, 0, alignment=Qt.AlignLeft)
@@ -96,7 +96,7 @@ class UI_Busqueda(QWidget):
 
         # Combobox Sector
         self.sector_cb = QComboBox()
-        self.sector_cb.addItem("SECTOR")
+        self.sector_cb.addItem("Sector")
         self.sector_cb.model().item(0).setEnabled(False)
         sectores = ["1", "2", "3", "4", "5", "6", "7", "8"]
         self.sector_cb.addItems(sectores)
@@ -105,7 +105,7 @@ class UI_Busqueda(QWidget):
        
         # Combobox Planta
         self.planta_cb = QComboBox()
-        self.planta_cb.addItem("PLANTA")
+        self.planta_cb.addItem("Planta")
         self.planta_cb.model().item(0).setEnabled(False)
 
         self.filtros_frame.setLayout(filtros_layout)
@@ -114,25 +114,25 @@ class UI_Busqueda(QWidget):
 
         # ComboBox estado
         self.estado_cb = QComboBox()
-        self.estado_cb.addItem("ESTADO ACTUAL")
+        self.estado_cb.addItem("Estado Actual")
         self.estado_cb.addItem("")
-        self.estado_cb.addItem("VIGENTE")
-        self.estado_cb.addItem("VENCIDO")
-        self.estado_cb.addItem("ATENDIDO")
+        self.estado_cb.addItem("Vigente")
+        self.estado_cb.addItem("Vencido")
+        self.estado_cb.addItem("Atendido")
         self.estado_cb.model().item(0).setEnabled(False)
         filtros_layout.addWidget(self.estado_cb, 0, 3)
 
         # Combobox Status operativo
         self.status_cb = QComboBox()
-        self.status_cb.addItem("STATUS OPERATIVO")
-        self.status_cb.addItem("OPERANDO")
-        self.status_cb.addItem("FUERA DE OPERACIÓN")
+        self.status_cb.addItem("Status Operativo")
+        self.status_cb.addItem("Operando")
+        self.status_cb.addItem("Fuera de Operación")
         self.status_cb.model().item(0).setEnabled(False)
         filtros_layout.addWidget(self.status_cb, 1, 3)
 
         # Combobox Riesgo
         self.riesgo_cb = QComboBox()
-        self.riesgo_cb.addItem("RIESGO")
+        self.riesgo_cb.addItem("Riesgo")
         riesgos = ["A", "B", "C", "D"]
         self.riesgo_cb.addItems(riesgos)
         self.riesgo_cb.model().item(0).setEnabled(False)
@@ -156,7 +156,7 @@ class UI_Busqueda(QWidget):
 
 
         # botón buscar
-        self.buscar_btn = QPushButton("Buscar 🔎")
+        self.buscar_btn = QPushButton("BUSCAR 🔎")
         self.buscar_btn.setStyleSheet("font-weight: bold; font-size: 16px")
         self.buscar_btn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         filtros_layout.addWidget(self.buscar_btn, 0, 5, 2, 1)
@@ -192,85 +192,85 @@ class UI_Busqueda(QWidget):
 
         self.sector_resultado = QLineEdit()
         self.sector_resultado.setReadOnly(True)
-        self.datos_layout.addWidget(QLabel("SECTOR:"), 0, 1)
+        self.datos_layout.addWidget(QLabel("Sector:"), 0, 1)
         self.datos_layout.addWidget(self.sector_resultado, 1, 1)
         self.sector_resultado.setFixedWidth(70)
         
         
         self.planta_resultado = QLineEdit()
         self.planta_resultado.setReadOnly(True)
-        self.datos_layout.addWidget(QLabel("PLANTA:"), 0, 2)
+        self.datos_layout.addWidget(QLabel("Planta:"), 0, 2)
         self.datos_layout.addWidget(self.planta_resultado, 1, 2)
         self.planta_resultado.setFixedWidth(127)                                            
 
         self.circuito_resultado = QLineEdit()
         self.circuito_resultado.setReadOnly(True)
-        self.datos_layout.addWidget(QLabel("CIRCUITO:"), 0, 3,)
+        self.datos_layout.addWidget(QLabel("Circuito:"), 0, 3,)
         self.datos_layout.addWidget(self.circuito_resultado, 1, 3, 1, 2)
         
 
         self.UC_resultado = QLineEdit()
         self.UC_resultado.setReadOnly(True)
-        self.datos_layout.addWidget(QLabel("UNIDAD DE CONTROL:"), 0, 5)
+        self.datos_layout.addWidget(QLabel("Unidad de Control:"), 0, 5)
         self.datos_layout.addWidget(self.UC_resultado, 1, 5)
         
 
         self.status_resultado = QLineEdit()
         self.status_resultado.setReadOnly(True)
-        self.datos_layout.addWidget(QLabel("STATUS OPERATIVO:"), 0, 6)
+        self.datos_layout.addWidget(QLabel("Status Operativo:"), 0, 6)
         self.datos_layout.addWidget(self.status_resultado, 1, 6)
         
         self.vigencia_resultado = QLineEdit()
         self.vigencia_resultado.setReadOnly(True)
-        self.datos_layout.addWidget(QLabel("VIGENCIA:"), 2, 0)
+        self.datos_layout.addWidget(QLabel("Vigencia:"), 2, 0)
         self.datos_layout.addWidget(self.vigencia_resultado, 3, 0)
         self.vigencia_resultado.setFixedWidth(75)
 
         self.estado_resultado = QLineEdit()
         self.estado_resultado.setReadOnly(True)
-        self.datos_layout.addWidget(QLabel("ESTADO:"), 2, 1)
+        self.datos_layout.addWidget(QLabel("Estado:"), 2, 1)
         self.datos_layout.addWidget(self.estado_resultado, 3, 1)
         self.estado_resultado.setFixedWidth(70)
 
         self.mecanismo_resultado = QLineEdit()
         self.mecanismo_resultado.setReadOnly(True)
-        self.datos_layout.addWidget(QLabel("MECÁNISMO DE DAÑO:"), 2, 2)
+        self.datos_layout.addWidget(QLabel("Mecanismo de daño"), 2, 2)
         self.datos_layout.addWidget(self.mecanismo_resultado, 3, 2, 1, 2)
         
         
         self.material_resultado = QLineEdit()
         self.material_resultado.setReadOnly(True)
-        self.datos_layout.addWidget(QLabel("MATERIAL:"), 2, 4)
+        self.datos_layout.addWidget(QLabel("Material:"), 2, 4)
         self.datos_layout.addWidget(self.material_resultado, 3, 4, 1, 1)
         
         
         self.SAP_resultado = QLineEdit()
         self.SAP_resultado.setReadOnly(True)
-        self.datos_layout.addWidget(QLabel("AVISO SAP:"), 2, 5)
+        self.datos_layout.addWidget(QLabel("Aviso SAP:"), 2, 5)
         self.datos_layout.addWidget(self.SAP_resultado, 3, 5)
        
         
         self.riesgo_resultado = QLineEdit()
         self.riesgo_resultado.setReadOnly(True)
-        self.datos_layout.addWidget(QLabel("CLASE DE RIESGO:"), 2, 6)
+        self.datos_layout.addWidget(QLabel("Clase de Riesgo:"), 2, 6)
         self.datos_layout.addWidget(self.riesgo_resultado, 3, 6)
 
         self.descripcion_resultado = QTextEdit()
         self.descripcion_resultado.setReadOnly(True)
-        self.etiqueta_item = QLabel("DESCRIPCIÓN:")
+        self.etiqueta_item = QLabel("Descripción:")
         self.datos_layout.addWidget(self.etiqueta_item, 4, 0, 1, 6)
         self.datos_layout.addWidget(self.descripcion_resultado, 5, 0, 1, 7)
         self.descripcion_resultado.setFixedHeight(80)
 
         self.mitigacion_resultado = QLineEdit()
         self.mitigacion_resultado.setReadOnly(True)
-        self.datos_layout.addWidget(QLabel("MITIGACIÓN:"), 6, 0)
+        self.datos_layout.addWidget(QLabel("Mitigación:"), 6, 0)
         self.datos_layout.addWidget(self.mitigacion_resultado, 7, 0, 1, 7)
         self.mitigacion_resultado.setFixedHeight(30)
 
         self.comentarios_resultado = QLineEdit()
         self.comentarios_resultado.setReadOnly(True)
-        self.datos_layout.addWidget(QLabel("COMENTARIOS:"), 8, 0)
+        self.datos_layout.addWidget(QLabel("Comentarios:"), 8, 0)
         self.datos_layout.addWidget(self.comentarios_resultado, 9, 0, 1, 7)
 
         self.frame_inferior = QFrame()
@@ -316,7 +316,6 @@ class UI_Busqueda(QWidget):
         QToolButton {
             font-weight: normal;
             font-size: 12px;
-            border: none;
             background-color: transparent;
             padding: 0;
             }
@@ -336,7 +335,6 @@ class UI_Busqueda(QWidget):
         QToolButton {
             font-weight: normal;
             font-size: 12px;
-            border: none;
             background-color: transparent;
             padding: 0;
             }
@@ -374,13 +372,13 @@ class UI_Busqueda(QWidget):
 
     def etiqueta_descripcion(self):
         if self.botonEmp.isChecked():
-            tipo_item = "DESCRIPCIÓN DEL EMPLAZAMIENTO:"
+            tipo_item = "Descripción del Emplazamiento:"
             
         elif self.botonSF.isChecked():
-            tipo_item = "DESCRIPCIÓN DE LA SOLICITUD DE FABRICACIÓN:"
+            tipo_item = "Descripción de la Solicitud de Fabricación:"
             
         else:
-            tipo_item = "DESCRIPCIÓN:"
+            tipo_item = "Descripción:"
            
 
         self.etiqueta_item.setText(tipo_item)
@@ -391,11 +389,9 @@ class UI_Busqueda(QWidget):
 if __name__ == "__main__":
    app = QApplication(sys.argv)
    ventana = QMainWindow()
-   ventana.setWindowTitle("BÚSQUEDA DE EMPLAZAMIENTOS O SOLICITUDES")
-   
+   ventana.setWindowTitle("BUSCAR")
    base_dir = Path(__file__).resolve().parent
-   icono_ventana = base_dir.parent / "assets" / "app_icon.ico"
-        
+   icono_ventana = base_dir.parent / "assets" / "search_icon.ico"
    ui = UI_Busqueda()
    ventana.setCentralWidget(ui)
    ventana.setWindowIcon(QIcon(str(icono_ventana)))
