@@ -222,28 +222,32 @@ class UI_editar(QWidget):
         edicion_layout.addWidget(self.estado, 4, 0)
         self.estado.setFixedWidth(90)
 
-        SI_NO = ("NO" ,"SI")
+        SI_NO = (" ", "NO" ,"SI")
 
         self.paro_planta = QComboBox()
         self.paro_planta.addItems((SI_NO))
+        self.paro_planta.model().item(0).setEnabled(False)
         edicion_layout.addWidget(QLabel("Paro de Planta:"), 3, 1)
         edicion_layout.addWidget(self.paro_planta, 4, 1)
         #self.paro_planta.setFixedWidth(100)
         
         self.iniciativa = QComboBox()
         self.iniciativa.addItems((SI_NO))
+        self.iniciativa.model().item(0).setEnabled(False)
         edicion_layout.addWidget(QLabel("Iniciativa:"), 3, 2)
         edicion_layout.addWidget(self.iniciativa, 4, 2)
         #self.iniciativa.setFixedWidth(100)
 
         self.programa = QComboBox()
         self.programa.addItems(SI_NO)
+        self.programa.model().item(0).setEnabled(False)
         edicion_layout.addWidget(QLabel("Programa:"), 3, 3)
         edicion_layout.addWidget(self.programa, 4, 3)
         
         self.status = QComboBox()
-        self.status.addItems(["OPERANDO", "FUERA DE OPERACIÓN"])
-        edicion_layout.addWidget(QLabel("status Operativo:"), 3, 4)
+        self.status.addItems([" ", "OPERANDO", "FUERA DE OPERACIÓN"])
+        self.status.model().item(0).setEnabled(False)
+        edicion_layout.addWidget(QLabel("Status Operativo:"), 3, 4)
         edicion_layout.addWidget(self.status, 4, 4)
 
         self.sap = QLineEdit()
