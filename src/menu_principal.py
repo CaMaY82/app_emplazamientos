@@ -17,16 +17,15 @@ class MenuPrincipal(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Menú Principal")
-        self.resize(400, 300)
+        self.resize(1800, 900)
         layout_principal = QGridLayout()
         central_widget = QWidget()
         central_widget.setLayout(layout_principal)
         self.setCentralWidget(central_widget)
         frame_sup = QFrame()
         layout_sup = QHBoxLayout()
-        frame_sup.setLayout(layout_sup)
-        layout_principal.addWidget(frame_sup)
-
+        frame_sup.setLayout(layout_sup)        
+        layout_principal.addWidget(frame_sup, 0, 0, Qt.AlignTop)
         base_dir = Path(__file__).resolve().parent
         logoPMX = base_dir.parent / "assets" / "pemex_logo.png"
         pemex = QPixmap(str(logoPMX))
@@ -40,7 +39,7 @@ class MenuPrincipal(QMainWindow):
         titulo.setWordWrap(True)
         titulo.setAlignment(Qt.AlignCenter)
         layout_sup.addWidget(titulo, alignment=Qt.AlignCenter)
-        titulo.setStyleSheet("font-weight: bold; font-size: 20px")
+        titulo.setStyleSheet("font-weight: bold; font-size: 30px")
 
         if darkdetect.isDark():
          logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo_dark.png")
@@ -50,11 +49,15 @@ class MenuPrincipal(QMainWindow):
          logoIT = base_dir.parent / "assets" / "inspeccion_logo.png"
          
         logo_inspeccion = QLabel()
-        logo_inspeccion.setFixedSize(400, 150)
+        logo_inspeccion.setFixedSize(350, 150)
         logo_inspeccion.setScaledContents(True)        
         pixmap = QPixmap(str(logoIT))
         logo_inspeccion.setPixmap(pixmap)
         layout_sup.addWidget(logo_inspeccion)
+
+        #botones e iconos centrales
+
+        
 
         
 
