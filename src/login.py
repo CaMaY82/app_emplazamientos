@@ -1,16 +1,12 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout,
     QLabel, QPushButton, QRadioButton, 
-    QSizePolicy, QGridLayout, QLineEdit, QSpacerItem, QGroupBox, QDateEdit, QTextEdit, QFrame
+    QSizePolicy, QGridLayout, QLineEdit, QSpacerItem, QGroupBox, QDateEdit, QTextEdit, QFrame, QMessageBox
 )
-from PySide6.QtGui import QIcon, QPixmap, QPainter
-
+from PySide6.QtGui import QIcon, QPixmap, QPainter, QIntValidator
 from PySide6.QtCore import Qt
-
 import darkdetect
-
 import sys
-
 from pathlib import Path
 
 class login(QWidget):
@@ -65,23 +61,35 @@ class login(QWidget):
         self.layout_principal.addWidget(self.frame_sup)
         self.layout_sup.setAlignment(Qt.AlignHCenter)
 
-        titulo1 = QLabel("Bienvenido")
+        titulo1 = QLabel("Sistema de Administración de Emplazamientos")
         titulo1.setAlignment(Qt.AlignmentFlag.AlignCenter)
         titulo1.setStyleSheet("font-weight: regular; font-size: 16px")
-        self.layout_principal.addWidget(titulo1)
+        self.layout_principal.addWidget(titulo1)  
         
 
-        titulo2 = QLabel("al")
-        titulo2.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        titulo2.setStyleSheet("font-weight: regular; font-size: 16px")
-        self.layout_principal.addWidget(titulo2)
-        
+        #titulo2 = QLabel("Inicia sesión")
+        #titulo2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        #titulo2.setStyleSheet("font-weight: regular; font-size: 16px")
+        #self.layout_principal.addWidget(titulo2)  
+        self.layout_principal.addSpacerItem(QSpacerItem(10, 50, QSizePolicy.Preferred, QSizePolicy.Preferred))
 
-        titulo3 = QLabel("Sistema de Administración de Emplazamientos")
-        titulo3.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        titulo3.setStyleSheet("font-weight: regular; font-size: 16px")
-        self.layout_principal.addWidget(titulo3)
+       
+        # Imagen de Login
+
+        base_dir = Path(__file__).resolve().parent
         
+        user_img = QPixmap(base_dir.parent / "assets" / "user_image.png")
+        user_img = base_dir.parent / "assets" / "user_image.png"
+        
+        imagen_usuario = QLabel()
+        imagen_usuario.setFixedSize(150, 75)
+        imagen_usuario.setScaledContents(True)
+        
+        pixmap = QPixmap(str(user_img))
+        imagen_usuario.setPixmap(pixmap)
+
+        self.layout_principal.addWidget(imagen_usuario, alignment=Qt.AlignCenter)
+        imagen_usuario.setFixedSize(100, 100)
 
         self.layout_principal.addSpacerItem(QSpacerItem(10, 50, QSizePolicy.Preferred, QSizePolicy.Preferred))
 
@@ -91,7 +99,10 @@ class login(QWidget):
         self.datos_layout = QGridLayout()
         self.frame_central.setLayout(self.datos_layout)
         self.datos_layout.setSpacing(10)
-        self.usuario = QLineEdit()        
+        self.usuario = QLineEdit()
+        self.usuario.setMaxLength(10)
+        validator = QIntValidator(0, 999999999)
+        self.usuario.setValidator(validator)
         self.datos_layout.addWidget(QLabel("Usuario"), 1, 0)
         self.datos_layout.addWidget(self.usuario, 2, 0)
         self.usuario.setFixedWidth(150)
@@ -102,14 +113,31 @@ class login(QWidget):
         self.datos_layout.addWidget(QLabel("Password"), 4, 0)
         self.datos_layout.addWidget(self.password, 5, 0)
         self.password.setFixedWidth(150)
+        self.password.returnPressed.connect(self.iniciar_sesion)
+        
         
         self.login_btn = QPushButton("Iniciar Sesion")
         self.login_btn.setFixedSize(150, 20)
+        self.login_btn.clicked.connect(self.iniciar_sesion)
+
         self.guess_btn = QPushButton("Continuar como invitado")
         self.guess_btn.setFixedSize(150, 20)
-        self.datos_layout.addWidget(self.login_btn, 7, 0)
-    
+        self.datos_layout.addWidget(self.login_btn, 7, 0)    
         self.datos_layout.addWidget(self.guess_btn, 8, 0)
+
+    def iniciar_sesion(self):
+        usuario = self.usuario.text()
+        password = self.password.text()
+
+        usuarios = {"345838": "camay", "433086": "Pemex123$"}
+
+        if usuario in usuarios and usuarios[usuario] == password:
+            #QMessageBox.information(self, "Bienvenido", f"Bienvenido")
+            self.close()
+            self.abrir_menu_principal()
+        else:
+             QMessageBox.critical(self, "Error", "Usuario o contraseña incorrectos.")
+
 
 
 
