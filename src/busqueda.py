@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QFrame, QLabel, QPushButton, QRadioButton, QComboBox, QTableWidget,
-    QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton, QTextEdit
+    QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton, QTextEdit, QMessageBox
 )
 from PySide6.QtCore import Qt, QSize
 
@@ -12,6 +12,9 @@ import darkdetect
 import sys
 
 from pathlib import Path
+
+import sqlite3 as sql
+
 
 class UI_Busqueda(QWidget):
     def __init__(self):
@@ -57,6 +60,8 @@ class UI_Busqueda(QWidget):
 
         self.setWindowTitle("Buscar")
         self.setMinimumSize(1100, 800)
+
+
 
         #Layoput de la ventana
         layout_principal = QVBoxLayout(self)
@@ -161,6 +166,8 @@ class UI_Busqueda(QWidget):
         self.buscar_btn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         filtros_layout.addWidget(self.buscar_btn, 0, 5, 2, 1)
 
+        self.buscar_btn.clicked.connect(self.buscar_en_db)
+
 
         #layout del frame intermedio (lista de resultados)
         self.resultados = QFrame()
@@ -182,6 +189,7 @@ class UI_Busqueda(QWidget):
         self.datos_layout.setAlignment(Qt.AlignLeft)
         self.datos_item.setLayout(self.datos_layout)
         layout_principal.addWidget(self.datos_item)
+        
 
         #cajas de texto de los resultados
         self.ID_resultado = QLineEdit()
@@ -359,12 +367,15 @@ class UI_Busqueda(QWidget):
        # Para conectar combo boxes, SECTOR y PLANTA se define la función:
 
         self.sector_cb.currentTextChanged.connect(self.actualizar_planta_Cbox)
+        
+        #layout_principal.addStretch()
 
-        layout_principal.addStretch()
+        
 
     def actualizar_planta_Cbox(self, sector):
         self.planta_cb.clear()
         planta = self.sectores_dict.get(sector)
+        
         if planta:
             self.planta_cb.addItems(planta)
 
@@ -382,7 +393,87 @@ class UI_Busqueda(QWidget):
            
 
         self.etiqueta_item.setText(tipo_item)
+
+        #Ruta de la base de datos
+
+        self.db_path = str(Path(__file__).resolve().parent.parent / "db" / "EMP.db")
+
+    def buscar_en_db(self):
+        if self.botonEmp.isChecked():
+            tabla = "EMP"
+            columna_id = "EMPLAZAMIENTO"
+        elif self.botonSF.isChecked():
+            tabla = "SF"
+            columna_id = "[SOLICITUD DE FABRICACIÓN]"  # Ponlo entre corchetes por el espacio
+        else:
+            QMessageBox.warning(self, "Advertencia", "Selecciona lo que deseas buscar")
+            return
        
+        sector = self.sector_cb.currentText()
+        planta = self.planta_cb.currentText()
+        estado = self.estado_cb.currentText()
+        status = self.status_cb.currentText()
+        riesgo = self.riesgo_cb.currentText()
+
+       # validar que un filtro tenga valor:
+
+        if not sector and not planta and not estado and not riesgo:
+            QMessageBox.warning(self, "Advertencia", "Debes seleccionar al menos un filtro.")
+            return
+
+        # creando la consulta
+        query = f"""
+        SELECT {columna_id}, SECTOR, PLANTA, [ESTADO ACTUAL], [STATUS OPERATIVO], 
+               RIESGO
+        FROM {tabla}
+        WHERE 1=1
+        """
+        valores = []
+
+        if sector:
+          query += "AND SECTOR = ?"
+          valores.append(sector)
+        if planta:
+          query += "AND PLANTA = ?"
+          valores.append(planta)
+        if estado:
+          query += " AND [ESTADO ACTUAL] = ?"
+          valores.append(estado)
+        if status:
+          query += "AND [STATUS OPERATIVO] = ?"
+          valores.append(status)
+        if riesgo:
+          query += "AND RIESGO = ?"
+          valores.append(riesgo)
+       
+        # conectando a db
+
+        conexion = sql.connect(self.db_path)
+        cursor = conexion.cursor()
+        cursor.execute(query, valores)
+        resultados = cursor.fetchall()
+        conexion.close
+
+        columnas = ["ID", "PLANTA", "CIRCUITO", "UNIDAD DE CONTROL", "FECHA DE ELABORACION", "FECHA DE VENCIMIENTO", "ESTADO ACTUAL"]
+
+        self.tabla_resultados.setColumnCount(len(columnas))
+        self.tabla_resultados.setHorizontalHeaderLabels(columnas)
+        self.tabla_resultados.setRowCount(0)
+
+        if resultados:
+            for fila_idx, fila_datos in enumerate(resultados):
+             self.tabla_resultados.insertRow(fila_idx)
+            for col_idx, dato in enumerate(fila_datos):
+                self.tabla_resultados.setItem(fila_idx, col_idx, QTableWidgetItem(str(dato)))
+            self.tabla_resultados.resizeColumnsToContents()
+        else:
+            QMessageBox.information(self, "Sin resultados", "No se encontraron registros.")
+
+        conexion.close()
+
+    
+
+        
            
 
     
