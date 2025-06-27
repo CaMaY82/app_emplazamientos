@@ -1,21 +1,25 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QFrame, QLabel, QPushButton, QRadioButton, QComboBox,
-    QSizePolicy, QGridLayout, QLineEdit, QSpacerItem, QGroupBox, QDateEdit, QTextEdit
+    QSizePolicy, QGridLayout, QLineEdit, QSpacerItem, QGroupBox, QDateEdit, QTextEdit, QMessageBox, QCalendarWidget
 )
 from PySide6.QtCore import Qt, QSize, QDate
-
-from PySide6.QtGui import QIcon, QPixmap
-
+from PySide6.QtGui import QIcon, QPixmap, QIntValidator
 import darkdetect
-
 import sys
-
 from pathlib import Path
+import sqlite3 as sql
+from datetime import datetime
 
 class UI_Nuevo(QWidget):
     def __init__(self):
         super().__init__()
+
+        self.db_path = str(Path(__file__).resolve().parent.parent / "db" / "EMP.db")
+
+        # Conexión a la base de datos accesible desde cualquier método
+        self.conexion = sql.connect(self.db_path)
+        self.cursor = self.conexion.cursor()
 
         if darkdetect.isDark():
          modo = "oscuro"
@@ -74,6 +78,8 @@ class UI_Nuevo(QWidget):
         self.boton_sf = QRadioButton("Solicitud de Fabricación")
         self.logo = QLabel()
         self.logo.setFixedSize(170, 70)
+        self.boton_emp.toggled.connect(self.generar_id)
+        self.boton_sf.toggled.connect(self.generar_id)
         
         self.logo.setPixmap(logoIT)
         self.logo.setScaledContents(True)
@@ -102,15 +108,15 @@ class UI_Nuevo(QWidget):
 
         
         
-        # Agregando campos para captura de datos
-
-        
+        # Agregando campos para captura de datos       
 
         self.ID = QLineEdit()
         self.layout_inferior.addWidget(QLabel("ID:"), 0, 0)
         self.layout_inferior.addWidget(self.ID, 1, 0)
         #self.ID.setFixedWidth(150)
         self.ID.setFixedHeight(25)
+        self.ID.setReadOnly(True)
+        self.ID.setStyleSheet("color: #5a7b8f;")
 
         sectores = (" ", "1", "2", "3", "4", "5", "6", "7", "8")
 
@@ -129,16 +135,19 @@ class UI_Nuevo(QWidget):
         self.circuito = QLineEdit()
         self.layout_inferior.addWidget(QLabel("Circuito:"), 6, 0)
         self.layout_inferior.addWidget(self.circuito,7, 0,)
+        self.circuito.textChanged.connect(lambda text: self.circuito.setText(text.upper()))
         self.circuito.setFixedHeight(25)
 
         self.UC = QLineEdit()
         self.layout_inferior.addWidget(QLabel("Unidad de Control:"),8 ,0)
         self.layout_inferior.addWidget(self.UC, 9, 0)
+        self.UC.textChanged.connect(lambda text: self.UC.setText(text.upper()))
         self.UC.setFixedHeight(25)
 
         self.material = QLineEdit()
         self.layout_inferior.addWidget(QLabel("Material:"), 0, 1)
         self.layout_inferior.addWidget(self.material, 1, 1)
+        self.material.textChanged.connect(lambda text: self.material.setText(text.upper()))
         self.material.setFixedHeight(25)
 
         self.fecha_elab = QDateEdit()
@@ -151,7 +160,7 @@ class UI_Nuevo(QWidget):
         self.fecha_elab.setCalendarPopup(True)
         self.fecha_elab.setDate(QDate.currentDate())
         self.fecha_elab.setDisplayFormat("dd/MM/yyyy")
-
+       
         self.fecha_ven = QDateEdit()
         self.layout_inferior.addWidget(QLabel("Fecha de Vencimiento:"), 4, 1)
         self.layout_inferior.addWidget(self.fecha_ven, 5, 1)
@@ -163,6 +172,7 @@ class UI_Nuevo(QWidget):
         self.SAP = QLineEdit()
         self.layout_inferior.addWidget(QLabel("Aviso SAP:"), 6, 1)
         self.layout_inferior.addWidget(self.SAP, 7, 1)
+        self.SAP.setValidator(QIntValidator(0, 9999999))
         self.SAP.setFixedHeight(25)
               
         self.programa = QComboBox()
@@ -209,6 +219,7 @@ class UI_Nuevo(QWidget):
         self.descripcion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.layout_inferior2.addWidget(QLabel("Descripción:"))
         self.layout_inferior2.addWidget(self.descripcion)
+        self.descripcion.textChanged.connect(lambda text: self.descripcion.setText(text.upper()))
         self.descripcion.setFixedHeight(45)
         
         self.mitigacion = QTextEdit()
@@ -345,9 +356,120 @@ class UI_Nuevo(QWidget):
             self.planta.addItems(planta)
         
 
+    
 
+    def guardar_registro (self):
+
+     try:
+
+        if self.boton_emp.isChecked():
+            tabla = "EMP"
+            columna_id = "EMPLAZAMIENTO"
+            descripcion_columna = "DESCRIPCIÓN DEL EMPLAZAMIENTO"
+            enlace_columna = "ENLACE EMP"
+
+            
+            
+        elif self.boton_sf.isChecked():
+            tabla = "SF"
+            columna_id = "[SOLICITUD DE FABRICACIÓN]"
+            descripcion_columna = "DESCRIPCIÓN DE LA SOLICITUD DE FABRICACIÓN"
+            enlace_columna = "ENLACE SF"
+           
+            
+        else:
+           
+            return
         
+        # Obtener valores del formulario
+        id_value = self.ID.text().strip()
+        sector_value = self.sector.currentText().strip()
+        planta_value = self.planta.currentText().strip()
+        circuito_value = self.circuito.text().strip()
+        uc_value = self.UC.text().strip()
+        descripcion_value = self.descripcion.toPlainText().strip()
+        mecanismo_value = self.mecanismo.currentText().strip()
+        material_value = self.material.text().strip()
+        fecha_elab_value = self.fecha_elab.date().toString('yyyy-MM-dd')
+        sap_value = self.SAP.text().strip()
+        fecha_ven_value = self.fecha_ven.date().toString('yyyy-MM-dd')
+        programa_value = self.programa.currentText().strip()
+        iniciativa_value = self.iniciativa.currentText().strip()
+        paro_value = self.paro_planta.currentText().strip()
+        estado_actual = self.status.currentText().strip()
+        status_operativo = self.status.currentText().strip()
+        riesgo_value = self.riesgo.currentText().strip()
+        mitigacion_value = self.mitigacion.toPlainText().strip()
+        observaciones_value = self.comentarios.toPlainText().strip()
+        enlace_value = self.enlace.text().strip()
 
+        # Validar campos obligatorios
+        campos_obligatorios = [
+            id_value, sector_value, planta_value, circuito_value, uc_value,
+            descripcion_value, mecanismo_value, material_value, fecha_elab_value,
+            sap_value, fecha_ven_value, programa_value, iniciativa_value, paro_value,
+            estado_actual, status_operativo, riesgo_value, mitigacion_value
+        ]
+
+        if "" in campos_obligatorios or sector_value == " " or planta_value == " " or programa_value == " " or iniciativa_value == " " or paro_value == " " or estado_actual == " " or riesgo_value == " " or mecanismo_value == " ":
+            QMessageBox.warning(self, "Campos Vacíos", "Por favor completa todos los campos obligatorios.")
+            return
+
+        # Sentencia SQL
+        self.cursor.execute(f"""
+            INSERT INTO {tabla} (
+                {columna_id}, SECTOR, PLANTA, CIRCUITO, UNIDAD DE CONTROL,
+                {descripcion_columna}, MECANISMO DE DAÑO, ESPECIFICACIÓN,
+                FECHA DE ELABORACIÓN, SAP, FECHA DE VENCIMIENTO, PROGRAMA DE ATENCIÓN,
+                INICIATIVA, PARO DE PLANTA, FECHA DE ATENCIÓN, ESTADO ACTUAL,
+                FECHA DE REVALUACIÓN, STATUS OPERATIVO, RIESGO, MEDIDA DE MITIGACIÓN,
+                OBSERVACIONES GENERALES, {enlace_columna}
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            id_value, sector_value, planta_value, circuito_value, uc_value,
+            descripcion_value, mecanismo_value, material_value,
+            fecha_elab_value, sap_value, fecha_ven_value, programa_value,
+            iniciativa_value, paro_value, estado_actual,
+            status_operativo, riesgo_value, mitigacion_value,
+            observaciones_value, enlace_value
+        ))
+
+        self.conexion.commit()
+        QMessageBox.information(self, "Éxito", f"Registro guardado correctamente en la tabla {tabla}.")
+        self.limpiar_formulario()
+
+     except Exception as e:
+        QMessageBox.critical(self, "Error", f"Ocurrió un error: {str(e)}")
+
+    def generar_id(self):
+        # Verifica cuál botón está activo
+        if self.boton_emp.isChecked():
+            tabla = "EMP"
+            columna_id = "EMPLAZAMIENTO"
+        elif self.boton_sf.isChecked():
+            tabla = "SF"
+            columna_id = "[SOLICITUD DE FABRICACIÓN]"
+        else:
+           return  # No hace nada si no hay botón seleccionado
+        try:
+            # Año actual
+            anio_actual = datetime.now().year
+
+        # Consulta los registros que ya existen de este año
+            self.cursor.execute(f"""
+            SELECT COUNT(*) FROM {tabla} 
+            WHERE {columna_id} LIKE '%/{anio_actual}'
+            """)
+            conteo = self.cursor.fetchone()[0] + 1  # Siguiente número consecutivo
+
+            # Formatear con ceros a la izquierda
+            nuevo_id = f"{str(conteo).zfill(3)}/{anio_actual}"
+
+            # Mostrar el ID sugerido
+            self.ID.setText(nuevo_id)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"No se pudo generar el ID: {str(e)}")
         
 
 
