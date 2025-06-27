@@ -4,16 +4,12 @@ from PySide6.QtWidgets import (
     QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton, QTextEdit, QMessageBox
 )
 from PySide6.QtCore import Qt, QSize
-
 from PySide6.QtGui import QIcon, QPixmap
-
 import darkdetect
-
 import sys
-
 from pathlib import Path
-
 import sqlite3 as sql
+from functools import partial
 
 
 class UI_Busqueda(QWidget):
@@ -96,7 +92,13 @@ class UI_Busqueda(QWidget):
 
         self.botonEmp.toggled.connect(self.etiqueta_descripcion)
         self.botonSF.toggled.connect(self.etiqueta_descripcion)
-        
+
+        self.botonEmp.toggled.connect(self.limpiar_resultados)
+        self.botonSF.toggled.connect(self.limpiar_resultados)
+
+        self.botonEmp.clicked.connect(self.ocultar_etiqueta_resultado)
+        self.botonSF.clicked.connect(self.ocultar_etiqueta_resultado)
+
         # Combo boxes
 
         # Combobox Sector
@@ -162,6 +164,8 @@ class UI_Busqueda(QWidget):
         self.buscar_btn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         filtros_layout.addWidget(self.buscar_btn, 1, 5, 3, 1)
         filtros_layout.addWidget(self.resultados_label, 0, 5, alignment=Qt.AlignCenter)
+        
+
 
         self.buscar_btn.clicked.connect(self.buscar_en_db)
 
@@ -175,9 +179,10 @@ class UI_Busqueda(QWidget):
         self.tabla_resultados.setColumnCount(7)
         self.tabla_resultados.setHorizontalHeaderLabels(["ID", "PLANTA", "CIRCUITO", "UNIDAD DE CONTROL", "FECHA DE ELABORACIÓN", "FECHA DE VENCIMIENTO", "ESTADO ACTUAL"])
         self.tabla_resultados.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tabla_resultados.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         resultados_layout.addWidget(self.tabla_resultados)
         self.resultados.setLayout(resultados_layout)
-        layout_principal.addWidget(self.resultados)
+        layout_principal.addWidget(self.resultados, stretch=3)
         self.tabla_resultados.itemSelectionChanged.connect(self.detalle_elemento)
 
 
@@ -328,6 +333,7 @@ class UI_Busqueda(QWidget):
             
             """)
         self.reporte_btn.setVisible(False)
+        
        
         icono_notificacion = base_dir.parent / "assets" /"notificacion_icon.png"
         self.notificacion_btn = QToolButton()
@@ -514,8 +520,10 @@ class UI_Busqueda(QWidget):
             self.tabla_resultados.resizeColumnsToContents()
             self.tabla_resultados.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
             self.resultados_label.setText(f"Encontrados {len(resultados)}")
+            self.resultados_label.setVisible(True)
 
             if darkdetect.isDark():
+              
               self.resultados_label.setStyleSheet("font-size: 16px; color: lightgreen; font-weight: bold;")
             else:
               self.resultados_label.setStyleSheet("font-size: 16px; color: teal; font-weight: bold;")
@@ -583,28 +591,50 @@ class UI_Busqueda(QWidget):
 
             # Asignar rutas de PDF a los ToolButtons
         if tabla == "EMP":
-            ruta_emp = resultado["ENLACE EMP"] if resultado["ENLACE EMP"] is not None else None
-            print(f"Ruta EMP: {ruta_emp}")
-            if ruta_emp and ruta_emp.strip():
-                if self.reporte_btn.receivers(b"clicked()") > 0:
-                   self.reporte_btn.clicked.disconnect()
-        
-                self.reporte_btn.clicked.connect(lambda: self.abrir_pdf(ruta_emp))
+            ruta_pdf = resultado["ENLACE EMP"] if resultado["ENLACE EMP"] is not None else None
+            print(f"Ruta EMP: {ruta_pdf}")
+
+            if ruta_pdf and ruta_pdf.strip():
+                try:
+                    self.reporte_btn.clicked.disconnect()
+                except TypeError:
+                    pass
+
+                self.reporte_btn.clicked.connect(partial(self.abrir_pdf, ruta_pdf))
                 self.reporte_btn.setVisible(True)
+            else:
+             self.reporte_btn.setVisible(False)
+
+        elif tabla == "SF":
+            ruta_pdf = resultado["ENLACE SF"] if resultado["ENLACE SF"] is not None else None
+            if ruta_pdf and ruta_pdf.strip():
+               try:
+                 self.reporte_btn.clicked.disconnect()
+               except TypeError:
+                 pass
+
+               self.reporte_btn.clicked.connect(partial(self.abrir_pdf, ruta_pdf))
+               self.reporte_btn.setVisible(True)
             else:
                 self.reporte_btn.setVisible(False)
 
-            ruta_notificacion = resultado.get("ENLACE NOT", None)
-            if ruta_notificacion and ruta_notificacion.strip():
-                if self.notificacion_btn.receivers(b"clicked()") > 0:
-                   self.notificacion_btn.clicked.disconnect()
-                self.notificacion_btn.clicked.connect(lambda: self.abrir_pdf(ruta_notificacion))
-                self.notificacion_btn.setVisible(True)
-            else:
-                self.notificacion_btn.setVisible(False)
+        ruta_notificacion = resultado["ENLACE NOT"]
+        print(f"Ruta NOT: {ruta_notificacion}")
+
+        if ruta_notificacion and ruta_notificacion.strip():
+           try:
+              self.notificacion_btn.clicked.disconnect()
+           except TypeError:
+                pass
+
+           self.notificacion_btn.clicked.connect(partial(self.abrir_pdf, ruta_notificacion))
+           self.notificacion_btn.setVisible(True)
+            
         else:
-            self.reporte_btn.setVisible(False)
             self.notificacion_btn.setVisible(False)
+        
+        
+       
 
     def abrir_pdf(self, ruta):
         import webbrowser
@@ -613,6 +643,37 @@ class UI_Busqueda(QWidget):
     
     def limpiar_valor(self, resultado):#se usa cuando el campo tiene valor null, se pone un caracter en blanco ""
         return str(resultado) if resultado is not None else ""
+    
+    def limpiar_resultados(self):
+        self.ID_resultado.clear()
+        self.sector_resultado.clear()
+        self.planta_resultado.clear()
+        self.circuito_resultado.clear()
+        self.UC_resultado.clear()
+        self.status_resultado.clear()
+        self.vigencia_resultado.clear()
+        self.estado_resultado.clear()
+        self.mecanismo_resultado.clear()
+        self.material_resultado.clear()
+        self.SAP_resultado.clear()
+        self.riesgo_resultado.clear()
+        self.descripcion_resultado.clear()
+        self.mitigacion_resultado.clear()
+        self.comentarios_resultado.clear()
+        self.tabla_resultados.setRowCount(0)
+        self.reporte_btn.setVisible(False)
+        self.notificacion_btn.setVisible(False)
+        self.sector_cb.setCurrentIndex(0)
+        self.planta_cb.setCurrentIndex(0)
+        self.estado_cb.setCurrentIndex(0)
+        self.status_cb.setCurrentIndex(0)
+        self.riesgo_cb.setCurrentIndex(0)
+        self.ID_busqueda.clear()
+        
+
+    def ocultar_etiqueta_resultado(self):
+        self.resultados_label.setVisible(False)
+    
         
            
 
