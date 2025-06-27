@@ -89,9 +89,9 @@ class UI_Busqueda(QWidget):
         self.botonSF = QRadioButton("Solicitudes de Fabricación")
         self.botonSF.setLayoutDirection(Qt.RightToLeft)
 
-        filtros_layout.addWidget(self.botonEmp, 0, 0, alignment=Qt.AlignLeft)
+        filtros_layout.addWidget(self.botonEmp, 1, 0, alignment=Qt.AlignLeft)
         filtros_layout.addItem(QSpacerItem(30, 0, QSizePolicy.Fixed, QSizePolicy.Minimum), 0, 1)
-        filtros_layout.addWidget(self.botonSF, 1, 0, alignment=Qt.AlignLeft)
+        filtros_layout.addWidget(self.botonSF, 3, 0, alignment=Qt.AlignLeft)
         filtros_layout.addItem(QSpacerItem(30, 0, QSizePolicy.Fixed, QSizePolicy.Minimum), 1, 1)
 
         self.botonEmp.toggled.connect(self.etiqueta_descripcion)
@@ -101,47 +101,41 @@ class UI_Busqueda(QWidget):
 
         # Combobox Sector
         self.sector_cb = QComboBox()
-        self.sector_cb.addItem("Sector")
-        self.sector_cb.model().item(0).setEnabled(False)
-        sectores = ["1", "2", "3", "4", "5", "6", "7", "8"]
+        #self.sector_cb.model().item(0).setEnabled(False)
+        sectores = [" ", "1", "2", "3", "4", "5", "6", "7", "8"]
         self.sector_cb.addItems(sectores)
-        
-        filtros_layout.addWidget(self.sector_cb, 0, 2)
+        filtros_layout.addWidget(QLabel("Sector"),0, 2)        
+        filtros_layout.addWidget(self.sector_cb, 1, 2)
        
         # Combobox Planta
         self.planta_cb = QComboBox()
-        self.planta_cb.addItem("Planta")
-        self.planta_cb.model().item(0).setEnabled(False)
-
+        #self.planta_cb.model().item(0).setEnabled(False)
         self.filtros_frame.setLayout(filtros_layout)
         layout_principal.addWidget(self.filtros_frame)
-        filtros_layout.addWidget(self.planta_cb, 1, 2)
+        filtros_layout.addWidget(QLabel("Planta"), 2, 2)
+        filtros_layout.addWidget(self.planta_cb, 3, 2)
 
         # ComboBox estado
         self.estado_cb = QComboBox()
-        self.estado_cb.addItem("Estado Actual")
-        self.estado_cb.addItem("")
+        self.estado_cb.addItem(" ")
         self.estado_cb.addItem("Vigente")
         self.estado_cb.addItem("Vencido")
         self.estado_cb.addItem("Atendido")
-        self.estado_cb.model().item(0).setEnabled(False)
-        filtros_layout.addWidget(self.estado_cb, 0, 3)
+        filtros_layout.addWidget(QLabel("Estado"), 2, 3)
+        filtros_layout.addWidget(self.estado_cb, 3, 3)
 
         # Combobox Status operativo
         self.status_cb = QComboBox()
-        self.status_cb.addItem("Status Operativo")
-        self.status_cb.addItem("Operando")
-        self.status_cb.addItem("Fuera de Operación")
-        self.status_cb.model().item(0).setEnabled(False)
+        self.status_cb.addItems([" ", "Operando", "Fuera de Operación"])
+        filtros_layout.addWidget(QLabel("Status Operativo"), 0, 3)
         filtros_layout.addWidget(self.status_cb, 1, 3)
 
         # Combobox Riesgo
         self.riesgo_cb = QComboBox()
-        self.riesgo_cb.addItem("Riesgo")
-        riesgos = ["A", "B", "C", "D"]
+        riesgos = [" ", "A", "B", "C", "D"]
         self.riesgo_cb.addItems(riesgos)
-        self.riesgo_cb.model().item(0).setEnabled(False)
-        filtros_layout.addWidget(self.riesgo_cb, 0, 4)
+        filtros_layout.addWidget(QLabel("Riesgo"), 0, 4)
+        filtros_layout.addWidget(self.riesgo_cb, 1, 4)
         self.riesgo_cb.setFixedWidth(200)
 
         # caja de texto para buscar emp o sf
@@ -156,15 +150,18 @@ class UI_Busqueda(QWidget):
         border: 1px solid black;
         }
         """)
-        filtros_layout.addWidget(self.ID_busqueda, 1, 4)
+        filtros_layout.addWidget(self.ID_busqueda, 3, 4)
         self.ID_busqueda.setFixedWidth(200)
 
 
-        # botón buscar
+        # botón buscar y etiqueta resultados
+        self.resultados_label = QLabel()
+
         self.buscar_btn = QPushButton("BUSCAR 🔎")
         self.buscar_btn.setStyleSheet("font-weight: bold; font-size: 16px")
         self.buscar_btn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-        filtros_layout.addWidget(self.buscar_btn, 0, 5, 2, 1)
+        filtros_layout.addWidget(self.buscar_btn, 1, 5, 3, 1)
+        filtros_layout.addWidget(self.resultados_label, 0, 5, alignment=Qt.AlignCenter)
 
         self.buscar_btn.clicked.connect(self.buscar_en_db)
 
@@ -181,6 +178,7 @@ class UI_Busqueda(QWidget):
         resultados_layout.addWidget(self.tabla_resultados)
         self.resultados.setLayout(resultados_layout)
         layout_principal.addWidget(self.resultados)
+        self.tabla_resultados.itemSelectionChanged.connect(self.detalle_elemento)
 
 
         #layout del frame inferior (Datos de resultado)
@@ -329,6 +327,7 @@ class UI_Busqueda(QWidget):
             }
             
             """)
+        self.reporte_btn.setVisible(False)
        
         icono_notificacion = base_dir.parent / "assets" /"notificacion_icon.png"
         self.notificacion_btn = QToolButton()
@@ -348,6 +347,7 @@ class UI_Busqueda(QWidget):
             }
            
             """)
+        self.notificacion_btn.setVisible(False)
 
         # Diccionario de sectores
         self.sectores_dict = {
@@ -402,49 +402,89 @@ class UI_Busqueda(QWidget):
         if self.botonEmp.isChecked():
             tabla = "EMP"
             columna_id = "EMPLAZAMIENTO"
+            label_result = "Emplazamientos encontrados"
+            
         elif self.botonSF.isChecked():
             tabla = "SF"
-            columna_id = "[SOLICITUD DE FABRICACIÓN]"  # Ponlo entre corchetes por el espacio
+            columna_id = "[SOLICITUD DE FABRICACIÓN]"
+            label_result = "Solicitudes de fabricación encontradas"
+            
         else:
             QMessageBox.warning(self, "Advertencia", "Selecciona lo que deseas buscar")
             return
        
-        sector = self.sector_cb.currentText()
-        planta = self.planta_cb.currentText()
-        estado = self.estado_cb.currentText()
-        status = self.status_cb.currentText()
-        riesgo = self.riesgo_cb.currentText()
+        
+        sector = self.sector_cb.currentText().upper()
+        if sector in [" "]:
+           sector = None # No se aplica filtro
+        
+        planta = self.planta_cb.currentText().upper()
+        if planta in [" "]:
+           planta = None
+
+        estado = self.estado_cb.currentText().upper()
+        if estado in [" "]:
+            estado = None
+        if estado is None:
+           filtro_base = "AND ([ESTADO ACTUAL] = 'VIGENTE' OR [ESTADO ACTUAL] = 'VENCIDO')"
+        else:
+           filtro_base = ""
+
+        status = self.status_cb.currentText().upper()
+        if status in [" "]:
+           status = None
+        
+        riesgo = self.riesgo_cb.currentText().upper()
+        if riesgo in [" "]:
+           riesgo = None
+        
+        id_busqueda = self.ID_busqueda.text().strip()
+        if id_busqueda == "":
+           id_busqueda = None
 
        # validar que un filtro tenga valor:
 
-        if not sector and not planta and not estado and not riesgo:
-            QMessageBox.warning(self, "Advertencia", "Debes seleccionar al menos un filtro.")
-            return
+        #if not sector and not planta and not estado and not status and not riesgo:
+            #QMessageBox.warning(self, "Advertencia", "Debes seleccionar al menos un filtro.")
+            #return
 
         # creando la consulta
-        query = f"""
-        SELECT {columna_id}, SECTOR, PLANTA, [ESTADO ACTUAL], [STATUS OPERATIVO], 
-               RIESGO
-        FROM {tabla}
-        WHERE 1=1
-        """
-        valores = []
+        if id_busqueda:
+         query = f"""
+         SELECT {columna_id}, PLANTA, CIRCUITO, [UNIDAD DE CONTROL], [FECHA DE ELABORACIÓN], [FECHA DE VENCIMIENTO], [ESTADO ACTUAL]
+         FROM {tabla}
+         WHERE {columna_id} = ?
+         """
+         valores = [id_busqueda]
+        else:
+            query = f"""
+             SELECT {columna_id}, PLANTA, CIRCUITO, [UNIDAD DE CONTROL], [FECHA DE ELABORACIÓN], [FECHA DE VENCIMIENTO],
+             [ESTADO ACTUAL] 
+               
+             FROM {tabla}
+             WHERE 1=1
+             {filtro_base}
+            """
+            valores = []
 
-        if sector:
-          query += "AND SECTOR = ?"
-          valores.append(sector)
-        if planta:
-          query += "AND PLANTA = ?"
-          valores.append(planta)
-        if estado:
-          query += " AND [ESTADO ACTUAL] = ?"
-          valores.append(estado)
-        if status:
-          query += "AND [STATUS OPERATIVO] = ?"
-          valores.append(status)
-        if riesgo:
-          query += "AND RIESGO = ?"
-          valores.append(riesgo)
+            if sector:
+                query += "AND SECTOR = ?"
+                valores.append(sector)
+            if planta:
+                query += "AND PLANTA = ?"
+                valores.append(planta)
+            if estado:
+                query += " AND [ESTADO ACTUAL] = ?"
+                valores.append(estado)
+            if status:
+                query += "AND [STATUS OPERATIVO] = ?"
+                valores.append(status)
+            if riesgo:
+                query += "AND RIESGO = ?"
+                valores.append(riesgo)
+            if id_busqueda:
+                query += f" AND {columna_id} = ?"
+                valores.append(id_busqueda)
        
         # conectando a db
 
@@ -462,17 +502,117 @@ class UI_Busqueda(QWidget):
 
         if resultados:
             for fila_idx, fila_datos in enumerate(resultados):
+             print(f"Fila {fila_idx}: {fila_datos}")
+             print(f"Resultados encontrados: {len(resultados)}")
+             
+             
+             
              self.tabla_resultados.insertRow(fila_idx)
-            for col_idx, dato in enumerate(fila_datos):
-                self.tabla_resultados.setItem(fila_idx, col_idx, QTableWidgetItem(str(dato)))
+             
+             for col_idx, dato in enumerate(fila_datos):
+                    self.tabla_resultados.setItem(fila_idx, col_idx, QTableWidgetItem(str(dato)))
             self.tabla_resultados.resizeColumnsToContents()
+            self.tabla_resultados.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            self.resultados_label.setText(f"Encontrados {len(resultados)}")
+
+            if darkdetect.isDark():
+              self.resultados_label.setStyleSheet("font-size: 16px; color: lightgreen; font-weight: bold;")
+            else:
+              self.resultados_label.setStyleSheet("font-size: 16px; color: teal; font-weight: bold;")
+
         else:
             QMessageBox.information(self, "Sin resultados", "No se encontraron registros.")
 
+        
+
+
+        #QMessageBox.information(self, "Resultados", f"  {len(resultados)} {label_result}")
+
         conexion.close()
 
+        #funcion para actualizar los campos
     
+    def detalle_elemento(self):
+        selected_items = self.tabla_resultados.selectedItems()
 
+        if selected_items:
+           
+            id_seleccionado = selected_items[0].text()
+            if self.botonEmp.isChecked():
+                tabla = "EMP"
+                columna_id = "EMPLAZAMIENTO"
+                descripcion = "DESCRIPCIÓN DEL EMPLAZAMIENTO"
+                columna_id_tabla = "EMPLAZAMIENTO"
+            elif self.botonSF.isChecked():
+                tabla = "SF"
+                columna_id = "[SOLICITUD DE FABRICACIÓN]"
+                descripcion = "DESCRIPCIÓN DE LA SOLICITUD DE FABRICACIÓN"
+                columna_id_tabla = "SOLICITUD DE FABRICACIÓN"
+            else:
+                return  
+             
+            conexion = sql.connect(self.db_path)
+            conexion.row_factory = sql.Row
+            cursor = conexion.cursor()
+
+            # Consulta SQL para traer toda la información de ese registro
+            cursor.execute(f"SELECT * FROM {tabla} WHERE {columna_id} = ?", (id_seleccionado,))
+            resultado = cursor.fetchone()
+
+            conexion.close()
+
+        if resultado:
+            # con esto se llenan los QlineEdit de resultados
+            self.ID_resultado.setText(self.limpiar_valor(resultado[columna_id_tabla]))
+            self.sector_resultado.setText(self.limpiar_valor(resultado['SECTOR']))
+            self.planta_resultado.setText(self.limpiar_valor(resultado['PLANTA']))
+            self.circuito_resultado.setText(self.limpiar_valor(resultado['CIRCUITO']))
+            self.UC_resultado.setText(self.limpiar_valor(resultado['UNIDAD DE CONTROL']))
+            self.status_resultado.setText(self.limpiar_valor(resultado['STATUS OPERATIVO']))
+            self.vigencia_resultado.setText(self.limpiar_valor(resultado['FECHA DE VENCIMIENTO']))
+            self.estado_resultado.setText(self.limpiar_valor(resultado["ESTADO ACTUAL"]))
+            self.mecanismo_resultado.setText(self.limpiar_valor(resultado["MECANISMO DE DAÑO"]))
+            self.material_resultado.setText(self.limpiar_valor(resultado["ESPECIFICACIÓN"]))
+            self.SAP_resultado.setText(self.limpiar_valor(resultado["SAP"]))
+            self.riesgo_resultado.setText(self.limpiar_valor(resultado["RIESGO"]))
+            self.descripcion_resultado.setText(self.limpiar_valor(resultado[descripcion]))
+            self.mitigacion_resultado.setText(self.limpiar_valor(resultado["MEDIDA DE MITIGACIÓN"]))
+            self.comentarios_resultado.setText(self.limpiar_valor(resultado["OBSERVACIONES GENERALES"]))
+
+
+
+            # Asignar rutas de PDF a los ToolButtons
+        if tabla == "EMP":
+            ruta_emp = resultado["ENLACE EMP"] if resultado["ENLACE EMP"] is not None else None
+            print(f"Ruta EMP: {ruta_emp}")
+            if ruta_emp and ruta_emp.strip():
+                if self.reporte_btn.receivers(b"clicked()") > 0:
+                   self.reporte_btn.clicked.disconnect()
+        
+                self.reporte_btn.clicked.connect(lambda: self.abrir_pdf(ruta_emp))
+                self.reporte_btn.setVisible(True)
+            else:
+                self.reporte_btn.setVisible(False)
+
+            ruta_notificacion = resultado.get("ENLACE NOT", None)
+            if ruta_notificacion and ruta_notificacion.strip():
+                if self.notificacion_btn.receivers(b"clicked()") > 0:
+                   self.notificacion_btn.clicked.disconnect()
+                self.notificacion_btn.clicked.connect(lambda: self.abrir_pdf(ruta_notificacion))
+                self.notificacion_btn.setVisible(True)
+            else:
+                self.notificacion_btn.setVisible(False)
+        else:
+            self.reporte_btn.setVisible(False)
+            self.notificacion_btn.setVisible(False)
+
+    def abrir_pdf(self, ruta):
+        import webbrowser
+        webbrowser.open(ruta)
+
+    
+    def limpiar_valor(self, resultado):#se usa cuando el campo tiene valor null, se pone un caracter en blanco ""
+        return str(resultado) if resultado is not None else ""
         
            
 
