@@ -55,8 +55,7 @@ class UI_Busqueda(QWidget):
             """)
 
         self.setWindowTitle("Buscar")
-        self.setMinimumSize(800, 600)
-
+        self.setMinimumSize(800, 700)
 
 
         #Layoput de la ventana
@@ -245,7 +244,7 @@ class UI_Busqueda(QWidget):
 
         self.mecanismo_resultado = QLineEdit()
         self.mecanismo_resultado.setReadOnly(True)
-        self.datos_layout.addWidget(QLabel("Mecanismo de daño"), 2, 2)
+        self.datos_layout.addWidget(QLabel("Mecanismo de daño:"), 2, 2)
         self.datos_layout.addWidget(self.mecanismo_resultado, 3, 2, 1, 2)
         
         
@@ -271,7 +270,7 @@ class UI_Busqueda(QWidget):
         self.etiqueta_item = QLabel("Descripción:")
         self.datos_layout.addWidget(self.etiqueta_item, 4, 0, 1, 6)
         self.datos_layout.addWidget(self.descripcion_resultado, 5, 0, 1, 7)
-        self.descripcion_resultado.setFixedHeight(80)
+        self.descripcion_resultado.setFixedHeight(60)
 
         self.mitigacion_resultado = QLineEdit()
         self.mitigacion_resultado.setReadOnly(True)
