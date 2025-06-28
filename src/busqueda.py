@@ -55,7 +55,7 @@ class UI_Busqueda(QWidget):
             """)
 
         self.setWindowTitle("Buscar")
-        self.setMinimumSize(1100, 800)
+        self.setMinimumSize(800, 600)
 
 
 
@@ -177,7 +177,7 @@ class UI_Busqueda(QWidget):
         # Lista de resultados
         self.tabla_resultados = QTableWidget()
         self.tabla_resultados.setColumnCount(7)
-        self.tabla_resultados.setHorizontalHeaderLabels(["ID", "PLANTA", "CIRCUITO", "UNIDAD DE CONTROL", "FECHA DE ELABORACIÓN", "FECHA DE VENCIMIENTO", "ESTADO ACTUAL"])
+        self.tabla_resultados.setHorizontalHeaderLabels(["ID", "PLANTA", "CIRCUITO", "UNIDAD DE CONTROL", "ELABORACIÓN", "VENCIMIENTO", "ESTADO ACTUAL"])
         self.tabla_resultados.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tabla_resultados.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         resultados_layout.addWidget(self.tabla_resultados)
