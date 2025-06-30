@@ -183,7 +183,7 @@ class UI_Nuevo(QWidget):
         self.programa.setFixedHeight(25)
 
         self.iniciativa = QComboBox()
-        self.iniciativa.addItems((" ", "No", "SÍ"))
+        self.iniciativa.addItems((" ", "NO", "SÍ"))
         self.iniciativa.model().item(0).setEnabled(False)
         self.layout_inferior.addWidget(QLabel("Iniciativa:"), 0, 2)
         self.layout_inferior.addWidget(self.iniciativa, 1, 2)
@@ -219,19 +219,21 @@ class UI_Nuevo(QWidget):
         self.descripcion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.layout_inferior2.addWidget(QLabel("Descripción:"))
         self.layout_inferior2.addWidget(self.descripcion)
-        self.descripcion.textChanged.connect(lambda text: self.descripcion.setText(text.upper()))
+        self.descripcion.textChanged.connect(self.convertir_descripcion_a_mayusculas)
         self.descripcion.setFixedHeight(45)
-        
+
         self.mitigacion = QTextEdit()
         self.mitigacion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.layout_inferior2.addWidget(QLabel("Medida de Mitigación:"))
         self.layout_inferior2.addWidget(self.mitigacion)
+        self.mitigacion.textChanged.connect(self.convertir_mitigacion_a_mayusculas)
         self.mitigacion.setFixedHeight(45)
 
         self.comentarios = QTextEdit()
         self.comentarios.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.layout_inferior2.addWidget(QLabel("Comentarios:"))
         self.layout_inferior2.addWidget(self.comentarios)
+        self.comentarios.textChanged.connect(self.convertir_comentarios_a_mayusculas)
         self.comentarios.setFixedHeight(45)
         
         
@@ -246,6 +248,7 @@ class UI_Nuevo(QWidget):
         self.layout_inferior2.addStretch()
         self.layout_inferior2.addWidget(self.guardar_btn, alignment=Qt.AlignRight)
         self.guardar_btn.setFixedSize(150, 50)
+        self.guardar_btn.clicked.connect(self.guardar_registro)
         
 
         
@@ -365,16 +368,16 @@ class UI_Nuevo(QWidget):
         if self.boton_emp.isChecked():
             tabla = "EMP"
             columna_id = "EMPLAZAMIENTO"
-            descripcion_columna = "DESCRIPCIÓN DEL EMPLAZAMIENTO"
-            enlace_columna = "ENLACE EMP"
+            descripcion_columna = '"DESCRIPCIÓN DEL EMPLAZAMIENTO"'
+            enlace_columna = '"ENLACE EMP"'
 
             
             
         elif self.boton_sf.isChecked():
             tabla = "SF"
-            columna_id = "[SOLICITUD DE FABRICACIÓN]"
-            descripcion_columna = "DESCRIPCIÓN DE LA SOLICITUD DE FABRICACIÓN"
-            enlace_columna = "ENLACE SF"
+            columna_id = '"SOLICITUD DE FABRICACIÓN"'
+            descripcion_columna = '"DESCRIPCIÓN DE LA SOLICITUD DE FABRICACIÓN"'
+            enlace_columna = '"ENLACE SF"'
            
             
         else:
@@ -396,7 +399,7 @@ class UI_Nuevo(QWidget):
         programa_value = self.programa.currentText().strip()
         iniciativa_value = self.iniciativa.currentText().strip()
         paro_value = self.paro_planta.currentText().strip()
-        estado_actual = self.status.currentText().strip()
+        estado_actual = "VIGENTE"
         status_operativo = self.status.currentText().strip()
         riesgo_value = self.riesgo.currentText().strip()
         mitigacion_value = self.mitigacion.toPlainText().strip()
@@ -416,27 +419,36 @@ class UI_Nuevo(QWidget):
             return
 
         # Sentencia SQL
+        estado_actual
+
         self.cursor.execute(f"""
             INSERT INTO {tabla} (
-                {columna_id}, SECTOR, PLANTA, CIRCUITO, UNIDAD DE CONTROL,
-                {descripcion_columna}, MECANISMO DE DAÑO, ESPECIFICACIÓN,
-                FECHA DE ELABORACIÓN, SAP, FECHA DE VENCIMIENTO, PROGRAMA DE ATENCIÓN,
-                INICIATIVA, PARO DE PLANTA, FECHA DE ATENCIÓN, ESTADO ACTUAL,
-                FECHA DE REVALUACIÓN, STATUS OPERATIVO, RIESGO, MEDIDA DE MITIGACIÓN,
-                OBSERVACIONES GENERALES, {enlace_columna}
+                {columna_id}, SECTOR, PLANTA, CIRCUITO, [UNIDAD DE CONTROL],
+                {descripcion_columna}, [MECANISMO DE DAÑO], ESPECIFICACIÓN,
+                [FECHA DE ELABORACIÓN], SAP, [FECHA DE VENCIMIENTO], [PROGRAMA DE ATENCIÓN],
+                INICIATIVA, [PARO DE PLANTA], [FECHA DE ATENCIÓN], [ESTADO ACTUAL],
+                [FECHA DE REVALUACIÓN], [STATUS OPERATIVO], RIESGO, [MEDIDA DE MITIGACIÓN],
+                [OBSERVACIONES GENERALES], {enlace_columna}
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             id_value, sector_value, planta_value, circuito_value, uc_value,
             descripcion_value, mecanismo_value, material_value,
             fecha_elab_value, sap_value, fecha_ven_value, programa_value,
-            iniciativa_value, paro_value, estado_actual,
-            status_operativo, riesgo_value, mitigacion_value,
+            iniciativa_value, paro_value, None, estado_actual,
+            None, status_operativo, riesgo_value, mitigacion_value,
             observaciones_value, enlace_value
         ))
 
         self.conexion.commit()
-        QMessageBox.information(self, "Éxito", f"Registro guardado correctamente en la tabla {tabla}.")
+
+        if tabla == "EMP":
+            mensaje = "Emplazamiento registrado exitosamente."
+        elif tabla == "SF":
+            mensaje = "Solicitud de fabricación registrada exitosamente."
+
+        QMessageBox.information(self,"Exito", mensaje)
+
         self.limpiar_formulario()
 
      except Exception as e:
@@ -470,8 +482,65 @@ class UI_Nuevo(QWidget):
             self.ID.setText(nuevo_id)
         except Exception as e:
             QMessageBox.critical(self, "Error", f"No se pudo generar el ID: {str(e)}")
-        
 
+    def convertir_descripcion_a_mayusculas(self):
+            cursor = self.descripcion.textCursor()  # Guardar posición del cursor
+            texto = self.descripcion.toPlainText()
+            self.descripcion.blockSignals(True)  # Para evitar recursión infinita
+            self.descripcion.setPlainText(texto.upper())
+            self.descripcion.blockSignals(False)
+            self.descripcion.setTextCursor(cursor)  # Restaurar posición del cursor
+
+    def convertir_mitigacion_a_mayusculas(self):
+            cursor = self.mitigacion.textCursor() 
+            texto = self.mitigacion.toPlainText()
+            self.mitigacion.blockSignals(True)  
+            self.mitigacion.setPlainText(texto.upper())
+            self.mitigacion.blockSignals(False)
+            self.mitigacion.setTextCursor(cursor) 
+
+    def convertir_comentarios_a_mayusculas(self):
+            cursor = self.comentarios.textCursor() 
+            texto = self.comentarios.toPlainText()
+            self.comentarios.blockSignals(True) 
+            self.comentarios.setPlainText(texto.upper())
+            self.comentarios.blockSignals(False)
+            self.comentarios.setTextCursor(cursor) 
+        
+    def limpiar_formulario(self):
+        # Limpiar QLineEdit
+        self.ID.clear()
+        self.circuito.clear()
+        self.UC.clear()
+        self.material.clear()
+        self.SAP.clear()
+        self.enlace.clear()
+
+    # Resetear QComboBox
+        self.sector.setCurrentIndex(0)
+        self.planta.clear()
+        self.programa.setCurrentIndex(0)
+        self.iniciativa.setCurrentIndex(0)
+        self.paro_planta.setCurrentIndex(0)
+        self.status.setCurrentIndex(0)
+        self.riesgo.setCurrentIndex(0)
+        self.mecanismo.setCurrentIndex(0)
+
+    # Limpiar QTextEdit
+        self.descripcion.clear()
+        self.mitigacion.clear()
+        self.comentarios.clear()
+
+    # Limpiar QDateEdit
+        self.fecha_elab.setDate(QDate.currentDate())
+        self.fecha_ven.setDate(QDate.currentDate())
+
+    # Opcional: Resetear el radio button
+        self.boton_emp.setChecked(False)
+        self.boton_sf.setChecked(False)
+
+    # Opcional: Volver a generar un ID vacío
+        self.ID.setText("")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

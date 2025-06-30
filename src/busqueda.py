@@ -55,7 +55,7 @@ class UI_Busqueda(QWidget):
             """)
 
         self.setWindowTitle("Buscar")
-        self.setMinimumSize(800, 700)
+        self.setMinimumSize(1000, 700)
 
 
         #Layoput de la ventana
@@ -246,18 +246,21 @@ class UI_Busqueda(QWidget):
         self.mecanismo_resultado.setReadOnly(True)
         self.datos_layout.addWidget(QLabel("Mecanismo de daño:"), 2, 2)
         self.datos_layout.addWidget(self.mecanismo_resultado, 3, 2, 1, 2)
+        self.mecanismo_resultado.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         
         
         self.material_resultado = QLineEdit()
         self.material_resultado.setReadOnly(True)
         self.datos_layout.addWidget(QLabel("Material:"), 2, 4)
         self.datos_layout.addWidget(self.material_resultado, 3, 4, 1, 1)
+        self.material_resultado.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         
         
         self.SAP_resultado = QLineEdit()
         self.SAP_resultado.setReadOnly(True)
         self.datos_layout.addWidget(QLabel("Aviso SAP:"), 2, 5)
         self.datos_layout.addWidget(self.SAP_resultado, 3, 5)
+        
        
         
         self.riesgo_resultado = QLineEdit()
@@ -403,14 +406,16 @@ class UI_Busqueda(QWidget):
 
         self.db_path = str(Path(__file__).resolve().parent.parent / "db" / "EMP.db")
 
+        # A continuación se usa VISTA_EMP o VISTA_SF como tablas de busqueda de la bd porque en esas vistas estan calculadas la columna ESTADO en base a las fechas 
+
     def buscar_en_db(self):
         if self.botonEmp.isChecked():
-            tabla = "EMP"
+            tabla = "VISTA_EMP"
             columna_id = "EMPLAZAMIENTO"
             label_result = "Emplazamientos encontrados"
             
         elif self.botonSF.isChecked():
-            tabla = "SF"
+            tabla = "VISTA_SF"
             columna_id = "[SOLICITUD DE FABRICACIÓN]"
             label_result = "Solicitudes de fabricación encontradas"
             
@@ -456,7 +461,7 @@ class UI_Busqueda(QWidget):
         # creando la consulta
         if id_busqueda:
          query = f"""
-         SELECT {columna_id}, PLANTA, CIRCUITO, [UNIDAD DE CONTROL], [FECHA DE ELABORACIÓN], [FECHA DE VENCIMIENTO], [ESTADO ACTUAL]
+         SELECT {columna_id}, PLANTA, CIRCUITO, [UNIDAD DE CONTROL], [FECHA DE ELABORACIÓN], [FECHA DE VENCIMIENTO], [ESTADO]
          FROM {tabla}
          WHERE {columna_id} = ?
          """
@@ -464,7 +469,7 @@ class UI_Busqueda(QWidget):
         else:
             query = f"""
              SELECT {columna_id}, PLANTA, CIRCUITO, [UNIDAD DE CONTROL], [FECHA DE ELABORACIÓN], [FECHA DE VENCIMIENTO],
-             [ESTADO ACTUAL] 
+             [ESTADO] 
                
              FROM {tabla}
              WHERE 1=1
@@ -479,7 +484,7 @@ class UI_Busqueda(QWidget):
                 query += "AND PLANTA = ?"
                 valores.append(planta)
             if estado:
-                query += " AND [ESTADO ACTUAL] = ?"
+                query += " AND [ESTADO] = ?"
                 valores.append(estado)
             if status:
                 query += "AND [STATUS OPERATIVO] = ?"
@@ -499,13 +504,14 @@ class UI_Busqueda(QWidget):
         resultados = cursor.fetchall()
         conexion.close
 
-        columnas = ["ID", "PLANTA", "CIRCUITO", "UNIDAD DE CONTROL", "FECHA DE ELABORACION", "FECHA DE VENCIMIENTO", "ESTADO ACTUAL"]
+        columnas = ["ID", "PLANTA", "CIRCUITO", "UNIDAD DE CONTROL", "ELABORACION", "VENCIMIENTO", "ESTADO ACTUAL"]
 
         self.tabla_resultados.setColumnCount(len(columnas))
         self.tabla_resultados.setHorizontalHeaderLabels(columnas)
         self.tabla_resultados.setRowCount(0)
 
         if resultados:
+           
             for fila_idx, fila_datos in enumerate(resultados):
              print(f"Fila {fila_idx}: {fila_datos}")
              print(f"Resultados encontrados: {len(resultados)}")
@@ -546,12 +552,12 @@ class UI_Busqueda(QWidget):
            
             id_seleccionado = selected_items[0].text()
             if self.botonEmp.isChecked():
-                tabla = "EMP"
+                tabla = "VISTA_EMP"
                 columna_id = "EMPLAZAMIENTO"
                 descripcion = "DESCRIPCIÓN DEL EMPLAZAMIENTO"
                 columna_id_tabla = "EMPLAZAMIENTO"
             elif self.botonSF.isChecked():
-                tabla = "SF"
+                tabla = "VISTA_SF"
                 columna_id = "[SOLICITUD DE FABRICACIÓN]"
                 descripcion = "DESCRIPCIÓN DE LA SOLICITUD DE FABRICACIÓN"
                 columna_id_tabla = "SOLICITUD DE FABRICACIÓN"
@@ -577,7 +583,7 @@ class UI_Busqueda(QWidget):
             self.UC_resultado.setText(self.limpiar_valor(resultado['UNIDAD DE CONTROL']))
             self.status_resultado.setText(self.limpiar_valor(resultado['STATUS OPERATIVO']))
             self.vigencia_resultado.setText(self.limpiar_valor(resultado['FECHA DE VENCIMIENTO']))
-            self.estado_resultado.setText(self.limpiar_valor(resultado["ESTADO ACTUAL"]))
+            self.estado_resultado.setText(self.limpiar_valor(resultado["ESTADO"]))
             self.mecanismo_resultado.setText(self.limpiar_valor(resultado["MECANISMO DE DAÑO"]))
             self.material_resultado.setText(self.limpiar_valor(resultado["ESPECIFICACIÓN"]))
             self.SAP_resultado.setText(self.limpiar_valor(resultado["SAP"]))
@@ -589,7 +595,7 @@ class UI_Busqueda(QWidget):
 
 
             # Asignar rutas de PDF a los ToolButtons
-        if tabla == "EMP":
+        if tabla == "VISTA_EMP":
             ruta_pdf = resultado["ENLACE EMP"] if resultado["ENLACE EMP"] is not None else None
             print(f"Ruta EMP: {ruta_pdf}")
 
@@ -604,7 +610,7 @@ class UI_Busqueda(QWidget):
             else:
              self.reporte_btn.setVisible(False)
 
-        elif tabla == "SF":
+        elif tabla == "VISTA_SF":
             ruta_pdf = resultado["ENLACE SF"] if resultado["ENLACE SF"] is not None else None
             if ruta_pdf and ruta_pdf.strip():
                try:
