@@ -664,18 +664,18 @@ class UI_editar(QWidget):
             # con esto se llenan los QlineEdit de resultados
 
             self.ID.setText(self.limpiar_valor(resultado[columna_id_tabla]))
-            self.sector.setText(self.limpiar_valor(resultado['SECTOR']))
-            self.planta.setText(self.limpiar_valor(resultado['PLANTA']))
-            self.reevaluacion.setText(self.limpiar_valor(resultado['FECHA DE REEVALUACIÓN']))
-            self.vigencia.setText(self.limpiar_valor(resultado['FECHA DE VENCIMIENTO']))
-            self.atencion.setText(self.limpiar_valor(resultado['FECHA DE ATENCIÓN']))
+            self.sector.setCurrentText(self.limpiar_valor(resultado['SECTOR']))
+            self.planta.setCurrentText(self.limpiar_valor(resultado['PLANTA']))
+            self.reevaluacion.setDate(QDate.fromString(self.limpiar_valor(self.limpiar_valor(resultado['FECHA DE REEVALUACIÓN']))))
+            self.vigencia.setDate(QDate.fromString((self.limpiar_valor(resultado['FECHA DE VENCIMIENTO']))))
+            self.atencion.setDate(QDate.fromString((self.limpiar_valor(resultado['FECHA DE ATENCIÓN']))))
             #self.circuito_resultado.setText(self.limpiar_valor(resultado['CIRCUITO']))
             #self.UC_resultado.setText(self.limpiar_valor(resultado['UNIDAD DE CONTROL']))
             self.estado.setText(self.limpiar_valor(resultado["ESTADO ACTUAL"]))
-            self.status.setText(self.limpiar_valor(resultado['STATUS OPERATIVO']))
+            self.status.setCurrentText(self.limpiar_valor(resultado['STATUS OPERATIVO']))
             
             
-            self.mecanismo.setText(self.limpiar_valor(resultado["MECANISMO DE DAÑO"]))
+            self.mecanismo.setCurrentText(self.limpiar_valor(resultado["MECANISMO DE DAÑO"]))
             self.material.setText(self.limpiar_valor(resultado["ESPECIFICACIÓN"]))
             self.sap.setText(self.limpiar_valor(resultado["SAP"]))
             #self.riesgo_resultado.setText(self.limpiar_valor(resultado["RIESGO"]))
