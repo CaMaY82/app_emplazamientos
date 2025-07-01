@@ -54,8 +54,8 @@ class UI_Busqueda(QWidget):
         }
             """)
 
-        self.setWindowTitle("Buscar")
-        self.setMinimumSize(1000, 700)
+        self.setWindowTitle("Búsqueda EMP o SF")
+        self.setMinimumSize(900, 700)
 
 
         #Layoput de la ventana
@@ -67,8 +67,8 @@ class UI_Busqueda(QWidget):
         titulo = QLabel("¿Qué Deseas Buscar?")
         titulo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         titulo.setStyleSheet("font-weight: bold; font-size: 16px")
-        layout_principal.addWidget(titulo)
-        layout_principal.addSpacerItem(QSpacerItem(10, 20, QSizePolicy.Minimum, QSizePolicy.Fixed))
+        #layout_principal.addWidget(titulo)
+        #layout_principal.addSpacerItem(QSpacerItem(10, 20, QSizePolicy.Minimum, QSizePolicy.Fixed))
 
         #layout del frame superior (filtros)
         self.filtros_frame = QFrame()        
@@ -211,7 +211,7 @@ class UI_Busqueda(QWidget):
         self.planta_resultado.setReadOnly(True)
         self.datos_layout.addWidget(QLabel("Planta:"), 0, 2)
         self.datos_layout.addWidget(self.planta_resultado, 1, 2)
-        self.planta_resultado.setFixedWidth(127)                                            
+        #self.planta_resultado.setFixedWidth(127)                                            
 
         self.circuito_resultado = QLineEdit()
         self.circuito_resultado.setReadOnly(True)
@@ -686,7 +686,7 @@ class UI_Busqueda(QWidget):
 if __name__ == "__main__":
    app = QApplication(sys.argv)
    ventana = QMainWindow()
-   ventana.setWindowTitle("BUSCAR")
+   ventana.setWindowTitle("Búsqueda EMP o SF")
    base_dir = Path(__file__).resolve().parent
    icono_ventana = base_dir.parent / "assets" / "search_icon.ico"
    ui = UI_Busqueda()

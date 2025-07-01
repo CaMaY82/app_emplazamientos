@@ -172,7 +172,7 @@ class UI_Nuevo(QWidget):
         self.SAP = QLineEdit()
         self.layout_inferior.addWidget(QLabel("Aviso SAP:"), 6, 1)
         self.layout_inferior.addWidget(self.SAP, 7, 1)
-        self.SAP.setValidator(QIntValidator(0, 9999999))
+        self.SAP.setValidator(QIntValidator(0, 999999999))
         self.SAP.setFixedHeight(25)
               
         self.programa = QComboBox()
