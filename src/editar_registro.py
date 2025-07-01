@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QFrame, QLabel, QPushButton, QRadioButton, QComboBox, QTableWidget,
-    QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton, QTextEdit, QGroupBox, QDateEdit, QMessageBox
+    QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton, QTextEdit, QGroupBox, QDateEdit, QMessageBox, QScrollArea
 
 )
 from PySide6.QtCore import Qt, QSize, QDate
@@ -72,7 +72,8 @@ class UI_editar(QWidget):
 
         # Layout de los filtros
         grupo_filtros = QGroupBox("Selecciona")
-        grupo_filtros.setFixedHeight(100)
+        layout_principal.addWidget(grupo_filtros, stretch=10)
+        grupo_filtros.setFixedHeight(120)
         
         
         filtros_layout = QGridLayout()
@@ -158,13 +159,18 @@ class UI_editar(QWidget):
         filtros_layout.addWidget(self.ID_busqueda, 3, 4)
         self.ID_busqueda.setFixedWidth(200)
 
+        self.resultados_label = QLabel()
+        filtros_layout.addWidget(self.resultados_label, 1, 5)
+        self.resultados_label.setAlignment(Qt.AlignCenter)
+
         # Boton buscar
         self.buscar_btn = QPushButton("BUSCAR 🔎")
         self.buscar_btn.setStyleSheet("font-weight: bold; font-size: 16px")
-        self.buscar_btn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-        filtros_layout.addWidget(self.buscar_btn, 1, 5, 2, 1)
-
+        self.buscar_btn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        filtros_layout.addWidget(self.buscar_btn, 2, 5, 2, 1)
         self.buscar_btn.clicked.connect(self.buscar_en_db)
+
+        
 
 
         #layout del frame intermedio (lista de resultados)
@@ -176,6 +182,8 @@ class UI_editar(QWidget):
         self.tabla_resultados.setColumnCount(7)
         self.tabla_resultados.setHorizontalHeaderLabels(["ID", "PLANTA", "CIRCUITO", "UNIDAD DE CONTROL", "FECHA DE ELABORACIÓN", "FECHA DE VENCIMIENTO", "ESTADO ACTUAL"])
         self.tabla_resultados.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tabla_resultados.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.tabla_resultados.itemSelectionChanged.connect(self.detalle_elemento)
         resultados_layout.addWidget(self.tabla_resultados)
         self.resultados.setLayout(resultados_layout)
         layout_principal.addWidget(self.resultados)
@@ -185,7 +193,7 @@ class UI_editar(QWidget):
         edicion_layout = QGridLayout()
         edicion_layout.setAlignment(Qt.AlignCenter)
         self.frame_edicion.setLayout(edicion_layout)
-        layout_principal.addWidget(self.frame_edicion)
+        #layout_principal.addWidget(self.frame_edicion)
         
         # Agregando controles de edición (widgets)
 
@@ -272,7 +280,7 @@ class UI_editar(QWidget):
         edicion2_layout = QGridLayout()
         edicion2_layout.setAlignment(Qt.AlignLeft)
         self.frame_edicion2.setLayout(edicion2_layout)
-        layout_principal.addWidget(self.frame_edicion2)
+        #layout_principal.addWidget(self.frame_edicion2)
 
         self.mecanismo = QComboBox()
         edicion2_layout.addWidget(QLabel("Mecanismo de Daño:"), 0, 0)
@@ -303,7 +311,7 @@ class UI_editar(QWidget):
         grupo_enlaces = QGroupBox("Agregar enlaces a archivo:")
         enlaces_layout = QGridLayout()
         grupo_enlaces.setLayout(enlaces_layout)
-        layout_principal.addWidget(grupo_enlaces)
+        #layout_principal.addWidget(grupo_enlaces)
 
         self.archivo_link = QLineEdit()
         enlaces_layout.addWidget(QLabel("Enlace a Archivo:"), 0, 1, alignment=Qt.AlignRight)        
@@ -354,14 +362,27 @@ class UI_editar(QWidget):
         botones_layout = QHBoxLayout()
         botones_layout.setAlignment(Qt.AlignRight)
         botones_frame.setLayout(botones_layout)        
-        layout_principal.addWidget(botones_frame)
+        #layout_principal.addWidget(botones_frame)
 
         self.actualizar = QPushButton("ACTUALIZAR")
         self.actualizar.setFixedSize(150, 40)
         botones_layout.addWidget(self.actualizar)
 
-        
-        
+
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+
+        contenedor_widget = QWidget()
+        self.contenedor = QVBoxLayout(contenedor_widget)
+        self.contenedor.addWidget(self.frame_edicion)
+        self.contenedor.addWidget(self.frame_edicion2)
+        self.contenedor.addWidget(grupo_enlaces)
+        self.contenedor.addWidget(botones_frame)
+
+        self.scroll_area.setWidget(contenedor_widget)
+        layout_principal.addWidget(self.scroll_area)
+        self.scroll_area.setMaximumHeight(400)
+
 
 
         
@@ -526,7 +547,7 @@ class UI_editar(QWidget):
         # creando la consulta
         if id_busqueda:
          query = f"""
-         SELECT {columna_id}, PLANTA, CIRCUITO, [UNIDAD DE CONTROL], [FECHA DE ELABORACIÓN], [FECHA DE VENCIMIENTO], [ESTADO]
+         SELECT {columna_id}, PLANTA, CIRCUITO, [UNIDAD DE CONTROL], [FECHA DE ELABORACIÓN], [FECHA DE VENCIMIENTO], [ESTADO ACTUAL]
          FROM {tabla}
          WHERE {columna_id} = ?
          """
