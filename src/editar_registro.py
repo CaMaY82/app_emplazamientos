@@ -290,17 +290,17 @@ class UI_editar(QWidget):
         edicion2_layout.addWidget(QLabel("Material"), 0, 1)
         edicion2_layout.addWidget(self.material, 1, 1)
 
-        self.mitigacion = QTextEdit()
-        self.mitigacion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.mitigacion.setFixedHeight(50)
-        edicion2_layout.addWidget(QLabel("Medida de Mitigación:"), 2, 0, 1, 1)
-        edicion2_layout.addWidget(self.mitigacion, 3, 0, 2, 2)
-
         self.descripcion = QTextEdit()
         self.descripcion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.descripcion.setFixedHeight(50)
-        edicion2_layout.addWidget(QLabel("Descripción:"), 5, 0, 1, 1)
-        edicion2_layout.addWidget(self.descripcion, 6, 0, 2, 1)
+        edicion2_layout.addWidget(QLabel("Descreipción:"), 2, 0, 1, 1)
+        edicion2_layout.addWidget(self.descripcion, 3, 0, 2, 2)
+
+        self.mitigacion = QTextEdit()
+        self.mitigacion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.mitigacion.setFixedHeight(50)
+        edicion2_layout.addWidget(QLabel("Mitigación:"), 5, 0, 1, 1)
+        edicion2_layout.addWidget(self.mitigacion, 6, 0, 2, 1)
 
         self.comentarios = QTextEdit()
         self.comentarios.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
