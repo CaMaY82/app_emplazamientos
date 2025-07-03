@@ -271,7 +271,7 @@ class UI_editar(QWidget):
         self.calendario_atn.setIcon(QIcon(str(icono_calendario)))
         self.calendario_atn.setIconSize(QSize(30, 30))
         self.calendario_atn.setFixedSize(30, 30)
-        edicion_layout.addWidget(self.calendario_vig, 1, 8)
+        edicion_layout.addWidget(self.calendario_atn, 1, 8)
         self.calendario_atn.setStyleSheet("""
         QToolButton {
             font-weight: normal;
@@ -334,7 +334,7 @@ class UI_editar(QWidget):
         self.frame_edicion3 = QFrame()
         edicion3_layout = QGridLayout()
         edicion3_layout.setAlignment(Qt.AlignLeft)
-        self.frame_edicion2.setLayout(edicion3_layout)
+        self.frame_edicion3.setLayout(edicion3_layout)
         #layout_principal.addWidget(self.frame_edicion2)
 
         self.mecanismo = QComboBox()
@@ -437,7 +437,7 @@ class UI_editar(QWidget):
 
         self.scroll_area.setWidget(contenedor_widget)
         layout_principal.addWidget(self.scroll_area)
-        self.scroll_area.setMaximumHeight(400)
+        self.scroll_area.setMaximumHeight(300)
 
       
 
