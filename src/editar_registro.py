@@ -216,30 +216,85 @@ class UI_editar(QWidget):
         edicion_layout.addWidget(QLabel("Planta:"), 0, 2)
         edicion_layout.addWidget(self.planta, 1, 2)
 
-        self.reevaluacion = QDateEdit()
-        self.reevaluacion.setCalendarPopup(True)
+        self.reevaluacion = QLineEdit()
+        #self.reevaluacion.setCalendarPopup(True)
         edicion_layout.addWidget(QLabel("Reevaluación:"),0, 3)
         edicion_layout.addWidget(self.reevaluacion, 1, 3)
         self.reevaluacion.setFixedWidth(150)
 
-        self.vigencia = QDateEdit()
-        self.vigencia.setCalendarPopup(True)
-        edicion_layout.addWidget(QLabel("Vigencia:"), 0, 4)
-        edicion_layout.addWidget(self.vigencia, 1, 4)
+        icono_calendario = base_dir.parent / "assets" /"calendar_icon.png"
+        self.calendario_reev = QToolButton()
+        self.calendario_reev.setIcon(QIcon(str(icono_calendario)))
+        self.calendario_reev.setIconSize(QSize(30, 30))
+        self.calendario_reev.setFixedSize(30, 30)
+        edicion_layout.addWidget(self.calendario_reev, 1, 4)
+        self.calendario_reev.setStyleSheet("""
+        QToolButton {
+            font-weight: normal;
+            font-size: 12px;
+            border: none;
+            background-color: transparent;
+            padding: 0;
+            }
+           
+            """)
+
+        
+        self.vigencia = QLineEdit()
+        edicion_layout.addWidget(QLabel("Vigencia:"), 0, 5)
+        edicion_layout.addWidget(self.vigencia, 1, 5)
         #self.vigencia.setFixedWidth(90)
 
-        self.atencion = QDateEdit()
-        self.atencion.setCalendarPopup(True)
-        edicion_layout.addWidget(QLabel("Atención:"), 0, 5)
-        edicion_layout.addWidget(self.atencion, 1, 5)
+        self.calendario_vig = QToolButton()
+        self.calendario_vig.setIcon(QIcon(str(icono_calendario)))
+        self.calendario_vig.setIconSize(QSize(30, 30))
+        self.calendario_vig.setFixedSize(30, 30)
+        edicion_layout.addWidget(self.calendario_vig, 1, 6)
+        self.calendario_vig.setStyleSheet("""
+        QToolButton {
+            font-weight: normal;
+            font-size: 12px;
+            border: none;
+            background-color: transparent;
+            padding: 0;
+            }
+           
+            """)
+
+        self.atencion = QLineEdit()
+        #self.atencion.setCalendarPopup(True)
+        edicion_layout.addWidget(QLabel("Atención:"), 0, 7)
+        edicion_layout.addWidget(self.atencion, 1, 7)
         #self.atencion.setFixedWidth(90)
 
-        edicion_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed), 2, 0, 1, 5)
+        self.calendario_atn = QToolButton()
+        self.calendario_atn.setIcon(QIcon(str(icono_calendario)))
+        self.calendario_atn.setIconSize(QSize(30, 30))
+        self.calendario_atn.setFixedSize(30, 30)
+        edicion_layout.addWidget(self.calendario_vig, 1, 8)
+        self.calendario_atn.setStyleSheet("""
+        QToolButton {
+            font-weight: normal;
+            font-size: 12px;
+            border: none;
+            background-color: transparent;
+            padding: 0;
+            }
+           
+            """)
+
+        #edicion_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed), 2, 0, 1, 5)
+
+        # Layout de edición 2
+        self.frame_edicion2 = QFrame()
+        edicion2_layout = QGridLayout()
+        edicion2_layout.setAlignment(Qt.AlignLeft)
+        self.frame_edicion2.setLayout(edicion2_layout)
 
         self.estado = QLineEdit()
         self.estado.setReadOnly(True)
-        edicion_layout.addWidget(QLabel("Estado:"), 3, 0)
-        edicion_layout.addWidget(self.estado, 4, 0)
+        edicion2_layout.addWidget(QLabel("Estado:"), 0, 0)
+        edicion2_layout.addWidget(self.estado, 1, 0)
         self.estado.setFixedWidth(90)
 
         SI_NO = (" ", "NO" ,"SI")
@@ -247,66 +302,66 @@ class UI_editar(QWidget):
         self.paro_planta = QComboBox()
         self.paro_planta.addItems((SI_NO))
         self.paro_planta.model().item(0).setEnabled(False)
-        edicion_layout.addWidget(QLabel("Paro de Planta:"), 3, 1)
-        edicion_layout.addWidget(self.paro_planta, 4, 1)
+        edicion2_layout.addWidget(QLabel("Paro de Planta:"), 0, 1)
+        edicion2_layout.addWidget(self.paro_planta, 1, 1)
         #self.paro_planta.setFixedWidth(100)
         
         self.iniciativa = QComboBox()
         self.iniciativa.addItems((SI_NO))
         self.iniciativa.model().item(0).setEnabled(False)
-        edicion_layout.addWidget(QLabel("Iniciativa:"), 3, 2)
-        edicion_layout.addWidget(self.iniciativa, 4, 2)
+        edicion2_layout.addWidget(QLabel("Iniciativa:"), 0, 2)
+        edicion2_layout.addWidget(self.iniciativa, 1, 2)
         #self.iniciativa.setFixedWidth(100)
 
         self.programa = QComboBox()
         self.programa.addItems(SI_NO)
         self.programa.model().item(0).setEnabled(False)
-        edicion_layout.addWidget(QLabel("Programa:"), 3, 3)
-        edicion_layout.addWidget(self.programa, 4, 3)
+        edicion2_layout.addWidget(QLabel("Programa:"), 0, 3)
+        edicion2_layout.addWidget(self.programa, 1, 3)
         
         self.status = QComboBox()
         self.status.addItems([" ", "OPERANDO", "FUERA DE OPERACIÓN"])
         self.status.model().item(0).setEnabled(False)
-        edicion_layout.addWidget(QLabel("Status Operativo:"), 3, 4)
-        edicion_layout.addWidget(self.status, 4, 4)
+        edicion2_layout.addWidget(QLabel("Status Operativo:"), 0, 4)
+        edicion2_layout.addWidget(self.status, 1, 4)
 
         self.sap = QLineEdit()
-        edicion_layout.addWidget(QLabel("Aviso SAP:"), 3, 5)
-        edicion_layout.addWidget(self.sap, 4, 5)
+        edicion2_layout.addWidget(QLabel("Aviso SAP:"), 0, 5)
+        edicion2_layout.addWidget(self.sap, 1, 5)
         #self.sap.setFixedWidth(100)
 
-        # Layout de edición 2
-        self.frame_edicion2 = QFrame()
-        edicion2_layout = QGridLayout()
-        edicion2_layout.setAlignment(Qt.AlignLeft)
-        self.frame_edicion2.setLayout(edicion2_layout)
+        # Layout de edición 3
+        self.frame_edicion3 = QFrame()
+        edicion3_layout = QGridLayout()
+        edicion3_layout.setAlignment(Qt.AlignLeft)
+        self.frame_edicion2.setLayout(edicion3_layout)
         #layout_principal.addWidget(self.frame_edicion2)
 
         self.mecanismo = QComboBox()
-        edicion2_layout.addWidget(QLabel("Mecanismo de Daño:"), 0, 0)
-        edicion2_layout.addWidget(self.mecanismo, 1, 0,)
+        edicion3_layout.addWidget(QLabel("Mecanismo de Daño:"), 0, 0)
+        edicion3_layout.addWidget(self.mecanismo, 1, 0,)
 
         self.material = QLineEdit()
-        edicion2_layout.addWidget(QLabel("Material"), 0, 1)
-        edicion2_layout.addWidget(self.material, 1, 1)
+        edicion3_layout.addWidget(QLabel("Material"), 0, 1)
+        edicion3_layout.addWidget(self.material, 1, 1)
 
         self.descripcion = QTextEdit()
         self.descripcion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.descripcion.setFixedHeight(50)
-        edicion2_layout.addWidget(QLabel("Descreipción:"), 2, 0, 1, 1)
-        edicion2_layout.addWidget(self.descripcion, 3, 0, 2, 2)
+        edicion3_layout.addWidget(QLabel("Descreipción:"), 2, 0, 1, 1)
+        edicion3_layout.addWidget(self.descripcion, 3, 0, 2, 2)
 
         self.mitigacion = QTextEdit()
         self.mitigacion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.mitigacion.setFixedHeight(50)
-        edicion2_layout.addWidget(QLabel("Mitigación:"), 5, 0, 1, 1)
-        edicion2_layout.addWidget(self.mitigacion, 6, 0, 2, 1)
+        edicion3_layout.addWidget(QLabel("Mitigación:"), 5, 0, 1, 1)
+        edicion3_layout.addWidget(self.mitigacion, 6, 0, 2, 1)
 
         self.comentarios = QTextEdit()
         self.comentarios.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.comentarios.setFixedHeight(50)
-        edicion2_layout.addWidget(QLabel("Comentarios:"), 5, 1, 1, 1)
-        edicion2_layout.addWidget(self.comentarios, 6, 1, 2, 1)
+        edicion3_layout.addWidget(QLabel("Comentarios:"), 5, 1, 1, 1)
+        edicion3_layout.addWidget(self.comentarios, 6, 1, 2, 1)
 
         grupo_enlaces = QGroupBox("Agregar enlaces a archivo:")
         enlaces_layout = QGridLayout()
@@ -376,6 +431,7 @@ class UI_editar(QWidget):
         self.contenedor = QVBoxLayout(contenedor_widget)
         self.contenedor.addWidget(self.frame_edicion)
         self.contenedor.addWidget(self.frame_edicion2)
+        self.contenedor.addWidget(self.frame_edicion3)
         self.contenedor.addWidget(grupo_enlaces)
         self.contenedor.addWidget(botones_frame)
 
@@ -383,9 +439,7 @@ class UI_editar(QWidget):
         layout_principal.addWidget(self.scroll_area)
         self.scroll_area.setMaximumHeight(400)
 
-
-
-        
+      
 
         # Lista Mecanismos de Daño
 
@@ -666,9 +720,9 @@ class UI_editar(QWidget):
             self.ID.setText(self.limpiar_valor(resultado[columna_id_tabla]))
             self.sector.setCurrentText(self.limpiar_valor(resultado['SECTOR']))
             self.planta.setCurrentText(self.limpiar_valor(resultado['PLANTA']))
-            self.reevaluacion.setDate(QDate.fromString(self.limpiar_valor(self.limpiar_valor(resultado['FECHA DE REEVALUACIÓN']))))
-            self.vigencia.setDate(QDate.fromString((self.limpiar_valor(resultado['FECHA DE VENCIMIENTO']))))
-            self.atencion.setDate(QDate.fromString((self.limpiar_valor(resultado['FECHA DE ATENCIÓN']))))
+            self.reevaluacion.setText(self.limpiar_valor(resultado['FECHA DE REEVALUACIÓN']))
+            self.vigencia.setText(self.limpiar_valor(resultado['FECHA DE VENCIMIENTO']))
+            self.atencion.setText(self.limpiar_valor(resultado['FECHA DE ATENCIÓN']))
             #self.circuito_resultado.setText(self.limpiar_valor(resultado['CIRCUITO']))
             #self.UC_resultado.setText(self.limpiar_valor(resultado['UNIDAD DE CONTROL']))
             self.estado.setText(self.limpiar_valor(resultado["ESTADO ACTUAL"]))
