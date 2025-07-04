@@ -1,7 +1,8 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QFrame, QLabel, QPushButton, QRadioButton, QComboBox, QTableWidget,
-    QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton, QTextEdit, QGroupBox, QDateEdit, QMessageBox, QScrollArea
+    QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, 
+    QToolButton, QTextEdit, QGroupBox, QDateEdit, QMessageBox, QScrollArea, QCalendarWidget, QDialog
 
 )
 from PySide6.QtCore import Qt, QSize, QDate
@@ -11,6 +12,24 @@ import sys
 from pathlib import Path
 import sqlite3 as sql
 from functools import partial
+
+class CalendarioPopup(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowFlags(Qt.Popup)
+        self.calendario = QCalendarWidget()
+        self.calendario.clicked.connect(self.seleccionar_fecha)
+        
+        layout = QVBoxLayout()
+        layout.addWidget(self.calendario)
+        self.setLayout(layout)
+
+        self.fecha_seleccionada = None
+
+    def seleccionar_fecha(self, fecha):
+        self.fecha_seleccionada = fecha
+        self.accept()
+
 
 class UI_editar(QWidget):
     def __init__(self):
@@ -171,8 +190,6 @@ class UI_editar(QWidget):
         self.buscar_btn.clicked.connect(self.buscar_en_db)
 
         
-
-
         #layout del frame intermedio (lista de resultados)
         self.resultados = QFrame()
         resultados_layout = QGridLayout()
@@ -290,6 +307,14 @@ class UI_editar(QWidget):
             }
            
             """)
+        
+        self.calendario_reev.clicked.connect(lambda: self.abrir_calendario(self.reevaluacion, self.calendario_reev))
+        self.calendario_vig.clicked.connect(lambda: self.abrir_calendario(self.vigencia, self.calendario_vig))
+        self.calendario_atn.clicked.connect(lambda: self.abrir_calendario(self.atencion, self.calendario_atn))
+
+
+    
+
 
         #edicion_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed), 2, 0, 1, 5)
 
@@ -307,8 +332,8 @@ class UI_editar(QWidget):
 
         self.estado = QLineEdit()
         self.estado.setReadOnly(True)
-        edicion2_layout.addWidget(QLabel("Estado:"), 0, 1)
-        edicion2_layout.addWidget(self.estado, 1, 1)
+        #edicion2_layout.addWidget(QLabel("Estado:"), 0, 1)
+        #edicion2_layout.addWidget(self.estado, 1, 1)
         self.estado.setFixedWidth(90)
 
         SI_NO = (" ", "NO" ,"SI")
@@ -563,11 +588,43 @@ class UI_editar(QWidget):
         if plantas:
             self.planta.addItems(plantas)
 
-    def calendarios (self):
-       
+    #Función para abrir calendario
 
-       
-       
+    def abrir_calendario(self, line_edit_objetivo, boton):
+        calendario = CalendarioPopup(self)
+        # Posición del botón
+        boton_pos = boton.mapToGlobal(boton.rect().bottomLeft())
+        # Tamaño del calendario
+        tam_calendario = calendario.sizeHint()
+        # Tamaño de la pantalla
+        pantalla = QApplication.primaryScreen().geometry()
+        nueva_posicion = boton_pos
+
+        # 🔹 Verificar si cabe hacia abajo
+        if boton_pos.y() + tam_calendario.height() > pantalla.height():
+        # Mostrar arriba del botón
+            nueva_posicion = boton.mapToGlobal(boton.rect().topLeft())
+            nueva_posicion.setY(nueva_posicion.y() - tam_calendario.height() - 5)
+        else:
+        # Mostrar debajo del botón con margen
+            nueva_posicion.setY(nueva_posicion.y() + 5)
+
+        # 🔹 Verificar si cabe hacia la derecha
+        if boton_pos.x() + tam_calendario.width() > pantalla.width():
+        # Mover hacia la izquierda para que no se salga
+            nueva_posicion.setX(pantalla.width() - tam_calendario.width() - 5)
+
+        # 🔹 Mover calendario
+        calendario.move(nueva_posicion)
+        calendario.show()
+
+        calendario.finished.connect(lambda: self.actualizar_fecha(calendario, line_edit_objetivo))
+
+
+    def actualizar_fecha(self, calendario, line_edit_objetivo):
+        fecha = calendario.fecha_seleccionada
+        if fecha:
+         line_edit_objetivo.setText(fecha.toString("yyyy-MM-dd")) 
 
         
     # Buscar en la base de datos:
@@ -596,7 +653,7 @@ class UI_editar(QWidget):
            planta = None
 
         estado = self.estado_fl.currentText().upper()
-        if estado in [" "]:
+        if estado in [""]:
             estado = None
         if estado is None:
            filtro_base = "AND ([ESTADO] = 'VIGENTE' OR [ESTADO] = 'VENCIDO')"
@@ -703,13 +760,13 @@ class UI_editar(QWidget):
            
             id_seleccionado = selected_items[0].text()
             if self.botonEmp.isChecked():
-                tabla = "VISTA_EMP"
+                tabla = "EMP"
                 columna_id = "EMPLAZAMIENTO"
                 descripcion = "DESCRIPCIÓN DEL EMPLAZAMIENTO"
                 columna_id_tabla = "EMPLAZAMIENTO"
                 enlace_archivo = "ENLACE EMP"
             elif self.botonSF.isChecked():
-                tabla = "VISTA_SF"
+                tabla = "SF"
                 columna_id = "[SOLICITUD DE FABRICACIÓN]"
                 descripcion = "DESCRIPCIÓN DE LA SOLICITUD DE FABRICACIÓN"
                 columna_id_tabla = "SOLICITUD DE FABRICACIÓN"
@@ -737,7 +794,7 @@ class UI_editar(QWidget):
             self.atencion.setText(self.limpiar_valor(resultado['FECHA DE ATENCIÓN']))
             self.circuito.setText(self.limpiar_valor(resultado['CIRCUITO']))
             self.UC.setText(self.limpiar_valor(resultado['UNIDAD DE CONTROL']))
-            self.estado.setText(self.limpiar_valor(resultado["ESTADO"]))
+            #self.estado.setText(self.limpiar_valor(resultado["ESTADO ACTUAL"]))
             self.status.setCurrentText(self.limpiar_valor(resultado['STATUS OPERATIVO']))
             self.programa.setCurrentText(self.limpiar_valor(resultado["PROGRAMA DE ATENCIÓN"]))
             self.paro_planta.setCurrentText(self.limpiar_valor(resultado['PARO DE PLANTA']))
@@ -755,7 +812,7 @@ class UI_editar(QWidget):
 
 
             # Asignar rutas de PDF a los ToolButtons
-        if tabla == "VISTA_EMP":
+        if tabla == "EMP":
             ruta_pdf = resultado["ENLACE EMP"] if resultado["ENLACE EMP"] is not None else None
             print(f"Ruta EMP: {ruta_pdf}")
 
@@ -770,7 +827,7 @@ class UI_editar(QWidget):
             else:
              self.archivo_btn.setVisible(False)
 
-        elif tabla == "VISTA_SF":
+        elif tabla == "SF":
             ruta_pdf = resultado["ENLACE SF"] if resultado["ENLACE SF"] is not None else None
             if ruta_pdf and ruta_pdf.strip():
                try:
