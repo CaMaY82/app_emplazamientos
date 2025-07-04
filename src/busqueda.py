@@ -55,7 +55,7 @@ class UI_Busqueda(QWidget):
             """)
 
         self.setWindowTitle("Búsqueda EMP o SF")
-        self.setMinimumSize(900, 700)
+        self.setMinimumSize(800, 700)
 
 
         #Layoput de la ventana

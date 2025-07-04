@@ -30,7 +30,7 @@ class MenuPrincipal(QMainWindow):
         logoPMX = base_dir.parent / "assets" / "pemex_logo.png"
         pemex = QPixmap(str(logoPMX))
         logo_pemex = QLabel()
-        logo_pemex.setFixedSize(400, 150)
+        logo_pemex.setFixedSize(200, 90)
         logo_pemex.setPixmap(pemex)
         logo_pemex.setScaledContents(True)
         layout_sup.addWidget(logo_pemex)
@@ -39,7 +39,7 @@ class MenuPrincipal(QMainWindow):
         titulo.setWordWrap(True)
         titulo.setAlignment(Qt.AlignCenter)
         layout_sup.addWidget(titulo, alignment=Qt.AlignCenter)
-        titulo.setStyleSheet("font-weight: bold; font-size: 30px")
+        titulo.setStyleSheet("font-weight: bold; font-size: 18px")
 
         if darkdetect.isDark():
          logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo_dark.png")
@@ -49,7 +49,7 @@ class MenuPrincipal(QMainWindow):
          logoIT = base_dir.parent / "assets" / "inspeccion_logo.png"
          
         logo_inspeccion = QLabel()
-        logo_inspeccion.setFixedSize(350, 150)
+        logo_inspeccion.setFixedSize(200, 100)
         logo_inspeccion.setScaledContents(True)        
         pixmap = QPixmap(str(logoIT))
         logo_inspeccion.setPixmap(pixmap)
@@ -65,66 +65,72 @@ class MenuPrincipal(QMainWindow):
         buscar_icon = QPixmap(base_dir.parent / "assets" / "buscar_icon.png")
                 
         self.buscar_img = QLabel()
-        self.buscar_img.setFixedSize(150, 150)
+        self.buscar_img.setFixedSize(100, 100)
         self.buscar_img.setScaledContents(True)
         self.buscar_img.setPixmap(buscar_icon)
+        
 
         self.buscar = QPushButton("Buscar")
-        self.buscar.setFixedSize(120, 50)
+        self.buscar.setFixedSize(150, 50)
         layout_principal.addWidget(central_frame)
-        central_layout.addWidget(self.buscar_img, 0, 0)
+        central_layout.addWidget(self.buscar_img, 0, 0, Qt.AlignCenter)
         central_layout.addWidget(self.buscar, 1, 0)
 
         editar_icon = QPixmap(base_dir.parent / "assets" / "editar_icon.png")
 
         self.editar_img = QLabel()
-        self.editar_img.setFixedSize(150, 150)
+        self.editar_img.setFixedSize(100, 100)
         self.editar_img.setScaledContents(True)
         self.editar_img.setPixmap(editar_icon)
         
+
+        
         
         self.editar = QPushButton("Editar")
-        self.editar.setFixedSize(120, 50)
-        central_layout.addWidget(self.editar_img, 0, 1)
+        self.editar.setFixedSize(150, 50)
+        central_layout.addWidget(self.editar_img, 0, 1, Qt.AlignCenter)
         central_layout.addWidget(self.editar, 1, 1)
 
         nuevo_icon = QPixmap(base_dir.parent / "assets" / "nuevo_icon.png")
 
         self.nuevo_img = QLabel()
-        self.nuevo_img.setFixedSize(150, 150)
+        self.nuevo_img.setFixedSize(100, 100)
         self.nuevo_img.setScaledContents(True)
         self.nuevo_img.setPixmap(nuevo_icon)
+        
 
         self.nuevo_registro = QPushButton("Nuevo Registro")
-        self.nuevo_registro.setFixedSize(120, 50)
-        central_layout.addWidget(self.nuevo_img, 0, 2)
+        self.nuevo_registro.setFixedSize(150, 50)
+        central_layout.addWidget(self.nuevo_img, 0, 2, Qt.AlignCenter)
         central_layout.addWidget(self.nuevo_registro, 1, 2)
 
         dash_icon = QPixmap(base_dir.parent / "assets" / "dashboard_icon.png")
 
         self.dash_img = QLabel()
-        self.dash_img.setFixedSize(150, 150)
+        self.dash_img.setFixedSize(100, 100)
         self.dash_img.setScaledContents(True)
         self.dash_img.setPixmap(dash_icon)
-
-
+        
 
         self.dashboard = QPushButton("Dashboard")
-        self.dashboard.setFixedSize(120, 50)
-        central_layout.addWidget(self.dash_img, 0, 3)
+        self.dashboard.setFixedSize(150, 50)
+        central_layout.addWidget(self.dash_img, 0, 3, Qt.AlignCenter)
         central_layout.addWidget(self.dashboard, 1, 3)
 
         salir_icon = QPixmap(base_dir.parent / "assets" / "salir_icon.png")
 
         self.salir_img = QLabel()
-        self.salir_img.setFixedSize(150, 150)
+        self.salir_img.setFixedSize(100, 100)
         self.salir_img.setScaledContents(True)
         self.salir_img.setPixmap(salir_icon)
+        
 
         self.salir = QPushButton("Salir")
-        self.salir.setFixedSize(120, 50)
-        central_layout.addWidget(self.salir_img, 0, 4)
+        self.salir.setFixedSize(150, 50)
+        central_layout.addWidget(self.salir_img, 0, 4, Qt.AlignCenter)
         central_layout.addWidget(self.salir, 1, 4)
+
+        
 
 
         
@@ -139,7 +145,7 @@ if __name__ == "__main__":
     import sys
     app = QApplication(sys.argv)
     ventana = MenuPrincipal()
-    ventana.show()
+    ventana.showMaximized()
     base_dir = Path(__file__).resolve().parent
     icono_ventana = base_dir.parent / "assets" / "app_icon_2.ico"
     ventana.setWindowIcon(QIcon(str(icono_ventana)))

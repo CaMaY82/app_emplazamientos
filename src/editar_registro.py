@@ -179,14 +179,14 @@ class UI_editar(QWidget):
         self.ID_busqueda.setFixedWidth(200)
 
         self.resultados_label = QLabel()
-        filtros_layout.addWidget(self.resultados_label, 1, 5)
+        filtros_layout.addWidget(self.resultados_label, 0, 5)
         self.resultados_label.setAlignment(Qt.AlignCenter)
 
         # Boton buscar
         self.buscar_btn = QPushButton("BUSCAR 🔎")
         self.buscar_btn.setStyleSheet("font-weight: bold; font-size: 16px")
         self.buscar_btn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        filtros_layout.addWidget(self.buscar_btn, 2, 5, 2, 1)
+        filtros_layout.addWidget(self.buscar_btn, 1, 5, 3, 1)
         self.buscar_btn.clicked.connect(self.buscar_en_db)
 
         
@@ -216,7 +216,7 @@ class UI_editar(QWidget):
 
         self.ID = QLineEdit()
         self.ID.setReadOnly(True)
-        self.ID.setFixedWidth(90)
+        self.ID.setFixedWidth(80)
         edicion_layout.addWidget(QLabel("ID:"), 0, 0)
         edicion_layout.addWidget(self.ID, 1, 0)
         
@@ -228,7 +228,7 @@ class UI_editar(QWidget):
         edicion_layout.addWidget(self.sector, 1, 1)
 
         self.planta = QComboBox()
-        self.planta.setFixedWidth(150)
+        self.planta.setFixedWidth(90)
         #self.planta.model().item(0).setEnabled(False)
         edicion_layout.addWidget(QLabel("Planta:"), 0, 2)
         edicion_layout.addWidget(self.planta, 1, 2)
@@ -387,7 +387,7 @@ class UI_editar(QWidget):
         self.descripcion = QTextEdit()
         self.descripcion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.descripcion.setFixedHeight(50)
-        edicion3_layout.addWidget(QLabel("Descreipción:"), 2, 0, 1, 1)
+        edicion3_layout.addWidget(QLabel("Descripción:"), 2, 0, 1, 1)
         edicion3_layout.addWidget(self.descripcion, 3, 0, 2, 2)
 
         self.mitigacion = QTextEdit()
@@ -456,11 +456,13 @@ class UI_editar(QWidget):
         botones_layout = QHBoxLayout()
         botones_layout.setAlignment(Qt.AlignRight)
         botones_frame.setLayout(botones_layout)        
-        #layout_principal.addWidget(botones_frame)
+        layout_principal.addWidget(botones_frame)
 
         self.actualizar = QPushButton("ACTUALIZAR")
         self.actualizar.setFixedSize(150, 40)
         botones_layout.addWidget(self.actualizar)
+
+        self.actualizar.clicked.connect(self.actualizar_registro)
 
 
         self.scroll_area = QScrollArea()
@@ -760,13 +762,13 @@ class UI_editar(QWidget):
            
             id_seleccionado = selected_items[0].text()
             if self.botonEmp.isChecked():
-                tabla = "EMP"
+                tabla = "VISTA_EMP"
                 columna_id = "EMPLAZAMIENTO"
                 descripcion = "DESCRIPCIÓN DEL EMPLAZAMIENTO"
                 columna_id_tabla = "EMPLAZAMIENTO"
                 enlace_archivo = "ENLACE EMP"
             elif self.botonSF.isChecked():
-                tabla = "SF"
+                tabla = "VISTA_SF"
                 columna_id = "[SOLICITUD DE FABRICACIÓN]"
                 descripcion = "DESCRIPCIÓN DE LA SOLICITUD DE FABRICACIÓN"
                 columna_id_tabla = "SOLICITUD DE FABRICACIÓN"
@@ -794,7 +796,7 @@ class UI_editar(QWidget):
             self.atencion.setText(self.limpiar_valor(resultado['FECHA DE ATENCIÓN']))
             self.circuito.setText(self.limpiar_valor(resultado['CIRCUITO']))
             self.UC.setText(self.limpiar_valor(resultado['UNIDAD DE CONTROL']))
-            #self.estado.setText(self.limpiar_valor(resultado["ESTADO ACTUAL"]))
+            self.estado.setText(self.limpiar_valor(resultado["ESTADO"]))
             self.status.setCurrentText(self.limpiar_valor(resultado['STATUS OPERATIVO']))
             self.programa.setCurrentText(self.limpiar_valor(resultado["PROGRAMA DE ATENCIÓN"]))
             self.paro_planta.setCurrentText(self.limpiar_valor(resultado['PARO DE PLANTA']))
@@ -865,6 +867,76 @@ class UI_editar(QWidget):
     
     def limpiar_valor(self, resultado):#se usa cuando el campo tiene valor null, se pone un caracter en blanco ""
         return str(resultado) if resultado is not None else ""
+    
+    #funcion para actualizar
+    def actualizar_registro(self):
+     if not self.ID.text():
+        QMessageBox.warning(self, "Advertencia", "No hay registro seleccionado para guardar.")
+        return
+
+     try:
+        conexion = sql.connect(self.db_path)
+        cursor = conexion.cursor()
+
+        # Prepara los valores a actualizar
+        datos_actualizados = {
+            'SECTOR': self.sector.currentText(),
+            'PLANTA': self.planta.currentText(),
+            'FECHA DE REEVALUACIÓN': self.reevaluacion.text(),
+            'FECHA DE VENCIMIENTO': self.vigencia.text(),
+            'FECHA DE ATENCIÓN': self.atencion.text(),
+            'CIRCUITO': self.circuito.text(),
+            'UNIDAD DE CONTROL': self.UC.text(),
+            'ESTADO ACTUAL': self.estado.text(),
+            'STATUS OPERATIVO': self.status.currentText(),
+            'PROGRAMA DE ATENCIÓN': self.programa.currentText(),
+            'PARO DE PLANTA': self.paro_planta.currentText(),
+            'INICIATIVA': self.iniciativa.currentText(),
+            'MECANISMO DE DAÑO': self.mecanismo.currentText(),
+            'ESPECIFICACIÓN': self.material.text(),
+            'SAP': self.sap.text(),
+            'RIESGO': self.riesgo.currentText(),
+            'OBSERVACIONES GENERALES': self.comentarios.toPlainText(),
+            'MEDIDA DE MITIGACIÓN': self.mitigacion.toPlainText(),
+            'ENLACE NOT': self.notificacion_link.text(),
+        }
+
+        # Nombre correcto para la columna descripción
+        if self.botonEmp.isChecked():
+            tabla = "EMP"
+            columna_id = "EMPLAZAMIENTO"
+            datos_actualizados['DESCRIPCIÓN DEL EMPLAZAMIENTO'] = self.descripcion.toPlainText()
+            datos_actualizados['ENLACE EMP'] = self.archivo_link.text()
+            mensaje = "EMPLAZAMIENTO ACTUALIZADO"
+         
+            
+        elif self.botonSF.isChecked():
+            tabla = "SF"
+            columna_id = "[SOLICITUD DE FABRICACIÓN]"
+            datos_actualizados['DESCRIPCIÓN DE LA SOLICITUD DE FABRICACIÓN'] = self.descripcion.toPlainText()
+            datos_actualizados['ENLACE SF'] = self.archivo_link.text()
+            mensaje = "SOLICITUD DE FABRICACIÓN ACTUALIZADA"
+            
+        # Armar el query dinámico
+        columnas = ', '.join([f"[{col}] = ?" for col in datos_actualizados.keys()])
+        valores = list(datos_actualizados.values())
+        valores = [v if v != '' else None for v in valores]
+
+        # Ejecutar actualización
+        query = f'UPDATE {tabla} SET {columnas} WHERE "{columna_id}" = ?'
+        for i, valor in enumerate(valores, start=1):
+            print(f"Parámetro {i}: {valor} ({type(valor)})")
+        cursor.execute(query, valores + [self.ID.text])
+
+        conexion.commit()
+        conexion.close()
+
+        QMessageBox.information(self, "Éxito", mensaje)
+
+     except Exception as e:
+        QMessageBox.critical(self, "Error", f"Ocurrió un error al guardar los cambios:\n{e}")
+    
+       
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
