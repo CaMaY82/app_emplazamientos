@@ -205,29 +205,38 @@ class UI_editar(QWidget):
         
         self.sector = QComboBox()
         self.sector.addItems(sectores)
-        self.sector.setFixedWidth(100)
+        self.sector.setFixedWidth(50)
         self.sector.model().item(0).setEnabled(False)
         edicion_layout.addWidget(QLabel("Sector:"), 0, 1)  
         edicion_layout.addWidget(self.sector, 1, 1)
 
         self.planta = QComboBox()
-        self.planta.setFixedWidth(200)
+        self.planta.setFixedWidth(150)
         #self.planta.model().item(0).setEnabled(False)
         edicion_layout.addWidget(QLabel("Planta:"), 0, 2)
         edicion_layout.addWidget(self.planta, 1, 2)
 
+        self.circuito = QLineEdit()
+        edicion_layout.addWidget(QLabel("Circuito:"), 0, 3)
+        edicion_layout.addWidget(self.circuito, 1, 3)
+
+        self.UC = QLineEdit()
+        edicion_layout.addWidget(QLabel("UC:"), 0, 4)
+        edicion_layout.addWidget(self.UC, 1, 4)
+
+
+
         self.reevaluacion = QLineEdit()
-        #self.reevaluacion.setCalendarPopup(True)
-        edicion_layout.addWidget(QLabel("Reevaluación:"),0, 3)
-        edicion_layout.addWidget(self.reevaluacion, 1, 3)
-        self.reevaluacion.setFixedWidth(150)
+        edicion_layout.addWidget(QLabel("Reevaluación:"),0, 5)
+        edicion_layout.addWidget(self.reevaluacion, 1, 5)
+        self.reevaluacion.setFixedWidth(100)
 
         icono_calendario = base_dir.parent / "assets" /"calendar_icon.png"
         self.calendario_reev = QToolButton()
         self.calendario_reev.setIcon(QIcon(str(icono_calendario)))
         self.calendario_reev.setIconSize(QSize(30, 30))
         self.calendario_reev.setFixedSize(30, 30)
-        edicion_layout.addWidget(self.calendario_reev, 1, 4)
+        edicion_layout.addWidget(self.calendario_reev, 1, 6)
         self.calendario_reev.setStyleSheet("""
         QToolButton {
             font-weight: normal;
@@ -241,15 +250,15 @@ class UI_editar(QWidget):
 
         
         self.vigencia = QLineEdit()
-        edicion_layout.addWidget(QLabel("Vigencia:"), 0, 5)
-        edicion_layout.addWidget(self.vigencia, 1, 5)
-        #self.vigencia.setFixedWidth(90)
+        edicion_layout.addWidget(QLabel("Vigencia:"), 0, 7)
+        edicion_layout.addWidget(self.vigencia, 1, 7)
+        self.vigencia.setFixedWidth(100)
 
         self.calendario_vig = QToolButton()
         self.calendario_vig.setIcon(QIcon(str(icono_calendario)))
         self.calendario_vig.setIconSize(QSize(30, 30))
         self.calendario_vig.setFixedSize(30, 30)
-        edicion_layout.addWidget(self.calendario_vig, 1, 6)
+        edicion_layout.addWidget(self.calendario_vig, 1, 8)
         self.calendario_vig.setStyleSheet("""
         QToolButton {
             font-weight: normal;
@@ -262,16 +271,15 @@ class UI_editar(QWidget):
             """)
 
         self.atencion = QLineEdit()
-        #self.atencion.setCalendarPopup(True)
-        edicion_layout.addWidget(QLabel("Atención:"), 0, 7)
-        edicion_layout.addWidget(self.atencion, 1, 7)
-        #self.atencion.setFixedWidth(90)
+        edicion_layout.addWidget(QLabel("Atención:"), 0, 9)
+        edicion_layout.addWidget(self.atencion, 1, 9)
+        self.atencion.setFixedWidth(100)
 
         self.calendario_atn = QToolButton()
         self.calendario_atn.setIcon(QIcon(str(icono_calendario)))
         self.calendario_atn.setIconSize(QSize(30, 30))
         self.calendario_atn.setFixedSize(30, 30)
-        edicion_layout.addWidget(self.calendario_atn, 1, 8)
+        edicion_layout.addWidget(self.calendario_atn, 1, 10)
         self.calendario_atn.setStyleSheet("""
         QToolButton {
             font-weight: normal;
@@ -291,10 +299,16 @@ class UI_editar(QWidget):
         edicion2_layout.setAlignment(Qt.AlignLeft)
         self.frame_edicion2.setLayout(edicion2_layout)
 
+        self.riesgo = QComboBox()
+        self.riesgo.addItems((riesgos))
+        self.riesgo.model().item(0).setEnabled(False)
+        edicion2_layout.addWidget(QLabel("Riesgo:"), 0, 0)
+        edicion2_layout.addWidget(self.riesgo, 1, 0)
+
         self.estado = QLineEdit()
         self.estado.setReadOnly(True)
-        edicion2_layout.addWidget(QLabel("Estado:"), 0, 0)
-        edicion2_layout.addWidget(self.estado, 1, 0)
+        edicion2_layout.addWidget(QLabel("Estado:"), 0, 1)
+        edicion2_layout.addWidget(self.estado, 1, 1)
         self.estado.setFixedWidth(90)
 
         SI_NO = (" ", "NO" ,"SI")
@@ -302,33 +316,33 @@ class UI_editar(QWidget):
         self.paro_planta = QComboBox()
         self.paro_planta.addItems((SI_NO))
         self.paro_planta.model().item(0).setEnabled(False)
-        edicion2_layout.addWidget(QLabel("Paro de Planta:"), 0, 1)
-        edicion2_layout.addWidget(self.paro_planta, 1, 1)
+        edicion2_layout.addWidget(QLabel("Paro de Planta:"), 0, 2)
+        edicion2_layout.addWidget(self.paro_planta, 1, 2)
         #self.paro_planta.setFixedWidth(100)
         
         self.iniciativa = QComboBox()
         self.iniciativa.addItems((SI_NO))
         self.iniciativa.model().item(0).setEnabled(False)
-        edicion2_layout.addWidget(QLabel("Iniciativa:"), 0, 2)
-        edicion2_layout.addWidget(self.iniciativa, 1, 2)
+        edicion2_layout.addWidget(QLabel("Iniciativa:"), 0, 3)
+        edicion2_layout.addWidget(self.iniciativa, 1, 3)
         #self.iniciativa.setFixedWidth(100)
 
         self.programa = QComboBox()
         self.programa.addItems(SI_NO)
         self.programa.model().item(0).setEnabled(False)
-        edicion2_layout.addWidget(QLabel("Programa:"), 0, 3)
-        edicion2_layout.addWidget(self.programa, 1, 3)
+        edicion2_layout.addWidget(QLabel("Programa:"), 0, 4)
+        edicion2_layout.addWidget(self.programa, 1, 4)
         
         self.status = QComboBox()
         self.status.addItems([" ", "OPERANDO", "FUERA DE OPERACIÓN"])
         self.status.model().item(0).setEnabled(False)
-        edicion2_layout.addWidget(QLabel("Status Operativo:"), 0, 4)
-        edicion2_layout.addWidget(self.status, 1, 4)
+        edicion2_layout.addWidget(QLabel("Status Operativo:"), 0, 5)
+        edicion2_layout.addWidget(self.status, 1, 5)
 
         self.sap = QLineEdit()
-        edicion2_layout.addWidget(QLabel("Aviso SAP:"), 0, 5)
-        edicion2_layout.addWidget(self.sap, 1, 5)
-        #self.sap.setFixedWidth(100)
+        edicion2_layout.addWidget(QLabel("Aviso SAP:"), 0, 6)
+        edicion2_layout.addWidget(self.sap, 1, 6)
+        self.sap.setFixedWidth(150)
 
         # Layout de edición 3
         self.frame_edicion3 = QFrame()
@@ -437,7 +451,8 @@ class UI_editar(QWidget):
 
         self.scroll_area.setWidget(contenedor_widget)
         layout_principal.addWidget(self.scroll_area)
-        self.scroll_area.setMaximumHeight(300)
+        #self.scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.scroll_area.setMaximumHeight(600)
 
       
 
@@ -548,20 +563,22 @@ class UI_editar(QWidget):
         if plantas:
             self.planta.addItems(plantas)
 
-        # Buscar en la base de datos:
+    def calendarios (self):
+       
 
-        #Ruta de la base de datos
+       
+       
 
         
-
+    # Buscar en la base de datos:
     def buscar_en_db(self):
         if self.botonEmp.isChecked():
-            tabla = "EMP"
+            tabla = "VISTA_EMP"
             columna_id = "EMPLAZAMIENTO"
             label_result = "Emplazamientos encontrados"
             
         elif self.botonSF.isChecked():
-            tabla = "SF"
+            tabla = "VISTA_SF"
             columna_id = "[SOLICITUD DE FABRICACIÓN]"
             label_result = "Solicitudes de fabricación encontradas"
             
@@ -582,7 +599,7 @@ class UI_editar(QWidget):
         if estado in [" "]:
             estado = None
         if estado is None:
-           filtro_base = "AND ([ESTADO ACTUAL] = 'VIGENTE' OR [ESTADO ACTUAL] = 'VENCIDO')"
+           filtro_base = "AND ([ESTADO] = 'VIGENTE' OR [ESTADO] = 'VENCIDO')"
         else:
            filtro_base = ""
 
@@ -601,7 +618,7 @@ class UI_editar(QWidget):
         # creando la consulta
         if id_busqueda:
          query = f"""
-         SELECT {columna_id}, PLANTA, CIRCUITO, [UNIDAD DE CONTROL], [FECHA DE ELABORACIÓN], [FECHA DE VENCIMIENTO], [ESTADO ACTUAL]
+         SELECT {columna_id}, PLANTA, CIRCUITO, [UNIDAD DE CONTROL], [FECHA DE ELABORACIÓN], [FECHA DE VENCIMIENTO], [ESTADO]
          FROM {tabla}
          WHERE {columna_id} = ?
          """
@@ -609,7 +626,7 @@ class UI_editar(QWidget):
         else:
             query = f"""
              SELECT {columna_id}, PLANTA, CIRCUITO, [UNIDAD DE CONTROL], [FECHA DE ELABORACIÓN], [FECHA DE VENCIMIENTO],
-             [ESTADO ACTUAL] 
+             [ESTADO] 
                
              FROM {tabla}
              WHERE 1=1
@@ -624,7 +641,7 @@ class UI_editar(QWidget):
                 query += "AND PLANTA = ?"
                 valores.append(planta)
             if estado:
-                query += " AND [ESTADO ACTUAL] = ?"
+                query += " AND [ESTADO] = ?"
                 valores.append(estado)
             if status:
                 query += "AND [STATUS OPERATIVO] = ?"
@@ -637,15 +654,12 @@ class UI_editar(QWidget):
                 valores.append(id_busqueda)
        
         # conectando a db
-
         conexion = sql.connect(self.db_path)
         cursor = conexion.cursor()
         cursor.execute(query, valores)
         resultados = cursor.fetchall()
         conexion.close
-
         columnas = ["ID", "PLANTA", "CIRCUITO", "UNIDAD DE CONTROL", "ELABORACION", "VENCIMIENTO", "ESTADO ACTUAL"]
-
         self.tabla_resultados.setColumnCount(len(columnas))
         self.tabla_resultados.setHorizontalHeaderLabels(columnas)
         self.tabla_resultados.setRowCount(0)
@@ -676,15 +690,12 @@ class UI_editar(QWidget):
         else:
             QMessageBox.information(self, "Sin resultados", "No se encontraron registros.")
 
-        
-
-
         #QMessageBox.information(self, "Resultados", f"  {len(resultados)} {label_result}")
 
         conexion.close()
 
-        # funcion para actualizar los campos
-    
+
+     # funcion para actualizar los campos    
     def detalle_elemento(self):
         selected_items = self.tabla_resultados.selectedItems()
 
@@ -692,15 +703,17 @@ class UI_editar(QWidget):
            
             id_seleccionado = selected_items[0].text()
             if self.botonEmp.isChecked():
-                tabla = "EMP"
+                tabla = "VISTA_EMP"
                 columna_id = "EMPLAZAMIENTO"
                 descripcion = "DESCRIPCIÓN DEL EMPLAZAMIENTO"
                 columna_id_tabla = "EMPLAZAMIENTO"
+                enlace_archivo = "ENLACE EMP"
             elif self.botonSF.isChecked():
-                tabla = "SF"
+                tabla = "VISTA_SF"
                 columna_id = "[SOLICITUD DE FABRICACIÓN]"
                 descripcion = "DESCRIPCIÓN DE LA SOLICITUD DE FABRICACIÓN"
                 columna_id_tabla = "SOLICITUD DE FABRICACIÓN"
+                enlace_archivo = "ENLACE SF"
             else:
                 return  
              
@@ -716,31 +729,33 @@ class UI_editar(QWidget):
 
         if resultado:
             # con esto se llenan los QlineEdit de resultados
-
             self.ID.setText(self.limpiar_valor(resultado[columna_id_tabla]))
             self.sector.setCurrentText(self.limpiar_valor(resultado['SECTOR']))
             self.planta.setCurrentText(self.limpiar_valor(resultado['PLANTA']))
             self.reevaluacion.setText(self.limpiar_valor(resultado['FECHA DE REEVALUACIÓN']))
             self.vigencia.setText(self.limpiar_valor(resultado['FECHA DE VENCIMIENTO']))
             self.atencion.setText(self.limpiar_valor(resultado['FECHA DE ATENCIÓN']))
-            #self.circuito_resultado.setText(self.limpiar_valor(resultado['CIRCUITO']))
-            #self.UC_resultado.setText(self.limpiar_valor(resultado['UNIDAD DE CONTROL']))
-            self.estado.setText(self.limpiar_valor(resultado["ESTADO ACTUAL"]))
+            self.circuito.setText(self.limpiar_valor(resultado['CIRCUITO']))
+            self.UC.setText(self.limpiar_valor(resultado['UNIDAD DE CONTROL']))
+            self.estado.setText(self.limpiar_valor(resultado["ESTADO"]))
             self.status.setCurrentText(self.limpiar_valor(resultado['STATUS OPERATIVO']))
-            
-            
+            self.programa.setCurrentText(self.limpiar_valor(resultado["PROGRAMA DE ATENCIÓN"]))
+            self.paro_planta.setCurrentText(self.limpiar_valor(resultado['PARO DE PLANTA']))
+            self.iniciativa.setCurrentText(self.limpiar_valor(resultado['INICIATIVA']))            
             self.mecanismo.setCurrentText(self.limpiar_valor(resultado["MECANISMO DE DAÑO"]))
             self.material.setText(self.limpiar_valor(resultado["ESPECIFICACIÓN"]))
             self.sap.setText(self.limpiar_valor(resultado["SAP"]))
-            #self.riesgo_resultado.setText(self.limpiar_valor(resultado["RIESGO"]))
+            self.riesgo.setCurrentText(self.limpiar_valor(resultado["RIESGO"]))
             self.descripcion.setText(self.limpiar_valor(resultado[descripcion]))
             self.mitigacion.setText(self.limpiar_valor(resultado["MEDIDA DE MITIGACIÓN"]))
             self.comentarios.setText(self.limpiar_valor(resultado["OBSERVACIONES GENERALES"]))
+            self.archivo_link.setText(self.limpiar_valor(resultado[enlace_archivo]))
+            self.notificacion_link.setText(self.limpiar_valor(resultado["ENLACE NOT"]))
 
 
 
             # Asignar rutas de PDF a los ToolButtons
-        if tabla == "EMP":
+        if tabla == "VISTA_EMP":
             ruta_pdf = resultado["ENLACE EMP"] if resultado["ENLACE EMP"] is not None else None
             print(f"Ruta EMP: {ruta_pdf}")
 
@@ -755,7 +770,7 @@ class UI_editar(QWidget):
             else:
              self.archivo_btn.setVisible(False)
 
-        elif tabla == "SF":
+        elif tabla == "VISTA_SF":
             ruta_pdf = resultado["ENLACE SF"] if resultado["ENLACE SF"] is not None else None
             if ruta_pdf and ruta_pdf.strip():
                try:
@@ -810,5 +825,5 @@ if __name__ == "__main__":
         icono_ventana = base_dir.parent / "assets" / "edit_icon_light.ico"    
     window.setWindowIcon(QIcon(str(icono_ventana)))
 
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
