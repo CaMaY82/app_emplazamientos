@@ -757,10 +757,13 @@ class UI_editar(QWidget):
      # funcion para actualizar los campos    
     def detalle_elemento(self):
         selected_items = self.tabla_resultados.selectedItems()
+        fila = self.tabla_resultados.currentRow()
+        
 
         if selected_items:
            
-            id_seleccionado = selected_items[0].text()
+            id_seleccionado = self.tabla_resultados.item(fila, 0).text()
+            
             if self.botonEmp.isChecked():
                 tabla = "VISTA_EMP"
                 columna_id = "EMPLAZAMIENTO"
@@ -869,6 +872,7 @@ class UI_editar(QWidget):
         return str(resultado) if resultado is not None else ""
     
     #funcion para actualizar
+    
     def actualizar_registro(self):
      if not self.ID.text():
         QMessageBox.warning(self, "Advertencia", "No hay registro seleccionado para guardar.")
