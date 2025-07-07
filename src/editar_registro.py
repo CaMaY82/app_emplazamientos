@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
 
 )
 from PySide6.QtCore import Qt, QSize, QDate
-from PySide6.QtGui import QIcon, QPixmap
+from PySide6.QtGui import QIcon, QPixmap, QIntValidator
 import darkdetect
 import sys
 from pathlib import Path
@@ -114,6 +114,11 @@ class UI_editar(QWidget):
        
         self.botonSF = QRadioButton("Solicitud de Fabricación")
         self.botonSF.setLayoutDirection(Qt.RightToLeft)
+
+        self.botonEmp.toggled.connect(self.etiqueta_descripcion)
+        self.botonEmp.toggled.connect(self.limpiar_campos)
+        self.botonSF.toggled.connect(self.etiqueta_descripcion)
+        self.botonSF.toggled.connect(self.limpiar_campos)
 
         filtros_layout.addWidget(self.botonEmp, 1, 0, alignment=Qt.AlignLeft)
         filtros_layout.addItem(QSpacerItem(30, 0, QSizePolicy.Fixed, QSizePolicy.Minimum), 0, 1)
@@ -235,13 +240,13 @@ class UI_editar(QWidget):
 
         self.circuito = QLineEdit()
         edicion_layout.addWidget(QLabel("Circuito:"), 0, 3)
+        self.circuito.textChanged.connect(lambda text: self.circuito.setText(text.upper()))    
         edicion_layout.addWidget(self.circuito, 1, 3)
 
         self.UC = QLineEdit()
         edicion_layout.addWidget(QLabel("UC:"), 0, 4)
+        self.UC.textChanged.connect(lambda text: self.UC.setText(text.upper()))
         edicion_layout.addWidget(self.UC, 1, 4)
-
-
 
         self.reevaluacion = QLineEdit()
         edicion_layout.addWidget(QLabel("Reevaluación:"),0, 5)
@@ -312,10 +317,6 @@ class UI_editar(QWidget):
         self.calendario_vig.clicked.connect(lambda: self.abrir_calendario(self.vigencia, self.calendario_vig))
         self.calendario_atn.clicked.connect(lambda: self.abrir_calendario(self.atencion, self.calendario_atn))
 
-
-    
-
-
         #edicion_layout.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed), 2, 0, 1, 5)
 
         # Layout de edición 2
@@ -367,6 +368,7 @@ class UI_editar(QWidget):
         self.sap = QLineEdit()
         edicion2_layout.addWidget(QLabel("Aviso SAP:"), 0, 6)
         edicion2_layout.addWidget(self.sap, 1, 6)
+        self.sap.setValidator(QIntValidator(0, 999999999))
         self.sap.setFixedWidth(150)
 
         # Layout de edición 3
@@ -381,26 +383,32 @@ class UI_editar(QWidget):
         edicion3_layout.addWidget(self.mecanismo, 1, 0,)
 
         self.material = QLineEdit()
+        self.material.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         edicion3_layout.addWidget(QLabel("Material"), 0, 1)
-        edicion3_layout.addWidget(self.material, 1, 1)
+        self.material.textChanged.connect(lambda text: self.material.setText(text.upper()))
+        edicion3_layout.addWidget(self.material, 1, 1, 1, 2)
 
         self.descripcion = QTextEdit()
         self.descripcion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.descripcion.setFixedHeight(50)
-        edicion3_layout.addWidget(QLabel("Descripción:"), 2, 0, 1, 1)
-        edicion3_layout.addWidget(self.descripcion, 3, 0, 2, 2)
-
+        self.descripcion.textChanged.connect(self.convertir_descripcion_a_mayusculas)
+        self.etiqueta_item = QLabel("Descripción:")
+        edicion3_layout.addWidget(self.etiqueta_item, 2, 0, 1, 1)
+        edicion3_layout.addWidget(self.descripcion, 3, 0, 2, 1)
+        
         self.mitigacion = QTextEdit()
         self.mitigacion.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.mitigacion.setFixedHeight(50)
-        edicion3_layout.addWidget(QLabel("Mitigación:"), 5, 0, 1, 1)
-        edicion3_layout.addWidget(self.mitigacion, 6, 0, 2, 1)
+        self.mitigacion.textChanged.connect(self.convertir_mitigacion_a_mayusculas)
+        edicion3_layout.addWidget(QLabel("Mitigación:"), 2, 1, 1, 1)
+        edicion3_layout.addWidget(self.mitigacion, 3, 1, 2, 1)
 
         self.comentarios = QTextEdit()
         self.comentarios.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.comentarios.setFixedHeight(50)
-        edicion3_layout.addWidget(QLabel("Comentarios:"), 5, 1, 1, 1)
-        edicion3_layout.addWidget(self.comentarios, 6, 1, 2, 1)
+        self.comentarios.textChanged.connect(self.convertir_comentarios_a_mayusculas)
+        edicion3_layout.addWidget(QLabel("Comentarios:"), 2, 2, 1, 1)
+        edicion3_layout.addWidget(self.comentarios, 3, 2, 2, 1)
 
         grupo_enlaces = QGroupBox("Agregar enlaces a archivo:")
         enlaces_layout = QGridLayout()
@@ -590,6 +598,46 @@ class UI_editar(QWidget):
         if plantas:
             self.planta.addItems(plantas)
 
+    def etiqueta_descripcion(self):
+        if self.botonEmp.isChecked():
+            tipo_item = "Descripción del Emplazamiento:"
+            
+        elif self.botonSF.isChecked():
+            tipo_item = "Descripción de la Solicitud de Fabricación:"
+            
+        else:
+            tipo_item = "Descripción:"           
+
+        self.etiqueta_item.setText(tipo_item)
+
+    # Funciones para cambiar cada QlineEdit a mayúsculas
+
+    
+    def convertir_mitigacion_a_mayusculas(self):
+            cursor = self.mitigacion.textCursor()
+            texto = self.mitigacion.toPlainText()
+            self.mitigacion.blockSignals(True)  
+            self.mitigacion.setPlainText(texto.upper())
+            self.mitigacion.blockSignals(False)
+            self.mitigacion.setTextCursor(cursor)
+
+    def convertir_comentarios_a_mayusculas(self):
+            cursor = self.comentarios.textCursor()
+            texto = self.comentarios.toPlainText()
+            self.comentarios.blockSignals(True)  
+            self.comentarios.setPlainText(texto.upper())
+            self.comentarios.blockSignals(False)
+            self.comentarios.setTextCursor(cursor)
+    
+    def convertir_descripcion_a_mayusculas(self):
+            cursor = self.descripcion.textCursor()
+            texto = self.descripcion.toPlainText()
+            self.descripcion.blockSignals(True)  
+            self.descripcion.setPlainText(texto.upper())
+            self.descripcion.blockSignals(False)
+            self.descripcion.setTextCursor(cursor)
+
+
     #Función para abrir calendario
 
     def abrir_calendario(self, line_edit_objetivo, boton):
@@ -726,11 +774,9 @@ class UI_editar(QWidget):
         if resultados:
            
             for fila_idx, fila_datos in enumerate(resultados):
-             print(f"Fila {fila_idx}: {fila_datos}")
-             print(f"Resultados encontrados: {len(resultados)}")
-             
-             
-             
+             #print(f"Fila {fila_idx}: {fila_datos}")
+             #print(f"Resultados encontrados: {len(resultados)}")             
+                       
              self.tabla_resultados.insertRow(fila_idx)
              
              for col_idx, dato in enumerate(fila_datos):
@@ -871,8 +917,8 @@ class UI_editar(QWidget):
     def limpiar_valor(self, resultado):#se usa cuando el campo tiene valor null, se pone un caracter en blanco ""
         return str(resultado) if resultado is not None else ""
     
-    #funcion para actualizar
     
+    #funcion para actualizar
     def actualizar_registro(self):
      if not self.ID.text():
         QMessageBox.warning(self, "Advertencia", "No hay registro seleccionado para guardar.")
@@ -911,15 +957,15 @@ class UI_editar(QWidget):
             columna_id = "EMPLAZAMIENTO"
             datos_actualizados['DESCRIPCIÓN DEL EMPLAZAMIENTO'] = self.descripcion.toPlainText()
             datos_actualizados['ENLACE EMP'] = self.archivo_link.text()
-            mensaje = "EMPLAZAMIENTO ACTUALIZADO"
+            mensaje = f"EMPLAZAMIENTO {self.ID.text()} ACTUALIZADO"
          
             
         elif self.botonSF.isChecked():
             tabla = "SF"
-            columna_id = "[SOLICITUD DE FABRICACIÓN]"
+            columna_id = "SOLICITUD DE FABRICACIÓN"
             datos_actualizados['DESCRIPCIÓN DE LA SOLICITUD DE FABRICACIÓN'] = self.descripcion.toPlainText()
             datos_actualizados['ENLACE SF'] = self.archivo_link.text()
-            mensaje = "SOLICITUD DE FABRICACIÓN ACTUALIZADA"
+            mensaje = f"SOLICITUD DE FABRICACIÓN {self.ID.text()} ACTUALIZADA"
             
         # Armar el query dinámico
         columnas = ', '.join([f"[{col}] = ?" for col in datos_actualizados.keys()])
@@ -927,20 +973,60 @@ class UI_editar(QWidget):
         valores = [v if v != '' else None for v in valores]
 
         # Ejecutar actualización
-        query = f'UPDATE {tabla} SET {columnas} WHERE "{columna_id}" = ?'
+        query = f'UPDATE {tabla} SET {columnas} WHERE [{columna_id}] = ?'
         for i, valor in enumerate(valores, start=1):
-            print(f"Parámetro {i}: {valor} ({type(valor)})")
-        cursor.execute(query, valores + [self.ID.text])
+            #print(f"Parámetro {i}: {valor} ({type(valor)})")
+            #print(f"Parámetro {len(valores) + 1} (ID): {self.ID.text()} ({type(self.ID.text())})")
+            cursor.execute(query, valores + [self.ID.text()])
+        #print("Query:", query)
+        #print("Valores:", valores + [self.ID.text()])
+        #print("Filas modificadas:", cursor.rowcount)
+
+
 
         conexion.commit()
         conexion.close()
 
         QMessageBox.information(self, "Éxito", mensaje)
 
+        self.limpiar_campos()
+        self.tabla_resultados.clearContents()
+        self.buscar_en_db()
+        
+
      except Exception as e:
         QMessageBox.critical(self, "Error", f"Ocurrió un error al guardar los cambios:\n{e}")
     
-       
+    def limpiar_campos(self):
+       self.sector_fl.setCurrentIndex(0)
+       self.planta_fl.setCurrentIndex(0)
+       self.estado_fl.setCurrentIndex(0)
+       self.riesgo_fl.setCurrentIndex(0)
+       self.status_fl.setCurrentIndex(0)
+       self.ID_busqueda.clear()
+       self.ID.clear()
+       self.sector.setCurrentIndex(0)
+       self.planta.setCurrentIndex(0)
+       self.circuito.clear()
+       self.UC.clear()
+       self.reevaluacion.clear()
+       self.vigencia.clear()
+       self.atencion.clear()
+       self.riesgo.setCurrentIndex(0)
+       self.paro_planta.setCurrentIndex(0)
+       self.iniciativa.setCurrentIndex(0)
+       self.programa.setCurrentIndex(0)
+       self.status.setCurrentIndex(0)
+       self.sap.clear()
+       self.mecanismo.setCurrentIndex(0)
+       self.material.clear()
+       self.descripcion.clear()
+       self.mitigacion.clear()
+       self.comentarios.clear()
+       self.archivo_link.clear()
+       self.notificacion_link.clear()
+
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -547,10 +547,11 @@ class UI_Busqueda(QWidget):
     
     def detalle_elemento(self):
         selected_items = self.tabla_resultados.selectedItems()
+        fila = self.tabla_resultados.currentRow()
 
         if selected_items:
            
-            id_seleccionado = selected_items[0].text()
+            id_seleccionado = self.tabla_resultados.item(fila, 0).text()
             if self.botonEmp.isChecked():
                 tabla = "VISTA_EMP"
                 columna_id = "EMPLAZAMIENTO"
