@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QFrame, QLabel, QPushButton, QRadioButton, QComboBox,
-    QSizePolicy, QGridLayout, QLineEdit, QSpacerItem, QGroupBox, QDateEdit, QTextEdit, QMessageBox, QCalendarWidget
+    QSizePolicy, QGridLayout, QLineEdit, QSpacerItem, QGroupBox, QDateEdit, QTextEdit, QMessageBox, QCalendarWidget, QScrollArea
 )
 from PySide6.QtCore import Qt, QSize, QDate
 from PySide6.QtGui import QIcon, QPixmap, QIntValidator
@@ -96,13 +96,13 @@ class UI_Nuevo(QWidget):
         self.layout_inferior = QGridLayout()
         self.layout_inferior.setHorizontalSpacing(100)
         self.frame_inferior.setLayout(self.layout_inferior)
-        layout_principal.addWidget(self.frame_inferior)
-        self.layout_inferior.setAlignment(Qt.AlignTop | Qt.AlignCenter)
+        #layout_principal.addWidget(self.frame_inferior)
+        #self.layout_inferior.setAlignment(Qt.AlignTop | Qt.AlignCenter)
 
         self.frame2_inferior = QFrame()
         self.layout_inferior2 = QVBoxLayout()
         self.frame2_inferior.setLayout(self.layout_inferior2)
-        layout_principal.addWidget(self.frame2_inferior)
+        #layout_principal.addWidget(self.frame2_inferior)
 
        
 
@@ -249,6 +249,18 @@ class UI_Nuevo(QWidget):
         self.layout_inferior2.addWidget(self.guardar_btn, alignment=Qt.AlignRight)
         self.guardar_btn.setFixedSize(150, 50)
         self.guardar_btn.clicked.connect(self.guardar_registro)
+
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+
+        contenedor_widget = QWidget()
+        self.contenedor = QVBoxLayout(contenedor_widget)
+        self.contenedor.addWidget(self.frame_inferior)
+        self.contenedor.addWidget(self.frame2_inferior)
+        self.scroll_area.setWidget(contenedor_widget)
+        layout_principal.addWidget(self.scroll_area, stretch=1)
+        self.scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
         
 
         
@@ -419,7 +431,7 @@ class UI_Nuevo(QWidget):
             return
 
         # Sentencia SQL
-        estado_actual
+        #estado_actual
 
         self.cursor.execute(f"""
             INSERT INTO {tabla} (
@@ -427,7 +439,7 @@ class UI_Nuevo(QWidget):
                 {descripcion_columna}, [MECANISMO DE DAÑO], ESPECIFICACIÓN,
                 [FECHA DE ELABORACIÓN], SAP, [FECHA DE VENCIMIENTO], [PROGRAMA DE ATENCIÓN],
                 INICIATIVA, [PARO DE PLANTA], [FECHA DE ATENCIÓN], [ESTADO ACTUAL],
-                [FECHA DE REVALUACIÓN], [STATUS OPERATIVO], RIESGO, [MEDIDA DE MITIGACIÓN],
+                [FECHA DE REEVALUACIÓN], [STATUS OPERATIVO], RIESGO, [MEDIDA DE MITIGACIÓN],
                 [OBSERVACIONES GENERALES], {enlace_columna}
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -443,13 +455,14 @@ class UI_Nuevo(QWidget):
         self.conexion.commit()
 
         if tabla == "EMP":
-            mensaje = "Emplazamiento registrado exitosamente."
+            mensaje = f"Emplazamiento {self.ID.text()} registrado correctamente"
         elif tabla == "SF":
-            mensaje = "Solicitud de fabricación registrada exitosamente."
+            mensaje = f"Solicitud de Fabricación {self.ID.text()} registrada correctamente"
 
         QMessageBox.information(self,"Exito", mensaje)
 
         self.limpiar_formulario()
+        self.limpiar_radio_buttons()
 
      except Exception as e:
         QMessageBox.critical(self, "Error", f"Ocurrió un error: {str(e)}")
@@ -468,18 +481,31 @@ class UI_Nuevo(QWidget):
             # Año actual
             anio_actual = datetime.now().year
 
-        # Consulta los registros que ya existen de este año
+            # Consulta los registros que ya existen de este año
             self.cursor.execute(f"""
-            SELECT COUNT(*) FROM {tabla} 
+            SELECT {columna_id} FROM {tabla} 
             WHERE {columna_id} LIKE '%/{anio_actual}'
             """)
-            conteo = self.cursor.fetchone()[0] + 1  # Siguiente número consecutivo
+            registros = self.cursor.fetchall()
+
+            numeros_existentes = []
+            for registro in registros:
+                id_registrado = registro[0]
+                numero = id_registrado.split('/')[0]  # Extrae el consecutivo
+                if numero.isdigit():
+                    numeros_existentes.append(int(numero))
+
+            if numeros_existentes:
+                nuevo_consecutivo = max(numeros_existentes) + 1
+            else:
+                nuevo_consecutivo = 1  # Primer registro del año
 
             # Formatear con ceros a la izquierda
-            nuevo_id = f"{str(conteo).zfill(3)}/{anio_actual}"
+            nuevo_id = f"{str(nuevo_consecutivo).zfill(3)}/{anio_actual}"
 
             # Mostrar el ID sugerido
             self.ID.setText(nuevo_id)
+
         except Exception as e:
             QMessageBox.critical(self, "Error", f"No se pudo generar el ID: {str(e)}")
 
@@ -515,6 +541,12 @@ class UI_Nuevo(QWidget):
         self.material.clear()
         self.SAP.clear()
         self.enlace.clear()
+
+    def limpiar_radio_buttons(self):
+        for boton in [self.boton_emp, self.boton_sf]:
+            boton.setAutoExclusive(False)
+            boton.setChecked(False)
+            boton.setAutoExclusive(True)
 
     # Resetear QComboBox
         self.sector.setCurrentIndex(0)

@@ -325,17 +325,17 @@ class UI_editar(QWidget):
         edicion2_layout.setAlignment(Qt.AlignLeft)
         self.frame_edicion2.setLayout(edicion2_layout)
 
+        self.estado = QLineEdit()
+        self.estado.setReadOnly(True)
+        edicion2_layout.addWidget(QLabel("Estado:"), 0, 0)
+        edicion2_layout.addWidget(self.estado, 1, 0)
+        self.estado.setFixedWidth(90)
+
         self.riesgo = QComboBox()
         self.riesgo.addItems((riesgos))
         self.riesgo.model().item(0).setEnabled(False)
-        edicion2_layout.addWidget(QLabel("Riesgo:"), 0, 0)
-        edicion2_layout.addWidget(self.riesgo, 1, 0)
-
-        self.estado = QLineEdit()
-        self.estado.setReadOnly(True)
-        #edicion2_layout.addWidget(QLabel("Estado:"), 0, 1)
-        #edicion2_layout.addWidget(self.estado, 1, 1)
-        self.estado.setFixedWidth(90)
+        edicion2_layout.addWidget(QLabel("Riesgo:"), 0, 1)
+        edicion2_layout.addWidget(self.riesgo, 1, 1)
 
         SI_NO = (" ", "NO" ,"SI")
 
@@ -383,7 +383,7 @@ class UI_editar(QWidget):
         edicion3_layout.addWidget(self.mecanismo, 1, 0,)
 
         self.material = QLineEdit()
-        self.material.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        
         edicion3_layout.addWidget(QLabel("Material"), 0, 1)
         self.material.textChanged.connect(lambda text: self.material.setText(text.upper()))
         edicion3_layout.addWidget(self.material, 1, 1, 1, 2)

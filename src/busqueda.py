@@ -12,9 +12,12 @@ import sqlite3 as sql
 from functools import partial
 
 
+
 class UI_Busqueda(QWidget):
-    def __init__(self):
+    def __init__(self, app):
         super().__init__()
+
+        base_dir = Path(__file__).resolve().parent
 
         # Con el uso de DarkDetect se hace la condicional y se da el estilo a los widgets para una mejor UI
         
@@ -513,10 +516,8 @@ class UI_Busqueda(QWidget):
         if resultados:
            
             for fila_idx, fila_datos in enumerate(resultados):
-             print(f"Fila {fila_idx}: {fila_datos}")
-             print(f"Resultados encontrados: {len(resultados)}")
-             
-             
+             #print(f"Fila {fila_idx}: {fila_datos}")
+             #print(f"Resultados encontrados: {len(resultados)}")            
              
              self.tabla_resultados.insertRow(fila_idx)
              
@@ -598,7 +599,7 @@ class UI_Busqueda(QWidget):
             # Asignar rutas de PDF a los ToolButtons
         if tabla == "VISTA_EMP":
             ruta_pdf = resultado["ENLACE EMP"] if resultado["ENLACE EMP"] is not None else None
-            print(f"Ruta EMP: {ruta_pdf}")
+            #print(f"Ruta EMP: {ruta_pdf}")
 
             if ruta_pdf and ruta_pdf.strip():
                 try:
@@ -625,7 +626,7 @@ class UI_Busqueda(QWidget):
                 self.reporte_btn.setVisible(False)
 
         ruta_notificacion = resultado["ENLACE NOT"]
-        print(f"Ruta NOT: {ruta_notificacion}")
+        #print(f"Ruta NOT: {ruta_notificacion}")
 
         if ruta_notificacion and ruta_notificacion.strip():
            try:
@@ -685,13 +686,20 @@ class UI_Busqueda(QWidget):
 
     
 if __name__ == "__main__":
-   app = QApplication(sys.argv)
-   ventana = QMainWindow()
-   ventana.setWindowTitle("Búsqueda EMP o SF")
-   base_dir = Path(__file__).resolve().parent
-   icono_ventana = base_dir.parent / "assets" / "search_icon.ico"
-   ui = UI_Busqueda()
-   ventana.setCentralWidget(ui)
-   ventana.setWindowIcon(QIcon(str(icono_ventana)))
-   ventana.show()
-   sys.exit(app.exec())
+    from PySide6.QtWidgets import QApplication, QMainWindow
+    from PySide6.QtGui import QIcon
+    import sys
+
+    app = QApplication(sys.argv)
+    ventana = QMainWindow()
+    ventana.setWindowTitle("Búsqueda EMP o SF")
+    base_dir = Path(__file__).resolve().parent
+    icono_ventana = base_dir.parent / "assets" / "search_icon.ico"
+    
+    # Pasa `app` al crear UI_Busqueda
+    ui = UI_Busqueda(app)
+    ventana.setCentralWidget(ui)
+    ventana.setWindowIcon(QIcon(str(icono_ventana)))
+    ventana.show()
+    
+    sys.exit(app.exec())

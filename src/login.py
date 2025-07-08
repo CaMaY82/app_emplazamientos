@@ -9,8 +9,8 @@ import darkdetect
 import sys
 from pathlib import Path
 
-class login(QWidget):
-    def __init__(self):
+class loginUI(QWidget):
+    def __init__(self, app):
         super().__init__()
         self.setFixedSize(400, 600)
         self.setWindowFlags(Qt.Window | Qt.WindowCloseButtonHint)
@@ -154,7 +154,7 @@ class login(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    ventana = login()
+    ventana = loginUI()
     ventana.setWindowTitle("Iniciar Sesion")    
     base_dir = Path(__file__).resolve().parent
     icono_ventana = base_dir.parent / "assets" / "login icon.ico"    
