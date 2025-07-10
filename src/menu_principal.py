@@ -73,7 +73,7 @@ class MenuPrincipal(QMainWindow):
         self.buscar_img.setScaledContents(True)
         self.buscar_img.setFixedSize(100, 100)
         self.buscar = QPushButton("Buscar")
-        self.buscar.setFixedSize(150, 50)
+        #self.buscar.setFixedSize(150, 50)
         layout_buscar = QVBoxLayout()
         layout_buscar.addWidget(self.buscar_img, alignment=Qt.AlignCenter)
         layout_buscar.addWidget(self.buscar, alignment=Qt.AlignCenter)
