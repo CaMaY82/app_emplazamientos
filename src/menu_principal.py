@@ -74,7 +74,7 @@ class MenuPrincipal(QMainWindow):
         self.buscar_img.setScaledContents(True)
         self.buscar_img.setFixedSize(100, 100)
         self.buscar = QPushButton("Buscar")
-        #self.buscar.setFixedSize(150, 50)
+        self.buscar.setFixedHeight(50)
         layout_buscar = QVBoxLayout()
         layout_buscar.addWidget(self.buscar_img, alignment=Qt.AlignCenter)
         layout_buscar.addWidget(self.buscar, alignment=Qt.AlignCenter)
@@ -90,7 +90,7 @@ class MenuPrincipal(QMainWindow):
         self.editar_img.setScaledContents(True)
         self.editar_img.setFixedSize(100, 100)
         self.editar = QPushButton("Editar")
-        self.editar.setFixedSize(150, 50)
+        self.editar.setFixedHeight(50)
         layout_editar = QVBoxLayout()
         layout_editar.addWidget(self.editar_img, alignment=Qt.AlignCenter)
         layout_editar.addWidget(self.editar, alignment=Qt.AlignCenter)
@@ -98,7 +98,7 @@ class MenuPrincipal(QMainWindow):
         editar_widget = QWidget()
         editar_widget.setLayout(layout_editar)
         central_layout.addWidget(editar_widget)
-        self.editar.clicked.connect(self.abrir_editar)
+        self.editar.clicked.connect(self.abrir_login_editar)
 
         # Nuevo Registro
         self.nuevo_img = QLabel()
@@ -106,7 +106,7 @@ class MenuPrincipal(QMainWindow):
         self.nuevo_img.setScaledContents(True)
         self.nuevo_img.setFixedSize(100, 100)
         self.nuevo_registro = QPushButton("Nuevo Registro")
-        self.nuevo_registro.setFixedSize(150, 50)
+        self.nuevo_registro.setFixedHeight(50)
         layout_nuevo = QVBoxLayout()
         layout_nuevo.addWidget(self.nuevo_img, alignment=Qt.AlignCenter)
         layout_nuevo.addWidget(self.nuevo_registro, alignment=Qt.AlignCenter)
@@ -121,7 +121,7 @@ class MenuPrincipal(QMainWindow):
         self.dash_img.setScaledContents(True)
         self.dash_img.setFixedSize(100, 100)
         self.dashboard = QPushButton("Dashboard")
-        self.dashboard.setFixedSize(150, 50)
+        self.dashboard.setFixedHeight(50)
         layout_dash = QVBoxLayout()
         layout_dash.addWidget(self.dash_img, alignment=Qt.AlignCenter)
         layout_dash.addWidget(self.dashboard, alignment=Qt.AlignCenter)
@@ -136,7 +136,7 @@ class MenuPrincipal(QMainWindow):
         self.salir_img.setScaledContents(True)
         self.salir_img.setFixedSize(100, 100)
         self.salir = QPushButton("Salir")
-        self.salir.setFixedSize(150, 50)
+        self.salir.setFixedHeight(50)
         layout_salir = QVBoxLayout()
         layout_salir.addWidget(self.salir_img, alignment=Qt.AlignCenter)
         layout_salir.addWidget(self.salir, alignment=Qt.AlignCenter)
@@ -144,6 +144,7 @@ class MenuPrincipal(QMainWindow):
         salir_widget = QWidget()
         salir_widget.setLayout(layout_salir)
         central_layout.addWidget(salir_widget)
+
 
         layout_principal.addWidget(central_widget_botones, 1, 0, alignment=Qt.AlignCenter)
         
@@ -158,24 +159,22 @@ class MenuPrincipal(QMainWindow):
     def abrir_busqueda(self):
         # Pasa self.app al crear la ventana de búsqueda
         self.ventana_busqueda = UI_Busqueda(self.app)
-        self.ventana_busqueda.show()
+        self.ventana_busqueda.showMaximized()
 
     def nuevo_registro(self):
         self.ventana_nuevo = UI_Nuevo(self.app)
-        self.ventana_nuevo.show()
+        self.ventana_nuevo.showMaximized()
         
     
 
 
-    def abrir_editar(self):
-        login = loginUI(app)
-        if login.exec():  # Si login fue exitoso
-            self.stacked.setCurrentWidget(self.editar_widget)
-        else:
-            QMessageBox.warning(self, "Acceso denegado", "Credenciales inválidas")
+    def abrir_login_editar(self):       
+        self.ventana_nuevo = loginUI(self.app)
+        self.ventana_nuevo.showMaximized()
 
-        
-
+            
+            
+      
 if __name__ == "__main__":
     import sys
     app = QApplication(sys.argv)
