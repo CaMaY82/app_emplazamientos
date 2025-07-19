@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 
 from busqueda import UI_Busqueda
+from nuevo_registro import UI_Nuevo
 from login import loginUI
 
 
@@ -158,7 +159,11 @@ class MenuPrincipal(QMainWindow):
         # Pasa self.app al crear la ventana de búsqueda
         self.ventana_busqueda = UI_Busqueda(self.app)
         self.ventana_busqueda.show()
-    
+
+    def nuevo_registro(self):
+        self.ventana_nuevo = UI_Nuevo(self.app)
+        self.ventana_nuevo.show()
+        
     
 
 

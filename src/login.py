@@ -8,6 +8,7 @@ from PySide6.QtCore import Qt
 import darkdetect
 import sys
 from pathlib import Path
+from editar_registro import UI_editar
 
 class loginUI(QWidget):
     def __init__(self, app):
@@ -134,11 +135,13 @@ class loginUI(QWidget):
         if usuario in usuarios and usuarios[usuario] == password:
             #QMessageBox.information(self, "Bienvenido", f"Bienvenido")
             self.close()
-            self.abrir_menu_principal()
+            self.ventana_editar()
         else:
              QMessageBox.critical(self, "Error", "Usuario o contraseña incorrectos.")
 
-
+    def abrir_editar(self):
+        self.ventana_editar = UI_editar(self.app)
+        self.ventana_editar.show()
 
 
 
@@ -154,7 +157,7 @@ class loginUI(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    ventana = loginUI()
+    ventana = loginUI(app)
     ventana.setWindowTitle("Iniciar Sesion")    
     base_dir = Path(__file__).resolve().parent
     icono_ventana = base_dir.parent / "assets" / "login icon.ico"    
