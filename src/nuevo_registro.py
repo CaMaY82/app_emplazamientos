@@ -12,8 +12,10 @@ import sqlite3 as sql
 from datetime import datetime
 
 class UI_Nuevo(QWidget):
-    def __init__(self):
+    def __init__(self, app):
         super().__init__()
+        self.app = app
+
 
         self.db_path = str(Path(__file__).resolve().parent.parent / "db" / "EMP.db")
 

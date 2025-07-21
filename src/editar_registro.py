@@ -32,8 +32,9 @@ class CalendarioPopup(QDialog):
 
 
 class UI_editar(QWidget):
-    def __init__(self):
+    def __init__(self, app):
         super().__init__()
+        self.app = app
 
         if darkdetect.isDark():
          modo = "oscuro"

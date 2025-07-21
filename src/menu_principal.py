@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (
     QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton, QTextEdit, QMessageBox
 )
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon, QPixmap
+from PySide6.QtGui import QIcon, QPixmap, QGuiApplication
 import darkdetect
 import sys
 from pathlib import Path
@@ -12,6 +12,7 @@ from pathlib import Path
 from busqueda import UI_Busqueda
 from nuevo_registro import UI_Nuevo
 from login import loginUI
+from login_nuevo import login_nuevoUI
 
 
 class MenuPrincipal(QMainWindow):
@@ -74,7 +75,7 @@ class MenuPrincipal(QMainWindow):
         self.buscar_img.setScaledContents(True)
         self.buscar_img.setFixedSize(100, 100)
         self.buscar = QPushButton("Buscar")
-        self.buscar.setFixedHeight(50)
+        self.buscar.setFixedSize(100, 50)
         layout_buscar = QVBoxLayout()
         layout_buscar.addWidget(self.buscar_img, alignment=Qt.AlignCenter)
         layout_buscar.addWidget(self.buscar, alignment=Qt.AlignCenter)
@@ -90,7 +91,7 @@ class MenuPrincipal(QMainWindow):
         self.editar_img.setScaledContents(True)
         self.editar_img.setFixedSize(100, 100)
         self.editar = QPushButton("Editar")
-        self.editar.setFixedHeight(50)
+        self.editar.setFixedSize(100, 50)
         layout_editar = QVBoxLayout()
         layout_editar.addWidget(self.editar_img, alignment=Qt.AlignCenter)
         layout_editar.addWidget(self.editar, alignment=Qt.AlignCenter)
@@ -106,7 +107,7 @@ class MenuPrincipal(QMainWindow):
         self.nuevo_img.setScaledContents(True)
         self.nuevo_img.setFixedSize(100, 100)
         self.nuevo_registro = QPushButton("Nuevo Registro")
-        self.nuevo_registro.setFixedHeight(50)
+        self.nuevo_registro.setFixedSize(100, 50)
         layout_nuevo = QVBoxLayout()
         layout_nuevo.addWidget(self.nuevo_img, alignment=Qt.AlignCenter)
         layout_nuevo.addWidget(self.nuevo_registro, alignment=Qt.AlignCenter)
@@ -114,6 +115,7 @@ class MenuPrincipal(QMainWindow):
         nuevo_widget = QWidget()
         nuevo_widget.setLayout(layout_nuevo)
         central_layout.addWidget(nuevo_widget)
+        self.nuevo_registro.clicked.connect(self.abrir_login_nuevo)
 
         # Dashboard
         self.dash_img = QLabel()
@@ -121,7 +123,7 @@ class MenuPrincipal(QMainWindow):
         self.dash_img.setScaledContents(True)
         self.dash_img.setFixedSize(100, 100)
         self.dashboard = QPushButton("Dashboard")
-        self.dashboard.setFixedHeight(50)
+        self.dashboard.setFixedSize(100, 50)
         layout_dash = QVBoxLayout()
         layout_dash.addWidget(self.dash_img, alignment=Qt.AlignCenter)
         layout_dash.addWidget(self.dashboard, alignment=Qt.AlignCenter)
@@ -129,6 +131,7 @@ class MenuPrincipal(QMainWindow):
         dash_widget = QWidget()
         dash_widget.setLayout(layout_dash)
         central_layout.addWidget(dash_widget)
+        self.dashboard.clicked.connect(self.proximamente)
 
         # Salir
         self.salir_img = QLabel()
@@ -136,7 +139,7 @@ class MenuPrincipal(QMainWindow):
         self.salir_img.setScaledContents(True)
         self.salir_img.setFixedSize(100, 100)
         self.salir = QPushButton("Salir")
-        self.salir.setFixedHeight(50)
+        self.salir.setFixedSize(100, 50)
         layout_salir = QVBoxLayout()
         layout_salir.addWidget(self.salir_img, alignment=Qt.AlignCenter)
         layout_salir.addWidget(self.salir, alignment=Qt.AlignCenter)
@@ -144,6 +147,7 @@ class MenuPrincipal(QMainWindow):
         salir_widget = QWidget()
         salir_widget.setLayout(layout_salir)
         central_layout.addWidget(salir_widget)
+        self.salir.clicked.connect(self.salir_app)
 
 
         layout_principal.addWidget(central_widget_botones, 1, 0, alignment=Qt.AlignCenter)
@@ -159,18 +163,68 @@ class MenuPrincipal(QMainWindow):
     def abrir_busqueda(self):
         # Pasa self.app al crear la ventana de búsqueda
         self.ventana_busqueda = UI_Busqueda(self.app)
+        self.ventana_busqueda.setWindowTitle("Buscar...")
+        base_dir = Path(__file__).resolve().parent
+        icono_ventana = base_dir.parent / "assets" / "search_icon.ico"
+        self.ventana_busqueda.setWindowIcon(QIcon(str(icono_ventana)))
         self.ventana_busqueda.showMaximized()
 
-    def nuevo_registro(self):
-        self.ventana_nuevo = UI_Nuevo(self.app)
-        self.ventana_nuevo.showMaximized()
+    def abrir_login_nuevo(self):
+        self.login = login_nuevoUI(self.app)
+        self.login.setWindowTitle("Iniciar sesión - Nuevo registro")
+        self.login.setFixedSize(400, 600)
+
+        base_dir = Path(__file__).resolve().parent
+        icono = base_dir.parent / "assets" / "login icon.ico"
+        self.login.setWindowIcon(QIcon(str(icono)))
+
+        screen = QGuiApplication.primaryScreen().availableGeometry()
+        self.login.move(
+        (screen.width() - self.login.width()) // 2,
+        (screen.height() - self.login.height()) // 2
+        )
+
+        self.login.show()
         
     
 
 
     def abrir_login_editar(self):       
-        self.ventana_nuevo = loginUI(self.app)
-        self.ventana_nuevo.showMaximized()
+        self.login = loginUI(self.app)
+        self.login.setFixedSize(400, 600)
+        self.login.setWindowTitle("Iniciar Sesión")
+        icono_ventana = base_dir.parent / "assets" / "login icon.ico"    
+        self.login.setWindowIcon(QIcon(str(icono_ventana)))
+
+
+        screen = QGuiApplication.primaryScreen().availableGeometry()
+        self.login.move(
+        (screen.width() - self.login.width()) // 2,
+        (screen.height() - self.login.height()) // 2
+        )
+
+        self.login.show()
+
+    def salir_app(self):
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Salir")
+        msg.setText("¿Estás seguro que deseas salir?")
+        msg.setIcon(QMessageBox.Question)
+
+        boton_si = msg.addButton("Sí", QMessageBox.YesRole)
+        boton_no = msg.addButton("No", QMessageBox.NoRole)
+
+        msg.exec()
+
+        if msg.clickedButton() == boton_si:
+            QApplication.quit()
+    
+    def proximamente(self):
+        QMessageBox.information(
+        self,
+        "Dashboard",
+        "Estará disponible próximamente."
+        )
 
             
             
