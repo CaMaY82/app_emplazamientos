@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (
     QFrame, QLabel, QPushButton, QRadioButton, QComboBox, QTableWidget,
     QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton, QTextEdit, QMessageBox
 )
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtCore import Qt, QSize, Signal
 from PySide6.QtGui import QIcon, QPixmap
 import darkdetect
 import sys
@@ -14,6 +14,8 @@ from functools import partial
 
 
 class UI_Busqueda(QWidget):
+    volver_home = Signal()
+
     def __init__(self, app):
         super().__init__()
 
@@ -311,9 +313,18 @@ class UI_Busqueda(QWidget):
         pixmap = QPixmap(str(logoIT))
         logo_inspeccion.setPixmap(pixmap)
 
+        self.regresar = QPushButton("Regresar")
+        self.regresar.setFixedSize(70, 30)
+        self.layout_inferior.addWidget(self.regresar)
+        self.regresar.clicked.connect(self.volver_home.emit)
+       
         self.frame_inferior.setLayout(self.layout_inferior)
         self.layout_inferior.addWidget(logo_inspeccion)
         self.layout_inferior.addStretch()
+
+        
+
+
        
         # Agreganbdo botones con icono para ver el archivo del emplazamiento y las notificaciones de ejecución:
 
