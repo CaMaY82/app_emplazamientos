@@ -50,7 +50,7 @@ class MenuPrincipal(QMainWindow):
         titulo = QLabel("Sistema de Administración de Emplazamientos y Solicitudes de Fabricación de la Refinería Madero")
         titulo.setWordWrap(True)
         titulo.setAlignment(Qt.AlignCenter)
-        titulo.setStyleSheet("font-weight: bold; font-size: 18px")
+        titulo.setStyleSheet("font-weight: bold; font-size: 24px")
         layout_sup.addWidget(titulo, alignment=Qt.AlignCenter)
 
         if darkdetect.isDark():
@@ -237,6 +237,7 @@ class MenuPrincipal(QMainWindow):
         self.busqueda = UI_Busqueda(self.app) # <-- importante: pasar self.app
         self.busqueda.volver_home.connect(self.ir_a_home)   
         self.nuevo = UI_Nuevo(self.app)
+        self.nuevo.volver_home.connect(self.ir_a_home)
         self.stack.addWidget(self.busqueda)     # índice 1
         self.stack.addWidget(self.nuevo)        # índice 2
 
@@ -245,6 +246,7 @@ class MenuPrincipal(QMainWindow):
 
     # --------- Navegación interna del stack
     def abrir_busqueda(self):
+        self.busqueda.limpiar_resultados()
         self.stack.setCurrentWidget(self.busqueda)   
 
     def ir_a_nuevo(self):
@@ -256,6 +258,7 @@ class MenuPrincipal(QMainWindow):
     # --------- Ventanas de login (externas al stack)
     def abrir_login_nuevo(self):
         self.login = login_nuevoUI(self.app)
+        
         self.login.setWindowTitle("Iniciar sesión - Nuevo registro")
         self.login.setFixedSize(400, 600)
 
@@ -269,9 +272,17 @@ class MenuPrincipal(QMainWindow):
             (screen.height() - self.login.height()) // 2
         )
 
+        self.login.auth_ok.connect(self._on_login_nuevo_ok)
+        self.login.show()
+
         # Sugerencia: al validar en login_nuevoUI, emite una señal y conéctala aquí para:
         # self.ir_a_nuevo()
-        self.login.show()
+
+    def _on_login_nuevo_ok(self):
+        print("Login OK (recibí la señal)")                  # debug
+        self.ir_a_nuevo()                                    # o slide_to(...)
+        self.login.close()
+        self.login = None   
 
     def abrir_login_editar(self):
         self.login = loginUI(self.app)
@@ -289,6 +300,14 @@ class MenuPrincipal(QMainWindow):
 
         # Igual que arriba: al validar, puedes navegar a una página de edición si la agregas al stack
         self.login.show()
+        
+    #def _on_login_nuevo_ok(self):
+        # Navega dentro del stack (sin abrir ventanas nuevas)
+        # Si usas animación: slide_to(self.stack, self.stack.indexOf(self.nuevo), direction="left", duration=260)
+        #self.ir_a_nuevo()
+        # Cierra y limpia el diálogo de login
+        #self.login.close()
+        #self.login = None   
 
     # --------- Utilidades
     def salir_app(self):

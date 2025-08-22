@@ -1,9 +1,9 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QFrame, QLabel, QPushButton, QRadioButton, QComboBox,
-    QSizePolicy, QGridLayout, QLineEdit, QSpacerItem, QGroupBox, QDateEdit, QTextEdit, QMessageBox, QCalendarWidget, QScrollArea
+    QSizePolicy, QGridLayout, QLineEdit, QSpacerItem, QGroupBox, QDateEdit, QTextEdit, QMessageBox, QCalendarWidget, QScrollArea,  QToolButton
 )
-from PySide6.QtCore import Qt, QSize, QDate
+from PySide6.QtCore import Qt, QSize, QDate, Signal
 from PySide6.QtGui import QIcon, QPixmap, QIntValidator
 import darkdetect
 import sys
@@ -12,6 +12,8 @@ import sqlite3 as sql
 from datetime import datetime
 
 class UI_Nuevo(QWidget):
+    volver_home = Signal()
+
     def __init__(self, app):
         super().__init__()
         self.app = app
@@ -92,7 +94,31 @@ class UI_Nuevo(QWidget):
         seleccion_layout.addWidget(self.boton_emp)
         seleccion_layout.addWidget(self.boton_sf)
         seleccion_layout.addSpacerItem(QSpacerItem(50, 0, QSizePolicy.Expanding, QSizePolicy.Minimum))
-        seleccion_layout.addWidget(self.logo, alignment=Qt.AlignTop)
+        #seleccion_layout.addWidget(self.logo, alignment=Qt.AlignTop)
+
+        
+        #Sustitucion de logo IT por el icono de regresar
+        icono_regresar = base_dir.parent / "assets" /"regresar_icon.png"       
+        self.regresar = QToolButton()
+        #self.regresar.setText("Regresar")
+        self.regresar.setIcon(QIcon(str(icono_regresar)))
+        self.regresar.setIconSize(QSize(50, 50))
+        self.regresar.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        #self.regresar.setFixedSize(70, 30)
+        self.regresar.setStyleSheet("""
+        QToolButton {
+            font-weight: normal;
+            font-size: 12px;
+            background-color: transparent;
+            border: 0px solid rgba(0,0,0,35);
+            border-radius: 12px;
+            padding: 10px 12px;
+            }
+            
+            """)
+        
+        seleccion_layout.addWidget(self.regresar, alignment=Qt.AlignTop)
+        self.regresar.clicked.connect(self.volver_home.emit)
 
         self.frame_inferior = QFrame()
         self.layout_inferior = QGridLayout()
@@ -245,7 +271,8 @@ class UI_Nuevo(QWidget):
         self.layout_inferior2.addSpacing(30)
 
         
-
+       
+        
         self.guardar_btn = QPushButton("GUARDAR")
         self.layout_inferior2.addStretch()
         self.layout_inferior2.addWidget(self.guardar_btn, alignment=Qt.AlignRight)
@@ -578,7 +605,7 @@ class UI_Nuevo(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = UI_Nuevo()
+    window = UI_Nuevo(app)
     base_dir = Path(__file__).resolve().parent   
 
     if darkdetect.isDark():

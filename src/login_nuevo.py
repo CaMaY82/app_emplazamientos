@@ -1,22 +1,23 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout,
-    QLabel, QPushButton, QRadioButton, 
-    QSizePolicy, QGridLayout, QLineEdit, QSpacerItem, QGroupBox, QDateEdit, QTextEdit, QFrame, QMessageBox
+    QLabel, QPushButton, QSizePolicy, QGridLayout, QLineEdit, QSpacerItem, QFrame, QMessageBox
 )
 from PySide6.QtGui import QIcon, QPixmap, QPainter, QIntValidator, QGuiApplication
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 import darkdetect
 import sys
 from pathlib import Path
 from nuevo_registro import UI_Nuevo
 
 class login_nuevoUI(QWidget):
-    def __init__(self, app):
-        super().__init__()
-        self.app = app
-        
+    auth_ok = Signal()
+    def __init__(self, app, parent=None):
+        super().__init__(parent)
+        self.app = app        
         self.setFixedSize(400, 600)
         self.setWindowFlags(Qt.Window | Qt.WindowCloseButtonHint)
+        self.setWindowModality(Qt.ApplicationModal)
+        self.setAttribute(Qt.WA_DeleteOnClose)
         
         if darkdetect.isDark():
          modo = "oscuro"
@@ -136,14 +137,15 @@ class login_nuevoUI(QWidget):
 
         if usuario in usuarios and usuarios[usuario] == password:
             #QMessageBox.information(self, "Bienvenido", f"Bienvenido")
+            self.auth_ok.emit()
             self.close()
-            self.abrir_nuevo()
+            #self.abrir_nuevo()
         else:
              QMessageBox.critical(self, "Error", "Usuario o contraseña incorrectos.")
 
-    def abrir_nuevo(self):
-        self.ventana_nuevo = UI_Nuevo(self.app)
-        self.ventana_nuevo.show()   
+    #def abrir_nuevo(self):
+        #self.ventana_nuevo = UI_Nuevo(self.app)
+        #self.ventana_nuevo.show()   
 
         
 
