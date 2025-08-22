@@ -1,14 +1,15 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QFrame, QLabel, QPushButton, QRadioButton, QComboBox, QTableWidget,
-    QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton, QTextEdit, QMessageBox, QStackedWidget
+    QFrame, QLabel, QPushButton, QGridLayout, QMessageBox, QStackedWidget, QToolButton
 )
 from PySide6.QtCore import Qt, QSize
+    # Si usas QSize: from PySide6.QtCore import QSize
 from PySide6.QtGui import QIcon, QPixmap, QGuiApplication
 import darkdetect
 import sys
 from pathlib import Path
 
+# Tus módulos deben heredar de QWidget y aceptar `app` en el __init__
 from busqueda import UI_Busqueda
 from nuevo_registro import UI_Nuevo
 from login import loginUI
@@ -21,22 +22,22 @@ class MenuPrincipal(QMainWindow):
         self.app = app
 
         base_dir = Path(__file__).resolve().parent
-        
+
         self.setWindowTitle("Menú Principal")
         self.resize(1280, 900)
 
+        # ---- Layout central
         layout_principal = QGridLayout()
         central_widget = QWidget()
         central_widget.setLayout(layout_principal)
         self.setCentralWidget(central_widget)
 
-        # Frame superior
+        # ---- Header / barra superior
         frame_sup = QFrame()
         layout_sup = QHBoxLayout()
         frame_sup.setLayout(layout_sup)
         layout_principal.addWidget(frame_sup, 0, 0, Qt.AlignTop)
 
-        base_dir = Path(__file__).resolve().parent
         logoPMX = base_dir.parent / "assets" / "pemex_logo.png"
         pemex = QPixmap(str(logoPMX))
 
@@ -63,133 +64,196 @@ class MenuPrincipal(QMainWindow):
         logo_inspeccion.setPixmap(logoIT)
         layout_sup.addWidget(logo_inspeccion)
 
-        layoutMedio = QVBoxLayout()
-        widgetMedio = QWidget()
-        widgetMedio.setLayout(layoutMedio)
-        
+        # ---- STACK: contenedor de páginas (home + módulos)
+        self.stack = QStackedWidget()
+        layout_principal.addWidget(self.stack, 1, 0)  # el stack ocupa la fila 1
 
-
-        Banner = QPixmap(base_dir.parent / "assets" / "Refineria1.jpg")
-        imagenVentana = QLabel()
-        imagenVentana.setFixedSize(500, 200)
-        imagenVentana.setScaledContents(True)
-        imagenVentana.setPixmap(Banner)
-       
-
-
-        
+        # ---- Página HOME (los botones grandes)
         central_widget_botones = QWidget()
         central_layout = QHBoxLayout()
         central_widget_botones.setLayout(central_layout)
         central_layout.setSpacing(80)
-        
+        central_layout.addStretch()
 
-        # Buscar
-        self.buscar_img = QLabel()
-        self.buscar_img.setPixmap(QPixmap(base_dir.parent / "assets" / "buscar_icon.png"))
-        self.buscar_img.setScaledContents(True)
-        self.buscar_img.setFixedSize(100, 100)
-        self.buscar = QPushButton("Buscar")
-        self.buscar.setFixedSize(100, 50)
+        # Buscar       
         layout_buscar = QVBoxLayout()
-        layout_buscar.addWidget(self.buscar_img, alignment=Qt.AlignCenter)
-        layout_buscar.addWidget(self.buscar, alignment=Qt.AlignCenter)
-        layout_buscar.addSpacing(15)
+        layout_buscar.setContentsMargins(0,0,0,0)
+        layout_buscar.addSpacing(2)       
         buscar_widget = QWidget()
         buscar_widget.setLayout(layout_buscar)
         central_layout.addWidget(buscar_widget)
-        self.buscar.clicked.connect(self.abrir_busqueda)
+        icono_buscar = base_dir.parent / "assets" /"buscar_icon.png"
+        self.buscar_btn = QToolButton()
+        self.buscar_btn.setText("Buscar")
+        self.buscar_btn.setIcon(QIcon(str(icono_buscar)))
+        self.buscar_btn.setIconSize(QSize(64, 64))
+        self.buscar_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.buscar_btn.setFixedSize(150, 200)        
+        self.buscar_btn.setFixedSize(150, 200)
+        self.buscar_btn.setIconSize(QSize(128, 128))
+        self.buscar_btn.setStyleSheet("""
+        QToolButton {
+            font-weight: normal;
+            font-size: 18px;
+            background-color: transparent;
+            border: 0px solid rgba(0,0,0,35);
+            border-radius: 12px;
+            padding: 10px 12px;
+            }
+            
+            """)
+        layout_buscar.addWidget(self.buscar_btn, alignment=Qt.AlignCenter)
+        self.buscar_btn.clicked.connect(self.abrir_busqueda)
+       
 
-        # Editar
-        self.editar_img = QLabel()
-        self.editar_img.setPixmap(QPixmap(base_dir.parent / "assets" / "editar_icon.png"))
-        self.editar_img.setScaledContents(True)
-        self.editar_img.setFixedSize(100, 100)
-        self.editar = QPushButton("Editar")
-        self.editar.setFixedSize(100, 50)
+        # Editar (abre login)
         layout_editar = QVBoxLayout()
-        layout_editar.addWidget(self.editar_img, alignment=Qt.AlignCenter)
-        layout_editar.addWidget(self.editar, alignment=Qt.AlignCenter)
-        layout_editar.addSpacing(15)
+        layout_editar.setContentsMargins(0,0,0,0)
+        layout_editar.addSpacing(2)
         editar_widget = QWidget()
         editar_widget.setLayout(layout_editar)
         central_layout.addWidget(editar_widget)
-        self.editar.clicked.connect(self.abrir_login_editar)
+        icono_editar = base_dir.parent / "assets" /"editar_icon.png"
+        self.editar_btn = QToolButton()
+        self.editar_btn.setText("Editar")
+        self.editar_btn.setIcon(QIcon(str(icono_editar)))
+        self.editar_btn.setIconSize(QSize(64, 64))
+        self.editar_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.editar_btn.setFixedSize(150, 200)        
+        self.editar_btn.setFixedSize(150, 200)
+        self.editar_btn.setIconSize(QSize(128, 128))
+        self.editar_btn.setStyleSheet("""
+        QToolButton {
+            font-weight: normal;
+            font-size: 18px;
+            background-color: transparent;
+            border: 0px solid rgba(0,0,0,35);
+            border-radius: 12px;
+            padding: 10px 12px;
+            }
+            
+            """)
+        layout_editar.addWidget(self.editar_btn, alignment=Qt.AlignCenter)        
+        self.editar_btn.clicked.connect(self.abrir_login_editar)
+        
 
-        # Nuevo Registro
-        self.nuevo_img = QLabel()
-        self.nuevo_img.setPixmap(QPixmap(base_dir.parent / "assets" / "nuevo_icon.png"))
-        self.nuevo_img.setScaledContents(True)
-        self.nuevo_img.setFixedSize(100, 100)
-        self.nuevo_registro = QPushButton("Nuevo Registro")
-        self.nuevo_registro.setFixedSize(100, 50)
+        # Nuevo Registro (abre login; tras validar, navega al módulo "nuevo")
         layout_nuevo = QVBoxLayout()
-        layout_nuevo.addWidget(self.nuevo_img, alignment=Qt.AlignCenter)
-        layout_nuevo.addWidget(self.nuevo_registro, alignment=Qt.AlignCenter)
-        layout_nuevo.addSpacing(15)
+        layout_nuevo.setContentsMargins(0,0,0,0)
+        layout_nuevo.addSpacing(2)
         nuevo_widget = QWidget()
         nuevo_widget.setLayout(layout_nuevo)
         central_layout.addWidget(nuevo_widget)
-        self.nuevo_registro.clicked.connect(self.abrir_login_nuevo)
+        icono_nuevo = base_dir.parent / "assets" /"nuevo_icon.png"
+        self.nuevo_btn = QToolButton()
+        self.nuevo_btn.setText("Nuevo Registro")
+        self.nuevo_btn.setIcon(QIcon(str(icono_nuevo)))
+        self.nuevo_btn.setIconSize(QSize(64, 64))
+        self.nuevo_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.nuevo_btn.setFixedSize(150, 200)
+        self.nuevo_btn.setIconSize(QSize(128, 128))
+        self.nuevo_btn.setStyleSheet("""
+        QToolButton {
+            font-weight: normal;
+            font-size: 18px;
+            background-color: transparent;
+            border: 0px solid rgba(0,0,0,35);
+            border-radius: 12px;
+            padding: 10px 12px;
+            }
+            
+            """)
+        layout_nuevo.addWidget(self.nuevo_btn, alignment = Qt.AlignCenter)
+        self.nuevo_btn.clicked.connect(self.abrir_login_nuevo)
+        
 
         # Dashboard
-        self.dash_img = QLabel()
-        self.dash_img.setPixmap(QPixmap(base_dir.parent / "assets" / "dashboard_icon.png"))
-        self.dash_img.setScaledContents(True)
-        self.dash_img.setFixedSize(100, 100)
-        self.dashboard = QPushButton("Dashboard")
-        self.dashboard.setFixedSize(100, 50)
         layout_dash = QVBoxLayout()
-        layout_dash.addWidget(self.dash_img, alignment=Qt.AlignCenter)
-        layout_dash.addWidget(self.dashboard, alignment=Qt.AlignCenter)
-        layout_dash.addSpacing(15)
+        layout_dash.setContentsMargins(0,0,0,0)
+        layout_dash.addSpacing(2)
         dash_widget = QWidget()
         dash_widget.setLayout(layout_dash)
         central_layout.addWidget(dash_widget)
-        self.dashboard.clicked.connect(self.proximamente)
+        icono_dashboard = base_dir.parent / "assets" /"dashboard_icon.png"
+        self.dashboard_btn = QToolButton()
+        self.dashboard_btn.setText("Dashboard")
+        self.dashboard_btn.setIcon(QIcon(str(icono_dashboard)))
+        self.dashboard_btn.setIconSize(QSize(64, 64))
+        self.dashboard_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.dashboard_btn.setFixedSize(150, 200)
+        self.dashboard_btn.setIconSize(QSize(128, 128))
+        self.dashboard_btn.setStyleSheet("""
+        QToolButton {
+            font-weight: normal;
+            font-size: 18px;
+            background-color: transparent;
+            border: 0px solid rgba(0,0,0,35);
+            border-radius: 12px;
+            padding: 10px 12px;
+            }
+            
+            """)
+        layout_dash.addWidget(self.dashboard_btn, alignment = Qt.AlignCenter)
+        self.dashboard_btn.clicked.connect(self.proximamente)   
 
+        
+        
         # Salir
-        self.salir_img = QLabel()
-        self.salir_img.setPixmap(QPixmap(base_dir.parent / "assets" / "salir_icon.png"))
-        self.salir_img.setScaledContents(True)
-        self.salir_img.setFixedSize(100, 100)
-        self.salir = QPushButton("Salir")
-        self.salir.setFixedSize(100, 50)
         layout_salir = QVBoxLayout()
-        layout_salir.addWidget(self.salir_img, alignment=Qt.AlignCenter)
-        layout_salir.addWidget(self.salir, alignment=Qt.AlignCenter)
-        layout_salir.addSpacing(15)
+        layout_salir.setContentsMargins(0,0,0,0)
+        layout_salir.addSpacing(2)
         salir_widget = QWidget()
         salir_widget.setLayout(layout_salir)
         central_layout.addWidget(salir_widget)
-        self.salir.clicked.connect(self.salir_app)
+        icono_salir = base_dir.parent / "assets" /"salir_icon.png"
+        self.salir_btn = QToolButton()
+        self.salir_btn.setText("Salir")
+        self.salir_btn.setIcon(QIcon(str(icono_salir)))
+        self.salir_btn.setIconSize(QSize(64, 64))
+        self.salir_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.salir_btn.setFixedSize(150, 200)
+        self.salir_btn.setIconSize(QSize(128, 128))
+        self.salir_btn.setStyleSheet("""
+        QToolButton {
+            font-weight: normal;
+            font-size: 18px;
+            background-color: transparent;
+            border: 0px solid rgba(0,0,0,35);
+            border-radius: 12px;
+            padding: 10px 12px;
+            }
+            
+            """)
+        layout_salir.addWidget(self.salir_btn, alignment = Qt.AlignCenter)
+        self.salir_btn.clicked.connect(self.salir_app)
 
+        central_layout.addStretch()       
 
-        layout_principal.addWidget(central_widget_botones, 1, 0, alignment=Qt.AlignCenter)
-        
-        central_layout.addStretch()
-        central_layout.addWidget(buscar_widget)
-        central_layout.addWidget(editar_widget)
-        central_layout.addWidget(nuevo_widget)
-        central_layout.addWidget(dash_widget)
-        central_layout.addWidget(salir_widget)
-        central_layout.addStretch()
+        # ---- Agregar la HOME al stack (página 0)
+        self.page_home = central_widget_botones
+        self.stack.addWidget(self.page_home)
 
-    def ir_a_busqueda(self):
-        self.stack.setCurrentWidget(self.busqueda)
+        # ---- Instanciar módulos y agregarlos al stack (páginas 1..n)
+        self.busqueda = UI_Busqueda(self.app) # <-- importante: pasar self.app
+        self.busqueda.volver_home.connect(self.ir_a_home)   
+        self.nuevo = UI_Nuevo(self.app)
+        self.stack.addWidget(self.busqueda)     # índice 1
+        self.stack.addWidget(self.nuevo)        # índice 2
+
+        # Página inicial
+        self.stack.setCurrentWidget(self.page_home)
+
+    # --------- Navegación interna del stack
+    def abrir_busqueda(self):
+        self.stack.setCurrentWidget(self.busqueda)   
 
     def ir_a_nuevo(self):
         self.stack.setCurrentWidget(self.nuevo)
+    
+    def ir_a_home(self):
+        self.stack.setCurrentWidget(self.page_home)
 
-    def abrir_busqueda(self):
-        # Pasa self.app al crear la ventana de búsqueda
-        self.ventana_busqueda = UI_Busqueda(self.app)
-        self.ventana_busqueda.setWindowTitle("Buscar...")
-        base_dir = Path(__file__).resolve().parent
-        icono_ventana = base_dir.parent / "assets" / "search_icon.ico"
-        self.ventana_busqueda.setWindowIcon(QIcon(str(icono_ventana)))
-        self.ventana_busqueda.show()
-
+    # --------- Ventanas de login (externas al stack)
     def abrir_login_nuevo(self):
         self.login = login_nuevoUI(self.app)
         self.login.setWindowTitle("Iniciar sesión - Nuevo registro")
@@ -201,32 +265,32 @@ class MenuPrincipal(QMainWindow):
 
         screen = QGuiApplication.primaryScreen().availableGeometry()
         self.login.move(
-        (screen.width() - self.login.width()) // 2,
-        (screen.height() - self.login.height()) // 2
+            (screen.width() - self.login.width()) // 2,
+            (screen.height() - self.login.height()) // 2
         )
 
+        # Sugerencia: al validar en login_nuevoUI, emite una señal y conéctala aquí para:
+        # self.ir_a_nuevo()
         self.login.show()
-        
-    
 
-
-    def abrir_login_editar(self):       
+    def abrir_login_editar(self):
         self.login = loginUI(self.app)
         self.login.setFixedSize(400, 600)
         base_dir = Path(__file__).resolve().parent
         self.login.setWindowTitle("Iniciar Sesión")
-        icono_ventana = base_dir.parent / "assets" / "login icon.ico"    
+        icono_ventana = base_dir.parent / "assets" / "login icon.ico"
         self.login.setWindowIcon(QIcon(str(icono_ventana)))
-
 
         screen = QGuiApplication.primaryScreen().availableGeometry()
         self.login.move(
-        (screen.width() - self.login.width()) // 2,
-        (screen.height() - self.login.height()) // 2
+            (screen.width() - self.login.width()) // 2,
+            (screen.height() - self.login.height()) // 2
         )
 
+        # Igual que arriba: al validar, puedes navegar a una página de edición si la agregas al stack
         self.login.show()
 
+    # --------- Utilidades
     def salir_app(self):
         msg = QMessageBox(self)
         msg.setWindowTitle("Salir")
@@ -236,23 +300,28 @@ class MenuPrincipal(QMainWindow):
         boton_si = msg.addButton("Sí", QMessageBox.YesRole)
         boton_no = msg.addButton("No", QMessageBox.NoRole)
 
+        for boton in (boton_si, boton_no):
+            boton.setMinimumSize(80, 40)   # ancho, alto
+            boton.setStyleSheet("font-size: 14px;")
+
         msg.exec()
 
         if msg.clickedButton() == boton_si:
             QApplication.quit()
-    
-    def proximamente(self):
-        QMessageBox.information(
-        self,
-        "Dashboard",
-        "Estará disponible próximamente."
-        )
 
-            
-            
-      
+    def proximamente(self):
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Dashboard")
+        msg.setText("Dashboard, Estará disponible próximamente.")
+        msg.setIcon(QMessageBox.Information)
+        boton_ok = msg.addButton("OK", QMessageBox.AcceptRole)
+        boton_ok.setMinimumSize(80, 40)
+        
+
+        msg.exec()
+
+
 if __name__ == "__main__":
-    import sys
     app = QApplication(sys.argv)
 
     if darkdetect.isDark():

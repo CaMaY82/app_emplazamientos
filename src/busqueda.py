@@ -313,8 +313,25 @@ class UI_Busqueda(QWidget):
         pixmap = QPixmap(str(logoIT))
         logo_inspeccion.setPixmap(pixmap)
 
-        self.regresar = QPushButton("Regresar")
-        self.regresar.setFixedSize(70, 30)
+        icono_regresar = base_dir.parent / "assets" /"regresar_icon.png"       
+        self.regresar = QToolButton()
+        #self.regresar.setText("Regresar")
+        self.regresar.setIcon(QIcon(str(icono_regresar)))
+        self.regresar.setIconSize(QSize(50, 50))
+        self.regresar.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        #self.regresar.setFixedSize(70, 30)
+        self.regresar.setStyleSheet("""
+        QToolButton {
+            font-weight: normal;
+            font-size: 12px;
+            background-color: transparent;
+            border: 0px solid rgba(0,0,0,35);
+            border-radius: 12px;
+            padding: 10px 12px;
+            }
+            
+            """)
+        
         self.layout_inferior.addWidget(self.regresar)
         self.regresar.clicked.connect(self.volver_home.emit)
        
