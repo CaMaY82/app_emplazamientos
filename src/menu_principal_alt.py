@@ -46,11 +46,11 @@ class MenuPrincipal(QMainWindow):
         logo_pemex.setScaledContents(True)
         layout_sup.addWidget(logo_pemex)
 
-        titulo = QLabel("Sistema de Administración de Emplazamientos y Solicitudes de Fabricación de la Refinería Madero")
-        titulo.setWordWrap(True)
-        titulo.setAlignment(Qt.AlignCenter)
-        titulo.setStyleSheet("font-weight: bold; font-size: 18px")
-        layout_sup.addWidget(titulo, alignment=Qt.AlignCenter)
+        self.titulo = QLabel("Sistema de Administración de Emplazamientos y Solicitudes de Fabricación de la Refinería Madero")
+        self.titulo.setWordWrap(True)
+        self.titulo.setAlignment(Qt.AlignCenter)
+        self.titulo.setStyleSheet("font-weight: bold; font-size: 18px")
+        layout_sup.addWidget(self.titulo, alignment=Qt.AlignCenter)
 
         if darkdetect.isDark():
             logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo_dark.png")

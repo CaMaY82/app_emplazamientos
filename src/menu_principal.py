@@ -25,7 +25,8 @@ class MenuPrincipal(QMainWindow):
         base_dir = Path(__file__).resolve().parent
 
         self.setWindowTitle("Menú Principal")
-        self.resize(1280, 900)
+        self.setMinimumSize(1050, 600)
+        #self.resize(1280, 900)
 
         # ---- Layout central
         layout_principal = QGridLayout()
@@ -48,11 +49,11 @@ class MenuPrincipal(QMainWindow):
         logo_pemex.setScaledContents(True)
         layout_sup.addWidget(logo_pemex)
 
-        titulo = QLabel("Sistema de Administración de Emplazamientos y Solicitudes de Fabricación de la Refinería Madero")
-        titulo.setWordWrap(True)
-        titulo.setAlignment(Qt.AlignCenter)
-        titulo.setStyleSheet("font-weight: bold; font-size: 24px")
-        layout_sup.addWidget(titulo, alignment=Qt.AlignCenter)
+        self.titulo = QLabel("Sistema de Administración de Emplazamientos y Solicitudes de Fabricación de la Refinería Madero")
+        self.titulo.setWordWrap(True)
+        self.titulo.setAlignment(Qt.AlignCenter)
+        self.titulo.setStyleSheet("font-weight: bold; font-size: 18px")
+        layout_sup.addWidget(self.titulo, alignment=Qt.AlignCenter)
 
         if darkdetect.isDark():
             logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo_dark.png")
@@ -245,8 +246,25 @@ class MenuPrincipal(QMainWindow):
         self.stack.addWidget(self.nuevo)        # índice 2
         self.stack.addWidget(self.editar)       # índice 3
 
-        # Página inicial
+        self.titulos_por_pagina = {
+            self.page_home: "Sistema De Administración De Emplazamientos & Solicitudes De Fabricación De La Refinería Madero",
+            self.busqueda:  "BUSCAR REGISTRO",
+            self.nuevo:     "REGISTRAR NUEVO",
+            self.editar: "EDITAR REGISTRO", 
+        }
+
+        # Reaccionar al cambio de página
+        self.stack.currentChanged.connect(self.actualizar_titulo)
+
+        # Página inicial + título inicial
         self.stack.setCurrentWidget(self.page_home)
+        self.actualizar_titulo(self.stack.currentIndex())
+
+    def actualizar_titulo(self, idx: int):
+        w = self.stack.widget(idx)
+        texto = self.titulos_por_pagina.get(w, "Aplicación")
+        self.titulo.setText(texto)
+        self.setWindowTitle(f"{texto} — SAE/SF Madero")  # opcional
 
     # --------- Navegación interna del stack
     def abrir_busqueda(self):

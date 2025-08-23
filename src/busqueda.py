@@ -60,7 +60,7 @@ class UI_Busqueda(QWidget):
             """)
 
         self.setWindowTitle("Búsqueda EMP o SF")
-        self.setMinimumSize(800, 700)
+        #self.setMinimumSize(800, 700)
 
 
         #Layoput de la ventana
@@ -336,7 +336,7 @@ class UI_Busqueda(QWidget):
         self.regresar.clicked.connect(self.volver_home.emit)
        
         self.frame_inferior.setLayout(self.layout_inferior)
-        self.layout_inferior.addWidget(logo_inspeccion)
+        #self.layout_inferior.addWidget(logo_inspeccion)
         self.layout_inferior.addStretch()
 
         

@@ -76,7 +76,7 @@ class UI_editar(QWidget):
         self.db_path = str(Path(__file__).resolve().parent.parent / "db" / "EMP.db")
 
         self.setWindowTitle("Editar Registro")
-        self.setMinimumSize(1150, 800)
+        #self.setMinimumSize(1150, 800)
 
          #Layoput de la ventana
         layout_principal = QVBoxLayout(self)

@@ -62,7 +62,7 @@ class UI_Nuevo(QWidget):
             """)
             
         self.setWindowTitle("REGISTRAR NUEVO")
-        self.setMinimumSize(800, 850)
+        #self.setMinimumSize(800, 850)
 
         #Layoput de la ventana
         layout_principal = QVBoxLayout(self)
