@@ -1,22 +1,23 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout,
-    QLabel, QPushButton, QRadioButton, 
-    QSizePolicy, QGridLayout, QLineEdit, QSpacerItem, QGroupBox, QDateEdit, QTextEdit, QFrame, QMessageBox
+    QLabel, QPushButton, QSizePolicy, QGridLayout, QLineEdit, QSpacerItem, QFrame, QMessageBox
 )
 from PySide6.QtGui import QIcon, QPixmap, QPainter, QIntValidator, QGuiApplication
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 import darkdetect
 import sys
 from pathlib import Path
 from editar_registro import UI_editar
 
 class loginUI(QWidget):
-    def __init__(self, app):
-        super().__init__()
-        self.app = app
-        
+    auth_ok = Signal()
+    def __init__(self, app, parent=None):
+        super().__init__(parent)
+        self.app = app        
         self.setFixedSize(400, 600)
         self.setWindowFlags(Qt.Window | Qt.WindowCloseButtonHint)
+        self.setWindowModality(Qt.ApplicationModal)
+        self.setAttribute(Qt.WA_DeleteOnClose)
         
         if darkdetect.isDark():
          modo = "oscuro"
@@ -136,14 +137,15 @@ class loginUI(QWidget):
 
         if usuario in usuarios and usuarios[usuario] == password:
             #QMessageBox.information(self, "Bienvenido", f"Bienvenido")
+            self.auth_ok.emit()
             self.close()
-            self.abrir_editar()
+            #self.abrir_nuevo()
         else:
              QMessageBox.critical(self, "Error", "Usuario o contraseña incorrectos.")
 
-    def abrir_editar(self):
-        self.ventana_editar = UI_editar(self.app)
-        self.ventana_editar.show()
+    #def abrir_editar(self):
+        #self.ventana_editar = UI_editar(self.app)
+        #self.ventana_editar.show()
 
       
 

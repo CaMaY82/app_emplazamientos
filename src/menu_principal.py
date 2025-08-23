@@ -14,6 +14,7 @@ from busqueda import UI_Busqueda
 from nuevo_registro import UI_Nuevo
 from login import loginUI
 from login_nuevo import login_nuevoUI
+from editar_registro import UI_editar
 
 
 class MenuPrincipal(QMainWindow):
@@ -238,8 +239,11 @@ class MenuPrincipal(QMainWindow):
         self.busqueda.volver_home.connect(self.ir_a_home)   
         self.nuevo = UI_Nuevo(self.app)
         self.nuevo.volver_home.connect(self.ir_a_home)
+        self.editar = UI_editar(self.app)
+        self.editar.volver_home.connect(self.ir_a_home)
         self.stack.addWidget(self.busqueda)     # índice 1
         self.stack.addWidget(self.nuevo)        # índice 2
+        self.stack.addWidget(self.editar)       # índice 3
 
         # Página inicial
         self.stack.setCurrentWidget(self.page_home)
@@ -252,13 +256,15 @@ class MenuPrincipal(QMainWindow):
     def ir_a_nuevo(self):
         self.stack.setCurrentWidget(self.nuevo)
     
+    def ir_a_editar(self):
+        self.stack.setCurrentWidget(self.editar)
+    
     def ir_a_home(self):
         self.stack.setCurrentWidget(self.page_home)
 
     # --------- Ventanas de login (externas al stack)
     def abrir_login_nuevo(self):
-        self.login = login_nuevoUI(self.app)
-        
+        self.login = login_nuevoUI(self.app)        
         self.login.setWindowTitle("Iniciar sesión - Nuevo registro")
         self.login.setFixedSize(400, 600)
 
@@ -286,9 +292,10 @@ class MenuPrincipal(QMainWindow):
 
     def abrir_login_editar(self):
         self.login = loginUI(self.app)
-        self.login.setFixedSize(400, 600)
-        base_dir = Path(__file__).resolve().parent
         self.login.setWindowTitle("Iniciar Sesión")
+        self.login.setFixedSize(400, 600)
+
+        base_dir = Path(__file__).resolve().parent
         icono_ventana = base_dir.parent / "assets" / "login icon.ico"
         self.login.setWindowIcon(QIcon(str(icono_ventana)))
 
@@ -298,8 +305,15 @@ class MenuPrincipal(QMainWindow):
             (screen.height() - self.login.height()) // 2
         )
 
-        # Igual que arriba: al validar, puedes navegar a una página de edición si la agregas al stack
+        self.login.auth_ok.connect(self._on_login_editar_ok)
         self.login.show()
+        
+        # Igual que arriba: al validar, puedes navegar a una página de edición si la agregas al stack
+    def _on_login_editar_ok(self):
+        print("Login OK (recibí la señal)")                  # debug
+        self.ir_a_editar()                                    # o slide_to(...)
+        self.login.close()
+        self.login = None  
         
     #def _on_login_nuevo_ok(self):
         # Navega dentro del stack (sin abrir ventanas nuevas)

@@ -212,9 +212,10 @@ class MenuPrincipal(QMainWindow):
 
     def abrir_login_editar(self):       
         self.login = loginUI(self.app)
-        self.login.setFixedSize(400, 600)
-        base_dir = Path(__file__).resolve().parent
         self.login.setWindowTitle("Iniciar Sesión")
+        self.login.setFixedSize(400, 600)
+
+        base_dir = Path(__file__).resolve().parent
         icono_ventana = base_dir.parent / "assets" / "login icon.ico"    
         self.login.setWindowIcon(QIcon(str(icono_ventana)))
 

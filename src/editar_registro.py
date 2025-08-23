@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
     QToolButton, QTextEdit, QGroupBox, QDateEdit, QMessageBox, QScrollArea, QCalendarWidget, QDialog
 
 )
-from PySide6.QtCore import Qt, QSize, QDate
+from PySide6.QtCore import Qt, QSize, QDate, Signal
 from PySide6.QtGui import QIcon, QPixmap, QIntValidator
 import darkdetect
 import sys
@@ -32,6 +32,7 @@ class CalendarioPopup(QDialog):
 
 
 class UI_editar(QWidget):
+    volver_home = Signal()
     def __init__(self, app):
         super().__init__()
         self.app = app
@@ -467,11 +468,34 @@ class UI_editar(QWidget):
         botones_frame.setLayout(botones_layout)        
         layout_principal.addWidget(botones_frame)
 
+        icono_regresar = base_dir.parent / "assets" /"regresar_icon.png"       
+        self.regresar = QToolButton()
+        #self.regresar.setText("Regresar")
+        self.regresar.setIcon(QIcon(str(icono_regresar)))
+        self.regresar.setIconSize(QSize(50, 50))
+        self.regresar.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        #self.regresar.setFixedSize(70, 30)
+        self.regresar.setStyleSheet("""
+        QToolButton {
+            font-weight: normal;
+            font-size: 12px;
+            background-color: transparent;
+            border: 0px solid rgba(0,0,0,35);
+            border-radius: 12px;
+            padding: 10px 12px;
+            }
+            
+            """)
+        botones_layout.addWidget(self.regresar)
+        self.regresar.clicked.connect(self.volver_home.emit)
+
         self.actualizar = QPushButton("ACTUALIZAR")
         self.actualizar.setFixedSize(150, 40)
         botones_layout.addWidget(self.actualizar)
 
         self.actualizar.clicked.connect(self.actualizar_registro)
+
+        
 
 
         self.scroll_area = QScrollArea()
@@ -1031,7 +1055,7 @@ class UI_editar(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = UI_editar()
+    window = UI_editar(app)
     #base_dir = Path(__file__).resolve().parent
     #icono_ventana = base_dir.parent / "assets" / "app_icon.ico"
     
