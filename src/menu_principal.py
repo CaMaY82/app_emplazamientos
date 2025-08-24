@@ -347,11 +347,14 @@ class MenuPrincipal(QMainWindow):
         slide_to(self.stack, idx, direction="left", duration=260)
         #fade_to(self.stack, self.stack.indexOf(self.nuevo), duration=1700)
     
-    def ir_a_editar(self):
+    def ir_a_editar(self):        
         #self.stack.setCurrentWidget(self.editar)
         idx = self.stack.indexOf(self.editar)
         slide_to(self.stack, idx, direction="left", duration=260)
         #fade_to(self.stack, self.stack.indexOf(self.editar), duration=1700)
+        self.editar.limpiar_campos()
+        self.editar.limpiar_tabla()
+        
         
     
     def ir_a_home(self):

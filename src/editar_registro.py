@@ -1050,6 +1050,10 @@ class UI_editar(QWidget):
        self.comentarios.clear()
        self.archivo_link.clear()
        self.notificacion_link.clear()
+    
+    def limpiar_tabla(self):
+        self.tabla_resultados.clearContents()
+    
 
 
 
