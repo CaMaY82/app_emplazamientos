@@ -18,6 +18,9 @@ class login_nuevoUI(QWidget):
         self.setWindowFlags(Qt.Window | Qt.WindowCloseButtonHint)
         self.setWindowModality(Qt.ApplicationModal)
         self.setAttribute(Qt.WA_DeleteOnClose)
+
+        base_dir = Path(__file__).resolve().parent
+        self.assets = base_dir.parent / "assets" 
         
         if darkdetect.isDark():
          modo = "oscuro"
@@ -65,7 +68,7 @@ class login_nuevoUI(QWidget):
         self.layout_principal.addWidget(self.frame_sup)
         self.layout_sup.setAlignment(Qt.AlignHCenter)
 
-        titulo1 = QLabel("Sistema de Administración de Emplazamientos")
+        titulo1 = QLabel("INICIA SESIÓN")
         titulo1.setAlignment(Qt.AlignmentFlag.AlignCenter)
         titulo1.setStyleSheet("font-weight: regular; font-size: 16px")
         self.layout_principal.addWidget(titulo1)  
@@ -81,21 +84,16 @@ class login_nuevoUI(QWidget):
         # Imagen de Login
 
         base_dir = Path(__file__).resolve().parent
-        
-        user_img = QPixmap(base_dir.parent / "assets" / "user_image.png")
-        user_img = base_dir.parent / "assets" / "user_image.png"
-        
-        imagen_usuario = QLabel()
-        imagen_usuario.setFixedSize(150, 75)
-        imagen_usuario.setScaledContents(True)
-        
-        pixmap = QPixmap(str(user_img))
-        imagen_usuario.setPixmap(pixmap)
+        assets = base_dir.parent / "assets"
 
-        self.layout_principal.addWidget(imagen_usuario, alignment=Qt.AlignCenter)
-        imagen_usuario.setFixedSize(100, 100)
-
+        self.imagen_usuario = QLabel()
+        self.imagen_usuario.setFixedSize(170, 170)
+        self.imagen_usuario.setScaledContents(True)
+        self.layout_principal.addWidget(self.imagen_usuario, alignment=Qt.AlignCenter)
+        self.imagen_usuario.setPixmap(QPixmap(str(assets / "user_image.png")))
         self.layout_principal.addSpacerItem(QSpacerItem(10, 50, QSizePolicy.Preferred, QSizePolicy.Preferred))
+        
+
 
 
         # Frame Central
@@ -111,6 +109,7 @@ class login_nuevoUI(QWidget):
         self.datos_layout.addWidget(self.usuario, 2, 0)
         self.usuario.setFixedWidth(150)
         self.layout_principal.addWidget(self.frame_central)
+        self.usuario.textChanged.connect(self._actualizar_avatar_por_usuario)
         
         self.password = QLineEdit()
         self.password.setEchoMode(QLineEdit.Password)
@@ -121,13 +120,22 @@ class login_nuevoUI(QWidget):
         
         
         self.login_btn = QPushButton("Iniciar Sesion")
-        self.login_btn.setFixedSize(150, 20)
+        self.login_btn.setFixedSize(150, 35)
         self.login_btn.clicked.connect(self.iniciar_sesion)
 
         self.guess_btn = QPushButton("Continuar como invitado")
         self.guess_btn.setFixedSize(150, 20)
         self.datos_layout.addWidget(self.login_btn, 7, 0)    
         #self.datos_layout.addWidget(self.guess_btn, 8, 0)
+
+    def _actualizar_avatar_por_usuario(self):
+        user_id = self.usuario.text().strip()   # <- aquí usas self.usuario
+        mapping = {
+        "345838": "JJVE.png",
+        "433086": "RRG.png",
+        }
+        img_path = self.assets / mapping.get(user_id, "user_image.png")
+        self.imagen_usuario.setPixmap(QPixmap(str(img_path)))
 
     def iniciar_sesion(self):
         usuario = self.usuario.text()
@@ -157,7 +165,7 @@ class login_nuevoUI(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     ventana = login_nuevoUI(app)
-    ventana.setWindowTitle("Iniciar Sesion")    
+    ventana.setWindowTitle("SAESF MADERO")    
     base_dir = Path(__file__).resolve().parent
     icono_ventana = base_dir.parent / "assets" / "login icon.ico"    
     ventana.setWindowIcon(QIcon(str(icono_ventana)))    

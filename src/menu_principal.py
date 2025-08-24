@@ -1,10 +1,9 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QFrame, QLabel, QPushButton, QGridLayout, QMessageBox, QStackedWidget, QToolButton
+    QFrame, QLabel, QPushButton, QGridLayout, QMessageBox, QStackedWidget, QToolButton, QGraphicsOpacityEffect
 )
-from PySide6.QtCore import Qt, QSize
-    # Si usas QSize: from PySide6.QtCore import QSize
-from PySide6.QtGui import QIcon, QPixmap, QGuiApplication
+from PySide6.QtCore import Qt, QSize, QPropertyAnimation, QEasingCurve, QRect, QParallelAnimationGroup    
+from PySide6.QtGui import QIcon, QPixmap, QGuiApplication, QCloseEvent
 import darkdetect
 import sys
 from pathlib import Path
@@ -15,6 +14,74 @@ from nuevo_registro import UI_Nuevo
 from login import loginUI
 from login_nuevo import login_nuevoUI
 from editar_registro import UI_editar
+
+def slide_to(stacked, next_index, direction="left", duration=260, easing=QEasingCurve.OutCubic):
+    """Transición deslizante entre páginas de un QStackedWidget."""
+    if next_index < 0 or next_index == stacked.currentIndex():
+        return
+    if stacked.property("_animating"):
+        return
+    stacked.setProperty("_animating", True)
+
+    curr  = stacked.currentWidget()
+    nextw = stacked.widget(next_index)
+
+    area = stacked.rect()
+    w, h = area.width(), area.height()
+
+    if direction == "left":
+        start_next = QRect(-w, 0, w, h); end_next = QRect(0, 0, w, h); end_curr = QRect(w, 0, w, h)
+    elif direction == "right":
+        start_next = QRect(w, 0, w, h);  end_next = QRect(0, 0, w, h); end_curr = QRect(-w, 0, w, h)
+    elif direction == "up":
+        start_next = QRect(0, -h, w, h); end_next = QRect(0, 0, w, h); end_curr = QRect(0, h, w, h)
+    else:  # "down"
+        start_next = QRect(0, h, w, h);  end_next = QRect(0, 0, w, h); end_curr = QRect(0, -h, w, h)
+
+    nextw.setGeometry(start_next)
+    nextw.show()
+    nextw.raise_()
+
+    group = QParallelAnimationGroup(stacked)
+
+    a_curr = QPropertyAnimation(curr, b"geometry")
+    a_curr.setDuration(duration)
+    a_curr.setEndValue(end_curr)
+    a_curr.setEasingCurve(easing)
+
+    a_next = QPropertyAnimation(nextw, b"geometry")
+    a_next.setDuration(duration)
+    a_next.setEndValue(end_next)
+    a_next.setEasingCurve(easing)
+
+    group.addAnimation(a_curr)
+    group.addAnimation(a_next)
+
+    def _finish():
+        stacked.setCurrentIndex(next_index)
+        curr.hide()
+        nextw.setGeometry(0, 0, w, h)
+        stacked.setProperty("_animating", False)
+
+    group.finished.connect(_finish)
+    group.start(QPropertyAnimation.DeleteWhenStopped)
+
+#Animacion de Fade
+def fade_to(stacked, next_index, duration=220, easing=QEasingCurve.OutCubic):
+    if next_index < 0 or next_index == stacked.currentIndex():
+        return
+    nextw = stacked.widget(next_index)
+    eff = QGraphicsOpacityEffect(nextw)
+    nextw.setGraphicsEffect(eff)
+    eff.setOpacity(0.0)
+    stacked.setCurrentIndex(next_index)
+
+    anim = QPropertyAnimation(eff, b"opacity", stacked)
+    anim.setDuration(duration)
+    anim.setStartValue(0.0)
+    anim.setEndValue(1.0)
+    anim.setEasingCurve(easing)
+    anim.start(QPropertyAnimation.DeleteWhenStopped)
 
 
 class MenuPrincipal(QMainWindow):
@@ -107,6 +174,34 @@ class MenuPrincipal(QMainWindow):
         layout_buscar.addWidget(self.buscar_btn, alignment=Qt.AlignCenter)
         self.buscar_btn.clicked.connect(self.abrir_busqueda)
        
+        # Nuevo Registro (abre login; tras validar, navega al módulo "nuevo")
+        layout_nuevo = QVBoxLayout()
+        layout_nuevo.setContentsMargins(0,0,0,0)
+        layout_nuevo.addSpacing(2)
+        nuevo_widget = QWidget()
+        nuevo_widget.setLayout(layout_nuevo)
+        central_layout.addWidget(nuevo_widget)
+        icono_nuevo = base_dir.parent / "assets" /"nuevo_icon.png"
+        self.nuevo_btn = QToolButton()
+        self.nuevo_btn.setText("Nuevo Registro")
+        self.nuevo_btn.setIcon(QIcon(str(icono_nuevo)))
+        self.nuevo_btn.setIconSize(QSize(64, 64))
+        self.nuevo_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.nuevo_btn.setFixedSize(150, 200)
+        self.nuevo_btn.setIconSize(QSize(128, 128))
+        self.nuevo_btn.setStyleSheet("""
+        QToolButton {
+            font-weight: normal;
+            font-size: 18px;
+            background-color: transparent;
+            border: 0px solid rgba(0,0,0,35);
+            border-radius: 12px;
+            padding: 10px 12px;
+            }
+            
+            """)
+        layout_nuevo.addWidget(self.nuevo_btn, alignment = Qt.AlignCenter)
+        self.nuevo_btn.clicked.connect(self.abrir_login_nuevo)
 
         # Editar (abre login)
         layout_editar = QVBoxLayout()
@@ -137,36 +232,6 @@ class MenuPrincipal(QMainWindow):
             """)
         layout_editar.addWidget(self.editar_btn, alignment=Qt.AlignCenter)        
         self.editar_btn.clicked.connect(self.abrir_login_editar)
-        
-
-        # Nuevo Registro (abre login; tras validar, navega al módulo "nuevo")
-        layout_nuevo = QVBoxLayout()
-        layout_nuevo.setContentsMargins(0,0,0,0)
-        layout_nuevo.addSpacing(2)
-        nuevo_widget = QWidget()
-        nuevo_widget.setLayout(layout_nuevo)
-        central_layout.addWidget(nuevo_widget)
-        icono_nuevo = base_dir.parent / "assets" /"nuevo_icon.png"
-        self.nuevo_btn = QToolButton()
-        self.nuevo_btn.setText("Nuevo Registro")
-        self.nuevo_btn.setIcon(QIcon(str(icono_nuevo)))
-        self.nuevo_btn.setIconSize(QSize(64, 64))
-        self.nuevo_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        self.nuevo_btn.setFixedSize(150, 200)
-        self.nuevo_btn.setIconSize(QSize(128, 128))
-        self.nuevo_btn.setStyleSheet("""
-        QToolButton {
-            font-weight: normal;
-            font-size: 18px;
-            background-color: transparent;
-            border: 0px solid rgba(0,0,0,35);
-            border-radius: 12px;
-            padding: 10px 12px;
-            }
-            
-            """)
-        layout_nuevo.addWidget(self.nuevo_btn, alignment = Qt.AlignCenter)
-        self.nuevo_btn.clicked.connect(self.abrir_login_nuevo)
         
 
         # Dashboard
@@ -226,8 +291,9 @@ class MenuPrincipal(QMainWindow):
             }
             
             """)
-        layout_salir.addWidget(self.salir_btn, alignment = Qt.AlignCenter)
-        self.salir_btn.clicked.connect(self.salir_app)
+        #layout_salir.addWidget(self.salir_btn, alignment = Qt.AlignCenter)
+        #self.salir_btn.clicked.connect(self.salir_app)
+        self.salir_btn.clicked.connect(self.close)
 
         central_layout.addStretch()       
 
@@ -247,7 +313,7 @@ class MenuPrincipal(QMainWindow):
         self.stack.addWidget(self.editar)       # índice 3
 
         self.titulos_por_pagina = {
-            self.page_home: "Sistema De Administración De Emplazamientos & Solicitudes De Fabricación De La Refinería Madero",
+            self.page_home: "Sistema De Administración De Emplazamientos \n&\n Solicitudes De Fabricación \nDe Refinería Madero",
             self.busqueda:  "BUSCAR REGISTRO",
             self.nuevo:     "REGISTRAR NUEVO",
             self.editar: "EDITAR REGISTRO", 
@@ -269,16 +335,29 @@ class MenuPrincipal(QMainWindow):
     # --------- Navegación interna del stack
     def abrir_busqueda(self):
         self.busqueda.limpiar_resultados()
-        self.stack.setCurrentWidget(self.busqueda)   
+        #self.stack.setCurrentWidget(self.busqueda)
+        idx = self.stack.indexOf(self.busqueda)
+        slide_to(self.stack, idx, direction="left", duration=260)
+        #fade_to(self.stack, self.stack.indexOf(self.busqueda), duration=1700)
+        
 
     def ir_a_nuevo(self):
-        self.stack.setCurrentWidget(self.nuevo)
+        #self.stack.setCurrentWidget(self.nuevo)
+        idx = self.stack.indexOf(self.nuevo)
+        slide_to(self.stack, idx, direction="left", duration=260)
+        #fade_to(self.stack, self.stack.indexOf(self.nuevo), duration=1700)
     
     def ir_a_editar(self):
-        self.stack.setCurrentWidget(self.editar)
+        #self.stack.setCurrentWidget(self.editar)
+        idx = self.stack.indexOf(self.editar)
+        slide_to(self.stack, idx, direction="left", duration=260)
+        #fade_to(self.stack, self.stack.indexOf(self.editar), duration=1700)
+        
     
     def ir_a_home(self):
-        self.stack.setCurrentWidget(self.page_home)
+        #self.stack.setCurrentWidget(self.page_home)
+        idx = self.stack.indexOf(self.page_home)
+        slide_to(self.stack, self.stack.indexOf(self.page_home), direction="right", duration=260)
 
     # --------- Ventanas de login (externas al stack)
     def abrir_login_nuevo(self):
@@ -342,23 +421,24 @@ class MenuPrincipal(QMainWindow):
         #self.login = None   
 
     # --------- Utilidades
-    def salir_app(self):
+    def salir_app(self) -> bool:
         msg = QMessageBox(self)
         msg.setWindowTitle("Salir")
         msg.setText("¿Estás seguro que deseas salir?")
-        msg.setIcon(QMessageBox.Question)
-
-        boton_si = msg.addButton("Sí", QMessageBox.YesRole)
-        boton_no = msg.addButton("No", QMessageBox.NoRole)
-
-        for boton in (boton_si, boton_no):
-            boton.setMinimumSize(80, 40)   # ancho, alto
-            boton.setStyleSheet("font-size: 14px;")
-
+        msg.setIcon(QMessageBox.Information)
+        si = msg.addButton("Sí", QMessageBox.YesRole)
+        no = msg.addButton("No", QMessageBox.NoRole)
+        for b in (si, no):
+            b.setMinimumSize(80, 40)
+            b.setStyleSheet("font-size: 14px;")
         msg.exec()
+        return msg.clickedButton() is si
 
-        if msg.clickedButton() == boton_si:
-            QApplication.quit()
+    def closeEvent(self, event: QCloseEvent):
+        if self.salir_app():
+            event.accept()
+        else:
+            event.ignore()
 
     def proximamente(self):
         msg = QMessageBox(self)
@@ -406,6 +486,12 @@ if __name__ == "__main__":
 
     ventana = MenuPrincipal(app)
     ventana.show()
+
+    screen = QGuiApplication.primaryScreen().availableGeometry()
+    ventana.move(
+        (screen.width() - ventana.width()) // 2,
+        (screen.height() - ventana.height()) // 2
+    )
 
     base_dir = Path(__file__).resolve().parent
     icono_ventana = base_dir.parent / "assets" / "app_icon_2.ico"
