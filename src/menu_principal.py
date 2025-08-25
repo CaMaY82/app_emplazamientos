@@ -96,16 +96,16 @@ class MenuPrincipal(QMainWindow):
         #self.resize(1280, 900)
 
         # ---- Layout central
-        layout_principal = QGridLayout()
+        self.layout_principal = QGridLayout()
         central_widget = QWidget()
-        central_widget.setLayout(layout_principal)
+        central_widget.setLayout(self.layout_principal)
         self.setCentralWidget(central_widget)
 
         # ---- Header / barra superior
-        frame_sup = QFrame()
-        layout_sup = QHBoxLayout()
-        frame_sup.setLayout(layout_sup)
-        layout_principal.addWidget(frame_sup, 0, 0, Qt.AlignTop)
+        self.frame_sup = QFrame()
+        self.layout_sup = QHBoxLayout()
+        self.frame_sup.setLayout(self.layout_sup)
+        self.layout_principal.addWidget(self.frame_sup, 0, 0, Qt.AlignTop)
 
         logoPMX = base_dir.parent / "assets" / "pemex_logo.png"
         pemex = QPixmap(str(logoPMX))
@@ -114,13 +114,24 @@ class MenuPrincipal(QMainWindow):
         logo_pemex.setFixedSize(200, 90)
         logo_pemex.setPixmap(pemex)
         logo_pemex.setScaledContents(True)
-        layout_sup.addWidget(logo_pemex)
+        self.layout_sup.addWidget(logo_pemex)
+
+        if darkdetect.isDark():
+            logoIT = QPixmap(base_dir.parent / "assets" / "app_logo_L.png")
+        else:
+            logoIT = QPixmap(base_dir.parent / "assets" / "app_logo_D.png")
+
+        logo_app = QLabel()
+        logo_app.setFixedSize(200, 200)
+        logo_app.setScaledContents(True)
+        logo_app.setPixmap(logoIT)
+        self.layout_sup.addWidget(logo_app)
 
         self.titulo = QLabel("Sistema de Administración de Emplazamientos y Solicitudes de Fabricación de la Refinería Madero")
         self.titulo.setWordWrap(True)
         self.titulo.setAlignment(Qt.AlignCenter)
         self.titulo.setStyleSheet("font-weight: bold; font-size: 18px")
-        layout_sup.addWidget(self.titulo, alignment=Qt.AlignCenter)
+        #layout_sup.addWidget(self.titulo, alignment=Qt.AlignCenter)
 
         if darkdetect.isDark():
             logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo_dark.png")
@@ -131,11 +142,15 @@ class MenuPrincipal(QMainWindow):
         logo_inspeccion.setFixedSize(200, 100)
         logo_inspeccion.setScaledContents(True)
         logo_inspeccion.setPixmap(logoIT)
-        layout_sup.addWidget(logo_inspeccion)
+        self.layout_sup.addWidget(logo_inspeccion)
 
         # ---- STACK: contenedor de páginas (home + módulos)
         self.stack = QStackedWidget()
-        layout_principal.addWidget(self.stack, 1, 0)  # el stack ocupa la fila 1
+        self.layout_principal.addWidget(self.stack, 1, 0)  # el stack ocupa la fila 1
+
+        # Para que el stack ocupe todo cuando se oculta el header
+        self.layout_principal.setRowStretch(0, 0)  # header
+        self.layout_principal.setRowStretch(1, 1)  # stack
 
         # ---- Página HOME (los botones grandes)
         central_widget_botones = QWidget()
@@ -330,10 +345,11 @@ class MenuPrincipal(QMainWindow):
         w = self.stack.widget(idx)
         texto = self.titulos_por_pagina.get(w, "Aplicación")
         self.titulo.setText(texto)
-        self.setWindowTitle(f"{texto} — SAE/SF Madero")  # opcional
+        self.setWindowTitle(f"{texto} — SAESMA")  # opcional
 
     # --------- Navegación interna del stack
     def abrir_busqueda(self):
+        self.frame_sup.hide()
         self.busqueda.limpiar_resultados()
         #self.stack.setCurrentWidget(self.busqueda)
         idx = self.stack.indexOf(self.busqueda)
@@ -343,12 +359,14 @@ class MenuPrincipal(QMainWindow):
 
     def ir_a_nuevo(self):
         #self.stack.setCurrentWidget(self.nuevo)
+        self.frame_sup.hide()
         idx = self.stack.indexOf(self.nuevo)
         slide_to(self.stack, idx, direction="left", duration=260)
         #fade_to(self.stack, self.stack.indexOf(self.nuevo), duration=1700)
     
     def ir_a_editar(self):        
         #self.stack.setCurrentWidget(self.editar)
+        self.frame_sup.hide()
         idx = self.stack.indexOf(self.editar)
         slide_to(self.stack, idx, direction="left", duration=260)
         #fade_to(self.stack, self.stack.indexOf(self.editar), duration=1700)
@@ -361,6 +379,7 @@ class MenuPrincipal(QMainWindow):
         #self.stack.setCurrentWidget(self.page_home)
         idx = self.stack.indexOf(self.page_home)
         slide_to(self.stack, self.stack.indexOf(self.page_home), direction="right", duration=260)
+        self.frame_sup.show()
 
     # --------- Ventanas de login (externas al stack)
     def abrir_login_nuevo(self):
