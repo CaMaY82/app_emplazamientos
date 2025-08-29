@@ -11,9 +11,30 @@ db_path = str(Path(__file__).resolve().parent.parent / "db" / "EMP.db")
 conn = sql.connect(str(db_path))
 df = pd.read_sql('SELECT * FROM "VISTA_EMP";', conn)
 
+
+
 #tabla de emp por sector
 matriz_emp = pd.crosstab(df["SECTOR"], df["ESTADO"])
 matriz_emp = matriz_emp.reindex(columns=["VIGENTE", "VENCIDO"], fill_value=0)
+
+#matriz de riesgo por emplazamiento 
+
+#filtrar vigente y vencido
+
+df_filtrado = df[df["ESTADO"].isin(["VIGENTE", "VENCIDO"])]
+
+#Normalizar valores de riezgo (aparece 2 columnas de "c")
+df_filtrado["RIESGO"] = df_filtrado["RIESGO"].str.strip().str.upper()
+
+#crear la tabla
+matriz_emp_riesgo = pd.crosstab(
+    [df_filtrado["SECTOR"], df_filtrado["ESTADO"]],
+    df_filtrado["RIESGO"]
+).reindex(columns=["A","B","C","D"], fill_value=0)
+
+#print(matriz_emp_riesgo)
+
+#print(matriz_emp)
 
 # Columna de totales
 matriz_emp["TOTAL_EMP"] = matriz_emp["VIGENTE"] + matriz_emp["VENCIDO"]
@@ -21,56 +42,69 @@ totales = pd.DataFrame(matriz_emp.sum()).T
 totales.index = ["TOTAL_GENERAL"]
 
 # Concatenar
-matriz_emp = pd.concat([matriz_emp, totales])
-#print(matriz_emp.reset_index())
+matriz_emp_totales = pd.concat([matriz_emp, totales])
+#print(matriz_emp_totales)
 
-df_plot = matriz_emp.loc[matriz_emp.index != "TOTAL_GENERAL", ["VIGENTE", "VENCIDO"]]
-fig, ax = plt.subplots(figsize=(10, 6))
-df_plot.plot(kind="bar", ax=ax)
+#grafico:
 
-ax.set_title("EMPLAZAMIENTOS")
-ax.set_xlabel("Sector")
-ax.set_ylabel("")
-ax.legend(title="Categoría")
+fig, ax = plt.subplots(figsize=(8, 5))
 
-# Etiquetas de datos por barra
-for container in ax.containers:
-    ax.bar_label(container, fmt="%.0f", label_type="edge", padding=3)
-
-plt.tight_layout()
-plt.xticks(rotation=360, ha="right")  # alineadas a la derecha
-plt.tight_layout()                   # ajusta el espacio automáticamente
-#plt.xticks(rotation=360)
-#plt.show()
-
-#creando tabla para tipo de riesgo
-matriz_riesgo = pd.crosstab(df["SECTOR"], ["RIESGO"]).reindex(columns=list("ABCD"), fill_value=0)
-
-global_counts = df["RIESGO"].value_counts().reindex(list("ABCD"), fill_value=0)
-
-values = global_counts.values
-
-def autopct_with_count(pct):
-    total = values.sum()
-    count = int(round(pct * total / 100.0))
-    return f"{count} ({pct:.1f}%)" if count > 0 else ""  # oculta etiquetas en 0
-
-import matplotlib.pyplot as plt
-fig, ax = plt.subplots(figsize=(5, 5))
-ax.pie(
-    values,
-    labels=[f"Riesgo {k}" for k in global_counts.index],
-    startangle=90,
-    autopct=autopct_with_count,  # ← cantidad y %
-    labeldistance=1.05, pctdistance=0.7  # opcional si se enciman
+# Solo graficamos VIGENTE y VENCIDO
+matriz_emp[["VIGENTE", "VENCIDO"]].plot(
+    kind="bar",
+    stacked=True,
+    color=["#024b7a", "#44a5c2"],
+    alpha=0.85,
+    ax=ax
 )
 
+ax.set_title("Emplazamientos por Sector")
+ax.set_xlabel("Sector")
+ax.set_ylabel("Cantidad")
+ax.legend(title="Estado")
 
-ax.set_title("Tipo de Riesgo en Emplazamintos")
-ax.axis("equal")
+# Etiquetas dentro de cada segmento
+for cont in ax.containers:
+    ax.bar_label(cont, label_type="center", fontsize=12, color="white", fontweight="bold")
+
+totales = matriz_emp[["VIGENTE", "VENCIDO"]].sum(axis=1).values
+xs = range(len(matriz_emp))
+
+
+for idx, total in enumerate(totales):
+    ax.text(idx, total, str(int(total)),
+            ha="center", va="bottom", fontsize=12, color="black")
+
+plt.xticks(rotation=360)
+yticks = ax.get_yticks()
+ax.set_yticks([t for t in yticks if t != 0])
+fig.patch.set_alpha(0)          # figura transparente
+ax.set_facecolor('none')
+plt.tight_layout()
+#plt.show()
+
+#grafico de pastel con riesgo
+
+colores = ["#B9DDF1", "#9FCAE6", "#73A4CA", "#497AA7"]
+df["ESTADO"] = df["ESTADO"].str.strip().str.upper()
+df["RIESGO"] = df["RIESGO"].str.strip().str.upper()
+df_filtrado = df[df["ESTADO"].isin(["VIGENTE", "VENCIDO"])]
+riesgo_counts = df_filtrado["RIESGO"].value_counts().reindex(list("ABCD"), fill_value=0)
+fig, ax = plt.subplots(figsize=(6, 6))
+explode = [0.5] * len(riesgo_counts)
+ax.pie(
+    riesgo_counts.values,
+    labels=riesgo_counts.index,
+    autopct=lambda p: f"{p:.1f}%\n({int(p*riesgo_counts.sum()/100)})",
+    colors=(colores),
+    startangle=90,
+    labeldistance=1.1,   # empuja etiquetas hacia afuera
+    pctdistance=0.8,
+)
+ax.set_title("Riesgos en Emplazamientos")
+ax.axis("equal")  # círculo perfecto
+
 plt.tight_layout()
 plt.show()
-
-
 
 
