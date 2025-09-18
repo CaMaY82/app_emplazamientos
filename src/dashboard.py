@@ -1,15 +1,12 @@
 import pandas as pd
-from pathlib import Path
-import sqlite3 as sql
 import matplotlib.pyplot as plt
+from conexiondb import globalconn
 
-
-#Ruta de la base de datos
-db_path = str(Path(__file__).resolve().parent.parent / "db" / "EMP.db")
 
 #conexion a bd
-conn = sql.connect(str(db_path))
-df = pd.read_sql('SELECT * FROM "VISTA_EMP";', conn)
+
+conexion = globalconn
+df = pd.read_sql('SELECT * FROM "VISTA_EMP";', conexion)
 
 
 

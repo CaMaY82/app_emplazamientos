@@ -8,8 +8,8 @@ from PySide6.QtGui import QIcon, QPixmap, QIntValidator
 import darkdetect
 import sys
 from pathlib import Path
-import sqlite3 as sql
 from datetime import datetime
+from conexiondb import globalconn
 
 class UI_Nuevo(QWidget):
     volver_home = Signal()
@@ -19,11 +19,7 @@ class UI_Nuevo(QWidget):
         self.app = app
 
 
-        self.db_path = str(Path(__file__).resolve().parent.parent / "db" / "EMP.db")
-
-        # Conexión a la base de datos accesible desde cualquier método
-        self.conexion = sql.connect(self.db_path)
-        self.cursor = self.conexion.cursor()
+        
 
         if darkdetect.isDark():
          modo = "oscuro"
@@ -405,47 +401,40 @@ class UI_Nuevo(QWidget):
     def guardar_registro (self):
 
      try:
-
         if self.boton_emp.isChecked():
             tabla = "EMP"
             columna_id = "EMPLAZAMIENTO"
             descripcion_columna = '"DESCRIPCIÓN DEL EMPLAZAMIENTO"'
             enlace_columna = '"ENLACE EMP"'
-
-            
-            
         elif self.boton_sf.isChecked():
             tabla = "SF"
             columna_id = '"SOLICITUD DE FABRICACIÓN"'
             descripcion_columna = '"DESCRIPCIÓN DE LA SOLICITUD DE FABRICACIÓN"'
             enlace_columna = '"ENLACE SF"'
-           
-            
         else:
-           
             return
         
         # Obtener valores del formulario
-        id_value = self.ID.text().strip()
-        sector_value = self.sector.currentText().strip()
-        planta_value = self.planta.currentText().strip()
-        circuito_value = self.circuito.text().strip()
-        uc_value = self.UC.text().strip()
-        descripcion_value = self.descripcion.toPlainText().strip()
-        mecanismo_value = self.mecanismo.currentText().strip()
-        material_value = self.material.text().strip()
+        id_value = self.ID.text().strip().replace("'", "''")
+        sector_value = self.sector.currentText().strip().replace("'", "''")
+        planta_value = self.planta.currentText().strip().replace("'", "''")
+        circuito_value = self.circuito.text().strip().replace("'", "''")
+        uc_value = self.UC.text().strip().replace("'", "''")
+        descripcion_value = self.descripcion.toPlainText().strip().replace("'", "''")
+        mecanismo_value = self.mecanismo.currentText().strip().replace("'", "''")
+        material_value = self.material.text().strip().replace("'", "''")
         fecha_elab_value = self.fecha_elab.date().toString('yyyy-MM-dd')
-        sap_value = self.SAP.text().strip()
+        sap_value = self.SAP.text().strip().replace("'", "''")
         fecha_ven_value = self.fecha_ven.date().toString('yyyy-MM-dd')
-        programa_value = self.programa.currentText().strip()
-        iniciativa_value = self.iniciativa.currentText().strip()
-        paro_value = self.paro_planta.currentText().strip()
+        programa_value = self.programa.currentText().strip().replace("'", "''")
+        iniciativa_value = self.iniciativa.currentText().strip().replace("'", "''")
+        paro_value = self.paro_planta.currentText().strip().replace("'", "''")
         estado_actual = "VIGENTE"
-        status_operativo = self.status.currentText().strip()
-        riesgo_value = self.riesgo.currentText().strip()
-        mitigacion_value = self.mitigacion.toPlainText().strip()
-        observaciones_value = self.comentarios.toPlainText().strip()
-        enlace_value = self.enlace.text().strip()
+        status_operativo = self.status.currentText().strip().replace("'", "''")
+        riesgo_value = self.riesgo.currentText().strip().replace("'", "''")
+        mitigacion_value = self.mitigacion.toPlainText().strip().replace("'", "''")
+        observaciones_value = self.comentarios.toPlainText().strip().replace("'", "''")
+        enlace_value = self.enlace.text().strip().replace("'", "''")
 
         # Validar campos obligatorios
         campos_obligatorios = [
@@ -459,10 +448,10 @@ class UI_Nuevo(QWidget):
             QMessageBox.warning(self, "Campos Vacíos", "Por favor completa todos los campos obligatorios.")
             return
 
-        # Sentencia SQL
-        #estado_actual
+        # contruit el Query SQLite cloud
+        
 
-        self.cursor.execute(f"""
+        query = f"""
             INSERT INTO {tabla} (
                 {columna_id}, SECTOR, PLANTA, CIRCUITO, [UNIDAD DE CONTROL],
                 {descripcion_columna}, [MECANISMO DE DAÑO], ESPECIFICACIÓN,
@@ -471,17 +460,16 @@ class UI_Nuevo(QWidget):
                 [FECHA DE REEVALUACIÓN], [STATUS OPERATIVO], RIESGO, [MEDIDA DE MITIGACIÓN],
                 [OBSERVACIONES GENERALES], {enlace_columna}
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            id_value, sector_value, planta_value, circuito_value, uc_value,
-            descripcion_value, mecanismo_value, material_value,
-            fecha_elab_value, sap_value, fecha_ven_value, programa_value,
-            iniciativa_value, paro_value, None, estado_actual,
-            None, status_operativo, riesgo_value, mitigacion_value,
-            observaciones_value, enlace_value
-        ))
+           VALUES (
+                    '{id_value}', '{sector_value}', '{planta_value}', '{circuito_value}', '{uc_value}',
+                    '{descripcion_value}', '{mecanismo_value}', '{material_value}', '{fecha_elab_value}',
+                    '{sap_value}', '{fecha_ven_value}', '{programa_value}', '{iniciativa_value}',
+                    '{paro_value}', NULL, '{estado_actual}', NULL, '{status_operativo}',
+                    '{riesgo_value}', '{mitigacion_value}', '{observaciones_value}', '{enlace_value}'
+                )
+            """
 
-        self.conexion.commit()
+        globalconn.execute(query)
 
         if tabla == "EMP":
             mensaje = f"Emplazamiento {self.ID.text()} registrado correctamente"
@@ -511,11 +499,12 @@ class UI_Nuevo(QWidget):
             anio_actual = datetime.now().year
 
             # Consulta los registros que ya existen de este año
-            self.cursor.execute(f"""
-            SELECT {columna_id} FROM {tabla} 
-            WHERE {columna_id} LIKE '%/{anio_actual}'
-            """)
-            registros = self.cursor.fetchall()
+            query = f"""
+                SELECT {columna_id} FROM {tabla} 
+                WHERE {columna_id} LIKE '%/{anio_actual}'
+            """
+            cursor = globalconn.execute(query)
+            registros = cursor.fetchall()
 
             numeros_existentes = []
             for registro in registros:

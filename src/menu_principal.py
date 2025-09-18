@@ -91,6 +91,8 @@ class MenuPrincipal(QMainWindow):
 
         base_dir = Path(__file__).resolve().parent
 
+        
+
         self.setWindowTitle("Menú Principal")
         self.setMinimumSize(1050, 600)
         #self.resize(1280, 900)
@@ -117,14 +119,23 @@ class MenuPrincipal(QMainWindow):
         self.layout_sup.addWidget(logo_pemex)
 
         if darkdetect.isDark():
-            logoIT = QPixmap(base_dir.parent / "assets" / "app_logo_L.png")
+            logoApp = QPixmap(base_dir.parent / "assets" / "app_logo_L.png")
         else:
-            logoIT = QPixmap(base_dir.parent / "assets" / "app_logo_D.png")
+            logoApp = QPixmap(base_dir.parent / "assets" / "app_logo_D.png")
 
         logo_app = QLabel()
-        logo_app.setFixedSize(200, 200)
+        logo_app.setFixedSize(150, 100)
         logo_app.setScaledContents(True)
-        logo_app.setPixmap(logoIT)
+        logo_app.setPixmap(logoApp)
+        logo_app.setToolTip("Sistema de Administración de Emplazamientos y Solicitudes de Fabricación Madero")
+        logo_app.setStyleSheet("""
+         QToolTip {
+        background-color: #FFFFFF;
+        color: black;
+        font-size: 24px;
+        border: 1px solid black;
+        }
+        """)
         self.layout_sup.addWidget(logo_app)
 
         self.titulo = QLabel("Sistema de Administración de Emplazamientos y Solicitudes de Fabricación de la Refinería Madero")

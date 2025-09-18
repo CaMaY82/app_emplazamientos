@@ -8,8 +8,8 @@ from PySide6.QtGui import QIcon, QPixmap
 import darkdetect
 import sys
 from pathlib import Path
-import sqlite3 as sql
 from functools import partial
+from conexiondb import globalconn
 
 
 
@@ -444,124 +444,70 @@ class UI_Busqueda(QWidget):
             tabla = "VISTA_EMP"
             columna_id = "EMPLAZAMIENTO"
             label_result = "Emplazamientos encontrados"
-            
         elif self.botonSF.isChecked():
             tabla = "VISTA_SF"
             columna_id = "[SOLICITUD DE FABRICACIÓN]"
             label_result = "Solicitudes de fabricación encontradas"
-            
         else:
             QMessageBox.warning(self, "Advertencia", "Selecciona lo que deseas buscar")
             return
-       
-        
-        sector = self.sector_cb.currentText().upper()
-        if sector in [" "]:
-           sector = None # No se aplica filtro
-        
-        planta = self.planta_cb.currentText().upper()
-        if planta in [" "]:
-           planta = None
 
+        sector = self.sector_cb.currentText().upper()
+        planta = self.planta_cb.currentText().upper()
         estado = self.estado_cb.currentText().upper()
+        status = self.status_cb.currentText().upper()
+        riesgo = self.riesgo_cb.currentText().upper()
+        id_busqueda = self.ID_busqueda.text().strip()
+
+        filtro_base = ""
         if estado in [" "]:
             estado = None
-        if estado is None:
-           filtro_base = "AND ([ESTADO ACTUAL] = 'VIGENTE' OR [ESTADO ACTUAL] = 'VENCIDO')"
-        else:
-           filtro_base = ""
+            filtro_base = "AND ([ESTADO ACTUAL] = 'VIGENTE' OR [ESTADO ACTUAL] = 'VENCIDO')"
 
-        status = self.status_cb.currentText().upper()
-        if status in [" "]:
-           status = None
-        
-        riesgo = self.riesgo_cb.currentText().upper()
-        if riesgo in [" "]:
-           riesgo = None
-        
-        id_busqueda = self.ID_busqueda.text().strip()
-        if id_busqueda == "":
-           id_busqueda = None
-
-       # validar que un filtro tenga valor:
-
-        #if not sector and not planta and not estado and not status and not riesgo:
-            #QMessageBox.warning(self, "Advertencia", "Debes seleccionar al menos un filtro.")
-            #return
-
-        # creando la consulta
+        filtros = ""
+        if sector and sector != " ":
+            filtros += f" AND SECTOR = '{sector}'"
+        if planta and planta != " ":
+            filtros += f" AND PLANTA = '{planta}'"
+        if estado:
+            filtros += f" AND [ESTADO] = '{estado}'"
+        if status and status != " ":
+            filtros += f" AND [STATUS OPERATIVO] = '{status}'"
+        if riesgo and riesgo != " ":
+            filtros += f" AND RIESGO = '{riesgo}'"
         if id_busqueda:
-         query = f"""
-         SELECT {columna_id}, PLANTA, CIRCUITO, [UNIDAD DE CONTROL], [FECHA DE ELABORACIÓN], [FECHA DE VENCIMIENTO], [ESTADO]
-         FROM {tabla}
-         WHERE {columna_id} = ?
-         """
-         valores = [id_busqueda]
-        else:
-            query = f"""
-             SELECT {columna_id}, PLANTA, CIRCUITO, [UNIDAD DE CONTROL], [FECHA DE ELABORACIÓN], [FECHA DE VENCIMIENTO],
-             [ESTADO] 
-               
-             FROM {tabla}
-             WHERE 1=1
-             {filtro_base}
-            """
-            valores = []
+            filtros += f" AND {columna_id} = '{id_busqueda}'"
 
-            if sector:
-                query += "AND SECTOR = ?"
-                valores.append(sector)
-            if planta:
-                query += "AND PLANTA = ?"
-                valores.append(planta)
-            if estado:
-                query += " AND [ESTADO] = ?"
-                valores.append(estado)
-            if status:
-                query += "AND [STATUS OPERATIVO] = ?"
-                valores.append(status)
-            if riesgo:
-                query += "AND RIESGO = ?"
-                valores.append(riesgo)
-            if id_busqueda:
-                query += f" AND {columna_id} = ?"
-                valores.append(id_busqueda)
-       
-        # conectando a db
+        query = f"""
+            SELECT {columna_id}, PLANTA, CIRCUITO, [UNIDAD DE CONTROL], [FECHA DE ELABORACIÓN], [FECHA DE VENCIMIENTO], [ESTADO]
+            FROM {tabla}
+            WHERE 1=1
+            {filtro_base}
+            {filtros}
+        """
 
-        conexion = sql.connect(self.db_path)
-        cursor = conexion.cursor()
-        cursor.execute(query, valores)
+        conexion = globalconn
+        cursor = conexion.execute(query)
         resultados = cursor.fetchall()
-        conexion.close
 
         columnas = ["ID", "PLANTA", "CIRCUITO", "UNIDAD DE CONTROL", "ELABORACION", "VENCIMIENTO", "ESTADO ACTUAL"]
-
         self.tabla_resultados.setColumnCount(len(columnas))
         self.tabla_resultados.setHorizontalHeaderLabels(columnas)
         self.tabla_resultados.setRowCount(0)
 
         if resultados:
-           
             for fila_idx, fila_datos in enumerate(resultados):
-             #print(f"Fila {fila_idx}: {fila_datos}")
-             #print(f"Resultados encontrados: {len(resultados)}")            
-             
-             self.tabla_resultados.insertRow(fila_idx)
-             
-             for col_idx, dato in enumerate(fila_datos):
+                self.tabla_resultados.insertRow(fila_idx)
+                for col_idx, dato in enumerate(fila_datos):
                     self.tabla_resultados.setItem(fila_idx, col_idx, QTableWidgetItem(str(dato)))
             self.tabla_resultados.resizeColumnsToContents()
             self.tabla_resultados.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
             self.resultados_label.setText(f"Encontrados {len(resultados)}")
             self.resultados_label.setVisible(True)
-
             if darkdetect.isDark():
-              
-              self.resultados_label.setStyleSheet("font-size: 16px; color: lightgreen; font-weight: bold;")
+                self.resultados_label.setStyleSheet("font-size: 16px; color: lightgreen; font-weight: bold;")
             else:
-              self.resultados_label.setStyleSheet("font-size: 16px; color: teal; font-weight: bold;")
-
+                self.resultados_label.setStyleSheet("font-size: 16px; color: teal; font-weight: bold;")
         else:
             QMessageBox.information(self, "Sin resultados", "No se encontraron registros.")
 
@@ -570,7 +516,7 @@ class UI_Busqueda(QWidget):
 
         #QMessageBox.information(self, "Resultados", f"  {len(resultados)} {label_result}")
 
-        conexion.close()
+        #conexion.close()
 
         #funcion para actualizar los campos
     
@@ -579,7 +525,6 @@ class UI_Busqueda(QWidget):
         fila = self.tabla_resultados.currentRow()
 
         if selected_items:
-           
             id_seleccionado = self.tabla_resultados.item(fila, 0).text()
             if self.botonEmp.isChecked():
                 tabla = "VISTA_EMP"
@@ -593,78 +538,68 @@ class UI_Busqueda(QWidget):
                 columna_id_tabla = "SOLICITUD DE FABRICACIÓN"
             else:
                 return  
-             
-            conexion = sql.connect(self.db_path)
-            conexion.row_factory = sql.Row
-            cursor = conexion.cursor()
 
-            # Consulta SQL para traer toda la información de ese registro
-            cursor.execute(f"SELECT * FROM {tabla} WHERE {columna_id} = ?", (id_seleccionado,))
+            # Construye el query con el valor directamente
+            query = f"SELECT * FROM {tabla} WHERE {columna_id} = '{id_seleccionado}'"
+            cursor = globalconn.execute(query)
             resultado = cursor.fetchone()
 
-            conexion.close()
-
         if resultado:
-            # con esto se llenan los QlineEdit de resultados
-            self.ID_resultado.setText(self.limpiar_valor(resultado[columna_id_tabla]))
-            self.sector_resultado.setText(self.limpiar_valor(resultado['SECTOR']))
-            self.planta_resultado.setText(self.limpiar_valor(resultado['PLANTA']))
-            self.circuito_resultado.setText(self.limpiar_valor(resultado['CIRCUITO']))
-            self.UC_resultado.setText(self.limpiar_valor(resultado['UNIDAD DE CONTROL']))
-            self.status_resultado.setText(self.limpiar_valor(resultado['STATUS OPERATIVO']))
-            self.vigencia_resultado.setText(self.limpiar_valor(resultado['FECHA DE VENCIMIENTO']))
-            self.estado_resultado.setText(self.limpiar_valor(resultado["ESTADO"]))
-            self.mecanismo_resultado.setText(self.limpiar_valor(resultado["MECANISMO DE DAÑO"]))
-            self.material_resultado.setText(self.limpiar_valor(resultado["ESPECIFICACIÓN"]))
-            self.SAP_resultado.setText(self.limpiar_valor(resultado["SAP"]))
-            self.riesgo_resultado.setText(self.limpiar_valor(resultado["RIESGO"]))
-            self.descripcion_resultado.setText(self.limpiar_valor(resultado[descripcion]))
-            self.mitigacion_resultado.setText(self.limpiar_valor(resultado["MEDIDA DE MITIGACIÓN"]))
-            self.comentarios_resultado.setText(self.limpiar_valor(resultado["OBSERVACIONES GENERALES"]))
+             # Obtener los nombres de las columnas
+            columnas = [desc[0] for desc in cursor.description]
+            resultado_dict = dict(zip(columnas, resultado))
+
+            self.ID_resultado.setText(self.limpiar_valor(resultado_dict.get(columna_id_tabla, "")))
+            self.sector_resultado.setText(self.limpiar_valor(resultado_dict.get('SECTOR', "")))
+            self.planta_resultado.setText(self.limpiar_valor(resultado_dict.get('PLANTA', "")))
+            self.circuito_resultado.setText(self.limpiar_valor(resultado_dict.get('CIRCUITO', "")))
+            self.UC_resultado.setText(self.limpiar_valor(resultado_dict.get('UNIDAD DE CONTROL', "")))
+            self.status_resultado.setText(self.limpiar_valor(resultado_dict.get('STATUS OPERATIVO', "")))
+            self.vigencia_resultado.setText(self.limpiar_valor(resultado_dict.get('FECHA DE VENCIMIENTO', "")))
+            self.estado_resultado.setText(self.limpiar_valor(resultado_dict.get("ESTADO", "")))
+            self.mecanismo_resultado.setText(self.limpiar_valor(resultado_dict.get("MECANISMO DE DAÑO", "")))
+            self.material_resultado.setText(self.limpiar_valor(resultado_dict.get("ESPECIFICACIÓN", "")))
+            self.SAP_resultado.setText(self.limpiar_valor(resultado_dict.get("SAP", "")))
+            self.riesgo_resultado.setText(self.limpiar_valor(resultado_dict.get("RIESGO", "")))
+            self.descripcion_resultado.setText(self.limpiar_valor(resultado_dict.get(descripcion, "")))
+            self.mitigacion_resultado.setText(self.limpiar_valor(resultado_dict.get("MEDIDA DE MITIGACIÓN", "")))
+            self.comentarios_resultado.setText(self.limpiar_valor(resultado_dict.get("OBSERVACIONES GENERALES", "")))
 
 
 
             # Asignar rutas de PDF a los ToolButtons
         if tabla == "VISTA_EMP":
-            ruta_pdf = resultado["ENLACE EMP"] if resultado["ENLACE EMP"] is not None else None
-            #print(f"Ruta EMP: {ruta_pdf}")
-
+            ruta_pdf = resultado_dict.get("ENLACE EMP")
             if ruta_pdf and ruta_pdf.strip():
                 try:
                     self.reporte_btn.clicked.disconnect()
                 except TypeError:
                     pass
-
                 self.reporte_btn.clicked.connect(partial(self.abrir_pdf, ruta_pdf))
                 self.reporte_btn.setVisible(True)
             else:
-             self.reporte_btn.setVisible(False)
+                self.reporte_btn.setVisible(False)
 
         elif tabla == "VISTA_SF":
-            ruta_pdf = resultado["ENLACE SF"] if resultado["ENLACE SF"] is not None else None
+            ruta_pdf = resultado_dict.get("ENLACE SF")
             if ruta_pdf and ruta_pdf.strip():
-               try:
-                 self.reporte_btn.clicked.disconnect()
-               except TypeError:
-                 pass
-
-               self.reporte_btn.clicked.connect(partial(self.abrir_pdf, ruta_pdf))
-               self.reporte_btn.setVisible(True)
+                try:
+                    self.reporte_btn.clicked.disconnect()
+                except TypeError:
+                    pass
+                self.reporte_btn.clicked.connect(partial(self.abrir_pdf, ruta_pdf))
+                self.reporte_btn.setVisible(True)
             else:
                 self.reporte_btn.setVisible(False)
 
-        ruta_notificacion = resultado["ENLACE NOT"]
-        #print(f"Ruta NOT: {ruta_notificacion}")
-
+        ruta_notificacion = resultado_dict.get("ENLACE NOT")
         if ruta_notificacion and ruta_notificacion.strip():
-           try:
-              self.notificacion_btn.clicked.disconnect()
-           except TypeError:
+            try:
+                self.notificacion_btn.clicked.disconnect()
+            except TypeError:
                 pass
-
-           self.notificacion_btn.clicked.connect(partial(self.abrir_pdf, ruta_notificacion))
-           self.notificacion_btn.setVisible(True)
-            
+            self.notificacion_btn.clicked.connect(partial(self.abrir_pdf, ruta_notificacion))
+            self.notificacion_btn.setVisible(True)
         else:
             self.notificacion_btn.setVisible(False)
         
