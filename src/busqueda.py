@@ -462,7 +462,7 @@ class UI_Busqueda(QWidget):
         filtro_base = ""
         if estado in [" "]:
             estado = None
-            filtro_base = "AND ([ESTADO ACTUAL] = 'VIGENTE' OR [ESTADO ACTUAL] = 'VENCIDO')"
+            filtro_base = "AND ([ESTADO] = 'VIGENTE' OR [ESTADO] = 'VENCIDO')"
 
         filtros = ""
         if sector and sector != " ":
