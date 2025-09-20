@@ -22,6 +22,14 @@ fig = px.bar(
     barmode="stack",
     text_auto=True 
 )
+fig.update_layout(
+    title={
+        'text': "Emplazamientos por Sector",
+        'x': 0.5,   # 0=izquierda, 0.5=centro, 1=derecha
+        'xanchor': 'center',
+        'yanchor': 'top'
+    }
+)
 fig.update_traces(textfont_size = 20, textangle = 0, textposition = "outside")
 fig.show()
 
@@ -31,12 +39,10 @@ fig.show()
 #primero se filtran los vigentes y vencidos
 df_filtrado = df[df["ESTADO"].isin(["VIGENTE", "VENCIDO"])]
 #Filtro operando y fuera de operación
-emp_op = df[df["STATUS OPERATIVO"].isin(["OPERANDO", "FUERA DE OPERACION"])]
-matriz_emp_op = pd.crosstab(emp_op["SECTOR"], emp_op["STATUS OPERATIVO"])
-matriz_emp_op = matriz_emp_op.reindex(columns=["OPERANDO", "FUERA DE OPERACION"], fill_value=0)
-totales = matriz_emp_op.sum().to_frame().reset_index()
+totales = df_filtrado["STATUS OPERATIVO"].value_counts().reset_index()
 totales.columns = ["STATUS OPERATIVO", "TOTAL"]
-print(matriz_emp_op)
+print(totales)
+
 
 fig2 = px.pie(
     totales, 
@@ -46,9 +52,58 @@ fig2 = px.pie(
     color = "STATUS OPERATIVO",
     color_discrete_map={"OPERANDO": "#44a5c2", "FUERA DE OPERACION": "#024b7a"},
 )
-fig2.update_traces(textposition='inside', textinfo='percent+label')
+fig2.update_layout(
+    title={
+        'text': "Emplazamientos Operando y Fuera de Operación",
+        'x': 0.5,   # 0=izquierda, 0.5=centro, 1=derecha
+        'xanchor': 'center',
+        'yanchor': 'top',
+        'font': dict(
+        family="Arial black",
+        size=24,
+        color  = "black",
+        )
+    }
+)
+fig2.update_traces(
+    pull =[0.1, 0],
+    textposition='inside',
+    textinfo='percent+label',
+    textfont_size = 20
+    )
 fig2.show()
 
-print(df["STATUS OPERATIVO"].value_counts())
+#Grafico por clase de riesgo
+riesgo = df_filtrado["RIESGO"].value_counts().reset_index()
+riesgo.columns = ["RIESGO", "TOTAL"]
+print(riesgo)
+
+fig3 = px.pie(
+    riesgo, 
+    names="RIESGO",
+    values="TOTAL",
+    title="Clase de riesgo en emplazamientos",  
+    color = "RIESGO",
+    color_discrete_map={"A": "#c24444", "B": "#f19935", "C": "#f2e205", "D": "#44c28c"},
+    hole = 0.7
+)
+fig3.update_layout(
+    title={
+        'text': "Clase de riesgo en emplazamientos",
+        'x': 0.5,   # 0=izquierda, 0.5=centro, 1=derecha
+        'xanchor': 'center',
+        'yanchor': 'top'
+    }
+)
+fig3.update_traces(
+    pull=[0.1, 0.01, 0.02, 0.03],
+    textposition='outside', 
+    textinfo='label+value+percent', 
+    textfont_size = 20,
+    marker=dict(line=dict(color="white", width=2))
+)
+fig3.show()
+
+#grafico de barras horizontales
 
 
