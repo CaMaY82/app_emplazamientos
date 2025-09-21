@@ -105,5 +105,14 @@ plt.tight_layout()
 plt.show()
 
 
+df_op = df[df["STATUS OPERATIVO"].isin(["OPERANDO", "FUERA DE OPERACIÓN"])]
+
+df_op_no_atn = df_op["ESTADO"].isin(["VIGENTE", "VENCIDO"])
+
+
+
+
+
+
 
 
