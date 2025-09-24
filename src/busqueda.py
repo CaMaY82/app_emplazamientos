@@ -1,15 +1,19 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QFrame, QLabel, QPushButton, QRadioButton, QComboBox, QTableWidget,
-    QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton, QTextEdit, QMessageBox
+    QTableWidgetItem, QSizePolicy, QGridLayout, QHeaderView, QLineEdit, QSpacerItem, QToolButton, QTextEdit, QMessageBox, QFileDialog
 )
-from PySide6.QtCore import Qt, QSize, Signal
-from PySide6.QtGui import QIcon, QPixmap
+from PySide6.QtCore import Qt, QSize, Signal, QUrl
+from PySide6.QtGui import QIcon, QPixmap, QDesktopServices, QGuiApplication
 import darkdetect
 import sys
 from pathlib import Path
 from functools import partial
 from conexiondb import globalconn
+import pandas as pd
+from datetime import date
+
+
 
 
 
@@ -95,7 +99,9 @@ class UI_Busqueda(QWidget):
         filtros_layout.addItem(QSpacerItem(30, 0, QSizePolicy.Fixed, QSizePolicy.Minimum), 1, 1)
 
         self.botonEmp.toggled.connect(self.etiqueta_descripcion)
+        self.botonEmp.clicked.connect(self.ocultar_excel)
         self.botonSF.toggled.connect(self.etiqueta_descripcion)
+        self.botonSF.clicked.connect(self.ocultar_excel)
 
         self.botonEmp.toggled.connect(self.limpiar_resultados)
         self.botonSF.toggled.connect(self.limpiar_resultados)
@@ -406,6 +412,7 @@ class UI_Busqueda(QWidget):
             }
            
             """)
+        self.excel_btn.clicked.connect(self.exportarxls)
         self.excel_btn.setVisible(False)
 
         # Diccionario de sectores
@@ -437,8 +444,9 @@ class UI_Busqueda(QWidget):
         
         if planta:
             self.planta_cb.addItems(planta)
-
     
+    def ocultar_excel(self):
+        self.excel_btn.setVisible(False)    
 
     def etiqueta_descripcion(self):
         if self.botonEmp.isChecked():
@@ -664,9 +672,141 @@ class UI_Busqueda(QWidget):
     def ocultar_etiqueta_resultado(self):
         self.resultados_label.setVisible(False)
     
-        
-           
 
+    def exportarxls (self):
+        
+        if self.botonEmp.isChecked():
+            tabla = "VISTA_EMP"
+            columna_id = "EMPLAZAMIENTO"            
+            descripcion = "[DESCRIPCIÓN DEL EMPLAZAMIENTO]"
+            nombre_hoja="EMPLAZAMIENTOS"
+        elif self.botonSF.isChecked():
+            tabla = "VISTA_SF"
+            columna_id = "[SOLICITUD DE FABRICACIÓN]"            
+            descripcion = "[DESCRIPCIÓN DE LA SOLICITUD DE FABRICACIÓN]"
+            nombre_hoja="SOLICITUDES DE FABRICACIÓN"
+        else:
+            QMessageBox.warning(self, "Advertencia", "Selecciona lo que deseas buscar")
+            return
+
+        sector = self.sector_cb.currentText().upper()
+        planta = self.planta_cb.currentText().upper()
+        estado = self.estado_cb.currentText().upper()
+        status = self.status_cb.currentText().upper()
+        riesgo = self.riesgo_cb.currentText().upper()
+        id_busqueda = self.ID_busqueda.text().strip()
+
+        filtro_base = ""
+        if estado in [" "]:
+            estado = None
+            filtro_base = "AND ([ESTADO] = 'VIGENTE' OR [ESTADO] = 'VENCIDO')"
+
+        filtros = ""
+        if sector and sector != " ":
+            filtros += f" AND SECTOR = '{sector}'"
+        if planta and planta != " ":
+            filtros += f" AND PLANTA = '{planta}'"
+        if estado:
+            filtros += f" AND [ESTADO] = '{estado}'"
+        if status and status != " ":
+            filtros += f" AND [STATUS OPERATIVO] = '{status}'"
+        if riesgo and riesgo != " ":
+            filtros += f" AND RIESGO = '{riesgo}'"
+        if id_busqueda:
+            filtros += f" AND {columna_id} = '{id_busqueda}'"
+
+        query = f"""
+            SELECT {columna_id}, SECTOR, PLANTA, CIRCUITO, [UNIDAD DE CONTROL], {descripcion}, [FECHA DE ELABORACIÓN], [FECHA DE VENCIMIENTO], [ESTADO], [RIESGO]
+            FROM {tabla}
+            WHERE 1=1
+            {filtro_base}
+            {filtros}
+            ORDER BY {columna_id}
+        """
+        try:
+            conexion = globalconn
+            cursor = conexion.execute(query)
+            filas = cursor.fetchall()
+            columnas = [d[0] for d in cursor.description]
+        except Exception as e:
+            QMessageBox.critical(self, "Error al consultar", str(e))
+            return
+
+        df = pd.DataFrame(filas, columns=columnas)
+
+        # opcional: parseo de fechas para que Excel las reconozca
+        for col in ("FECHA DE ELABORACIÓN", "FECHA DE VENCIMIENTO"):
+            if col in df.columns:
+                df[col] = pd.to_datetime(df[col], errors="coerce")
+
+        fecha = date.today().strftime("%d-%m-%Y")
+
+        if tabla == "VISTA_EMP":
+            nombre_sugerido = f"EMPLAZAMIENTOS-{fecha}.xlsx"
+        else:
+            nombre_sugerido = f"SOLICITUDES DE FABRICACION-{fecha}.xlsx"
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Guardar Excel", nombre_sugerido, "Excel (*.xlsx)"
+        )
+        if not file_path:
+            return
+        # opcional: garantizar extensión
+        if not file_path.lower().endswith(".xlsx"):
+            file_path += ".xlsx"
+        
+        
+        with pd.ExcelWriter(file_path, engine="xlsxwriter") as writer:
+            df.to_excel(excel_writer=writer, index=False, sheet_name=nombre_hoja)
+
+            workbook  = writer.book
+            worksheet = writer.sheets[nombre_hoja]
+
+        # formato para encabezados
+            header_format = workbook.add_format({
+            "bold": True,
+            "text_wrap": True,
+            "valign": "top",
+            "fg_color": "#CFCFCF",
+            "border": 1
+             })
+        
+        wrap_format = workbook.add_format({"text_wrap": True, "valign": "top"})
+        if "DESCRIPCION" in df.columns:
+          idx = df.columns.get_loc("DESCRIPCION")
+          worksheet.set_column(idx, idx, 50, wrap_format)
+        
+        
+        for col_num, value in enumerate(df.columns.values):
+            worksheet.write(0, col_num, value, header_format)
+
+        # autofiltro en la fila de encabezados
+        worksheet.autofilter(0, 0, len(df), len(df.columns) - 1)
+
+        # auto-ajuste de columnas
+        for i, col in enumerate(df.columns):
+            col_width = max(df[col].astype(str).map(len).max(), len(col)) + 2
+            worksheet.set_column(i, i, min(col_width, 40))
+
+        msg = QMessageBox(self)
+        msg.setIcon(QMessageBox.Information)
+        msg.setWindowTitle("Exportación exitosa")
+        msg.setText(f"Se exportaron {len(df)} filas.\n\n{file_path}")
+
+        btn_abrir = msg.addButton("Abrir archivo", QMessageBox.AcceptRole)
+        btn_carpeta = msg.addButton("Abrir carpeta", QMessageBox.ActionRole)
+        btn_copiar = msg.addButton("Copiar ruta", QMessageBox.ActionRole)
+        msg.addButton("Cerrar", QMessageBox.RejectRole)
+
+        msg.exec()
+
+        clicked = msg.clickedButton()
+        if clicked is btn_abrir:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(file_path))
+        elif clicked is btn_carpeta:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(os.path.dirname(file_path)))
+        elif clicked is btn_copiar:
+            QGuiApplication.clipboard().setText(file_path)
     
 if __name__ == "__main__":
     from PySide6.QtWidgets import QApplication, QMainWindow

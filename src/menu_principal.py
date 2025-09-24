@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (
     QFrame, QLabel, QPushButton, QGridLayout, QMessageBox, QStackedWidget, QToolButton, QGraphicsOpacityEffect
 )
 from PySide6.QtCore import Qt, QSize, QPropertyAnimation, QEasingCurve, QRect, QParallelAnimationGroup    
-from PySide6.QtGui import QIcon, QPixmap, QGuiApplication, QCloseEvent
+from PySide6.QtGui import QIcon, QPixmap, QGuiApplication, QCloseEvent, QAction
 import darkdetect
 import sys
 from pathlib import Path
@@ -84,6 +84,7 @@ def fade_to(stacked, next_index, duration=220, easing=QEasingCurve.OutCubic):
     anim.setEasingCurve(easing)
     anim.start(QPropertyAnimation.DeleteWhenStopped)
 
+    
 
 class MenuPrincipal(QMainWindow):
     def __init__(self, app):
@@ -92,8 +93,20 @@ class MenuPrincipal(QMainWindow):
 
         base_dir = Path(__file__).resolve().parent
 
-        
+        #Barra de menú
+        barra = self.menuBar()
+        menu = barra.addMenu("SAESMA")
+        # Crear acciones
+        about = QAction("Acerca de...", self)
+        about.triggered.connect(self.mostrar_acerca_de)
+        salir = QAction("Salir", self)
+        salir.triggered.connect(self.close)
 
+        # Agregar acciones al menú
+        menu.addAction(about)
+        menu.addSeparator()
+        menu.addAction(salir)
+    
         self.setWindowTitle("Menú Principal")
         self.setMinimumSize(1050, 600)
         #self.resize(1280, 900)
@@ -481,6 +494,21 @@ class MenuPrincipal(QMainWindow):
             event.accept()
         else:
             event.ignore()
+    
+    def mostrar_acerca_de(self):
+        QMessageBox.about(
+            self,
+            "Acerca de",
+            "<b>SAESMA</b><br>"
+            "Sistema de Administración de Emplazamientos y Solicitudes de Fabricación de la Refinería Madero<br><br>"
+            "Desarrollado por Juan Javier Velázquez Escalante - Inspección Técnica""<br>"
+            "Refinería Madero<br>"
+            "Versión 1.0<br>"
+            "© 2025 PlumeSoft"
+        )
+        
+        
+
 
     def proximamente(self):
         msg = QMessageBox(self)
