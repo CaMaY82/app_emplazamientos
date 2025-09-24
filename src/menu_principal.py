@@ -14,6 +14,7 @@ from nuevo_registro import UI_Nuevo
 from login import loginUI
 from login_nuevo import login_nuevoUI
 from editar_registro import UI_editar
+from dashboard import Dashboard
 
 def slide_to(stacked, next_index, direction="left", duration=260, easing=QEasingCurve.OutCubic):
     """Transición deslizante entre páginas de un QStackedWidget."""
@@ -119,12 +120,12 @@ class MenuPrincipal(QMainWindow):
         self.layout_sup.addWidget(logo_pemex)
 
         if darkdetect.isDark():
-            logoApp = QPixmap(base_dir.parent / "assets" / "app_logo_L.png")
+            logoApp = QPixmap(base_dir.parent / "assets" / "app_logo.png")
         else:
-            logoApp = QPixmap(base_dir.parent / "assets" / "app_logo_D.png")
+            logoApp = QPixmap(base_dir.parent / "assets" / "app_logo.png")
 
         logo_app = QLabel()
-        logo_app.setFixedSize(150, 100)
+        logo_app.setFixedSize(200, 100)
         logo_app.setScaledContents(True)
         logo_app.setPixmap(logoApp)
         logo_app.setToolTip("Sistema de Administración de Emplazamientos y Solicitudes de Fabricación Madero")
@@ -287,7 +288,7 @@ class MenuPrincipal(QMainWindow):
             
             """)
         layout_dash.addWidget(self.dashboard_btn, alignment = Qt.AlignCenter)
-        self.dashboard_btn.clicked.connect(self.proximamente)   
+        self.dashboard_btn.clicked.connect(self.abrir_dashboard)   
 
         
         
@@ -334,9 +335,12 @@ class MenuPrincipal(QMainWindow):
         self.nuevo.volver_home.connect(self.ir_a_home)
         self.editar = UI_editar(self.app)
         self.editar.volver_home.connect(self.ir_a_home)
+        self.dashboard = Dashboard(self.app)
+        self.dashboard.volver_home.connect(self.ir_a_home)
         self.stack.addWidget(self.busqueda)     # índice 1
         self.stack.addWidget(self.nuevo)        # índice 2
         self.stack.addWidget(self.editar)       # índice 3
+        self.stack.addWidget(self.dashboard)    # índice 4
 
         self.titulos_por_pagina = {
             self.page_home: "Sistema De Administración De Emplazamientos \n&\n Solicitudes De Fabricación \nDe Refinería Madero",
@@ -383,6 +387,11 @@ class MenuPrincipal(QMainWindow):
         #fade_to(self.stack, self.stack.indexOf(self.editar), duration=1700)
         self.editar.limpiar_campos()
         self.editar.limpiar_tabla()
+
+    def abrir_dashboard(self):
+        self.frame_sup.hide()
+        idx = self.stack.indexOf(self.dashboard)
+        slide_to(self.stack, idx, direction="left", duration=260)
         
         
     

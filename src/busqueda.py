@@ -388,6 +388,26 @@ class UI_Busqueda(QWidget):
             """)
         self.notificacion_btn.setVisible(False)
 
+        icono_excel = base_dir.parent / "assets" /"excel.png"
+        self.excel_btn = QToolButton()
+        self.excel_btn.setText("Exportar a Excel")
+        self.excel_btn.setIcon(QIcon(str(icono_excel)))
+        self.excel_btn.setIconSize(QSize(64, 64))
+        self.excel_btn.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.excel_btn.setFixedSize(100, 100)
+        self.frame_inferior.setLayout(self.layout_inferior)
+        self.layout_inferior.addWidget(self.excel_btn)
+        self.excel_btn.setStyleSheet("""
+        QToolButton {
+            font-weight: normal;
+            font-size: 12px;
+            background-color: transparent;
+            padding: 0;
+            }
+           
+            """)
+        self.excel_btn.setVisible(False)
+
         # Diccionario de sectores
         self.sectores_dict = {
             "1": ["", "BA", "MC", "FCC1", "MT2"],
@@ -515,7 +535,7 @@ class UI_Busqueda(QWidget):
 
 
         #QMessageBox.information(self, "Resultados", f"  {len(resultados)} {label_result}")
-
+        self.excel_btn.setVisible(True)
         #conexion.close()
 
         #funcion para actualizar los campos
