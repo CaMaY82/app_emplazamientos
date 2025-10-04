@@ -1,2 +1,21 @@
-﻿__pycache__/
-*.py[cod]
+# === Entornos virtuales ===
+.venv/
+venv/
+
+# === Archivos generados por Python ===
+__pycache__/
+*.pyc
+*.pyo
+
+# === Configuración de editores ===
+.vscode/
+.idea/
+
+# === Archivos de build / PyInstaller ===
+build/
+dist/
+*.spec
+
+# === Archivos del sistema ===
+.DS_Store
+Thumbs.db
