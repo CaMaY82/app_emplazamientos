@@ -7,10 +7,11 @@ from PySide6.QtCore import Qt, Signal
 import darkdetect
 import sys
 from pathlib import Path
-from editar_registro import UI_editar
+from nuevo_registro import UI_Nuevo
 
-class loginUI(QWidget):
+class login_menu(QWidget):
     auth_ok = Signal()
+    
     def __init__(self, app, parent=None):
         super().__init__(parent)
         self.app = app        
@@ -19,8 +20,8 @@ class loginUI(QWidget):
         self.setWindowModality(Qt.ApplicationModal)
         self.setAttribute(Qt.WA_DeleteOnClose)
 
-        #base_dir = Path(__file__).resolve().parent
-        #self.assets = base_dir.parent / "assets" 
+        base_dir = Path(__file__).resolve().parent
+        self.assets = base_dir.parent / "assets" 
         
         if darkdetect.isDark():
          modo = "oscuro"
@@ -92,6 +93,8 @@ class loginUI(QWidget):
         self.layout_principal.addWidget(self.imagen_usuario, alignment=Qt.AlignCenter)
         self.imagen_usuario.setPixmap(QPixmap("assets/user_image.png"))
         self.layout_principal.addSpacerItem(QSpacerItem(10, 50, QSizePolicy.Preferred, QSizePolicy.Preferred))
+        
+
 
 
         # Frame Central
@@ -120,17 +123,15 @@ class loginUI(QWidget):
         self.login_btn = QPushButton("Iniciar Sesion")
         self.login_btn.setFixedSize(150, 35)
         self.login_btn.clicked.connect(self.iniciar_sesion)
+        self.datos_layout.addWidget(self.login_btn, 7, 0) 
 
-        self.guess_btn = QPushButton("Continuar como invitado")
-        self.guess_btn.setFixedSize(150, 20)
-        self.datos_layout.addWidget(self.login_btn, 7, 0)    
-        #self.datos_layout.addWidget(self.guess_btn, 8, 0)
-
+        
     def _actualizar_avatar_por_usuario(self):
-        user_id = self.usuario.text().strip()  # <- obtienes el ID
+        user_id = self.usuario.text().strip()   # <- aquí usas self.usuario
         mapping = {
         "345838": "JJVE.png",
         "433086": "RRG.png",
+        "1202" :"madero.png"
         }
         img_name = mapping.get(user_id, "user_image.png")
         img_path = f"assets/{img_name}"
@@ -140,7 +141,7 @@ class loginUI(QWidget):
         usuario = self.usuario.text()
         password = self.password.text()
 
-        usuarios = {"345838": "camay", "433086": "Pemex123$"}
+        usuarios = {"345838": "camay", "433086": "Pemex123$", "1202": "Madero#114"}
 
         if usuario in usuarios and usuarios[usuario] == password:
             #QMessageBox.information(self, "Bienvenido", f"Bienvenido")
@@ -150,11 +151,9 @@ class loginUI(QWidget):
         else:
              QMessageBox.critical(self, "Error", "Usuario o contraseña incorrectos.")
 
-    #def abrir_editar(self):
-        #self.ventana_editar = UI_editar(self.app)
-        #self.ventana_editar.show()
-
-      
+    #def abrir_nuevo(self):
+        #self.ventana_nuevo = UI_Nuevo(self.app)
+        #self.ventana_nuevo.show()   
 
         
 
@@ -165,10 +164,10 @@ class loginUI(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    ventana = loginUI(app)
+    ventana = login_menu(app)
     ventana.setWindowTitle("SAESMA MADERO")    
     #base_dir = Path(__file__).resolve().parent
-    icono_ventana ="assets/login icon.ico"    
+    icono_ventana = "assets/login icon.ico"    
     ventana.setWindowIcon(QIcon(str(icono_ventana)))    
     ventana.show()
 

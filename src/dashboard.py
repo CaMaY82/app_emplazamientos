@@ -20,7 +20,7 @@ class Dashboard(QWidget):
     def __init__(self, app):
         super().__init__()
 
-        base_dir = Path(__file__).resolve().parent
+        #base_dir = Path(__file__).resolve().parent
 
         # ----- layout raíz -----
         root = QVBoxLayout(self)
@@ -28,7 +28,7 @@ class Dashboard(QWidget):
         root.setSpacing(0)
 
         # ----- botón regresar (arriba-izquierda, fijo) -----
-        icono_regresar = base_dir.parent / "assets" / "regresar_icon.png"
+        icono_regresar = "assets/regresar_icon.png"
 
         self.regresar = QToolButton(self)
         self.regresar.setObjectName("btnRegresar")
@@ -138,7 +138,7 @@ if __name__ == "__main__":
     ventana = QMainWindow()
     ventana.setWindowTitle("Dashboard")
     base_dir = Path(__file__).resolve().parent
-    icono_ventana = base_dir.parent / "assets" / "dashboard2.ico"
+    icono_ventana = "assets/dashboard2.ico"
     
     # Pasa `app` 
     ui =Dashboard(app)

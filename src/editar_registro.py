@@ -101,9 +101,9 @@ class UI_editar(QWidget):
         base_dir = Path(__file__).resolve().parent
 
         if darkdetect.isDark():
-         logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo_dark.png")
+         logoIT = QPixmap("assets/inspeccion_logo_dark.png")
         else:
-         logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo.png")
+         logoIT = QPixmap("assets/inspeccion_logo.png")
 
         
         grupo_filtros.setLayout(filtros_layout)
@@ -255,7 +255,7 @@ class UI_editar(QWidget):
         edicion_layout.addWidget(self.reevaluacion, 1, 5)
         self.reevaluacion.setFixedWidth(100)
 
-        icono_calendario = base_dir.parent / "assets" /"calendar_icon.png"
+        icono_calendario = "assets/calendar_icon.png"
         self.calendario_reev = QToolButton()
         self.calendario_reev.setIcon(QIcon(str(icono_calendario)))
         self.calendario_reev.setIconSize(QSize(30, 30))
@@ -425,8 +425,8 @@ class UI_editar(QWidget):
         enlaces_layout.addWidget(QLabel("Enlace a la Notificación de Ejecución:"), 1, 1)
         enlaces_layout.addWidget(self.notificacion_link, 1, 2)
 
-        icono_archivo = base_dir.parent / "assets" /"new_file.png"
-        icono_notificacion = base_dir.parent / "assets" /"notificacion2_icon.png"
+        icono_archivo = "assets/new_file.png"
+        icono_notificacion = "assets/notificacion2_icon.png"
 
         self.archivo_btn = QToolButton()
         self.archivo_btn.setIcon(QIcon(str(icono_archivo)))
@@ -468,7 +468,7 @@ class UI_editar(QWidget):
         botones_frame.setLayout(botones_layout)        
         layout_principal.addWidget(botones_frame)
 
-        icono_regresar = base_dir.parent / "assets" /"regresar_icon.png"       
+        icono_regresar = "assets/regresar_icon.png"       
         self.regresar = QToolButton()
         #self.regresar.setText("Regresar")
         self.regresar.setIcon(QIcon(str(icono_regresar)))
@@ -997,18 +997,5 @@ class UI_editar(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = UI_editar(app)
-    #base_dir = Path(__file__).resolve().parent
-    #icono_ventana = base_dir.parent / "assets" / "app_icon.ico"
-    
-    base_dir = Path(__file__).resolve().parent   
-
-    if darkdetect.isDark():
-        
-        icono_ventana = base_dir.parent / "assets" / "edit_icon_dark.ico"
-    else:
-        
-        icono_ventana = base_dir.parent / "assets" / "edit_icon_light.ico"    
-    window.setWindowIcon(QIcon(str(icono_ventana)))
-
     window.showMaximized()
     sys.exit(app.exec())

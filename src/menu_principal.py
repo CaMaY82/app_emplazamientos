@@ -2,7 +2,7 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QFrame, QLabel, QPushButton, QGridLayout, QMessageBox, QStackedWidget, QToolButton, QGraphicsOpacityEffect
 )
-from PySide6.QtCore import Qt, QSize, QPropertyAnimation, QEasingCurve, QRect, QParallelAnimationGroup    
+from PySide6.QtCore import Qt, QSize, QPropertyAnimation, QEasingCurve, QRect, QParallelAnimationGroup, QTimer, QEvent
 from PySide6.QtGui import QIcon, QPixmap, QGuiApplication, QCloseEvent, QAction
 import darkdetect
 import sys
@@ -91,6 +91,13 @@ class MenuPrincipal(QMainWindow):
         super().__init__()
         self.app = app
 
+         # --- Timer de inactividad ---
+        self.max_inactividad = 60 * 60 * 1000
+        self.timer_inactividad = QTimer(self)
+        self.timer_inactividad.setInterval(self.max_inactividad)
+        self.timer_inactividad.timeout.connect(self.cerrar_por_inactividad)
+        self.timer_inactividad.start()  
+        
         base_dir = Path(__file__).resolve().parent
 
         #Barra de menú
@@ -123,7 +130,7 @@ class MenuPrincipal(QMainWindow):
         self.frame_sup.setLayout(self.layout_sup)
         self.layout_principal.addWidget(self.frame_sup, 0, 0, Qt.AlignTop)
 
-        logoPMX = base_dir.parent / "assets" / "pemex_logo.png"
+        logoPMX = "assets/pemex_logo.png"
         pemex = QPixmap(str(logoPMX))
 
         logo_pemex = QLabel()
@@ -133,9 +140,9 @@ class MenuPrincipal(QMainWindow):
         self.layout_sup.addWidget(logo_pemex)
 
         if darkdetect.isDark():
-            logoApp = QPixmap(base_dir.parent / "assets" / "app_logo.png")
+            logoApp = QPixmap("assets/app_logo.png")
         else:
-            logoApp = QPixmap(base_dir.parent / "assets" / "app_logo.png")
+            logoApp = QPixmap("assets/app_logo.png")
 
         logo_app = QLabel()
         logo_app.setFixedSize(200, 100)
@@ -159,9 +166,9 @@ class MenuPrincipal(QMainWindow):
         #layout_sup.addWidget(self.titulo, alignment=Qt.AlignCenter)
 
         if darkdetect.isDark():
-            logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo_dark.png")
+            logoIT = QPixmap("assets/inspeccion_logo_dark.png")
         else:
-            logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo.png")
+            logoIT = QPixmap("assets/inspeccion_logo.png")
 
         logo_inspeccion = QLabel()
         logo_inspeccion.setFixedSize(200, 100)
@@ -191,7 +198,7 @@ class MenuPrincipal(QMainWindow):
         buscar_widget = QWidget()
         buscar_widget.setLayout(layout_buscar)
         central_layout.addWidget(buscar_widget)
-        icono_buscar = base_dir.parent / "assets" /"buscar_icon.png"
+        icono_buscar = "assets/buscar_icon.png"
         self.buscar_btn = QToolButton()
         self.buscar_btn.setText("Buscar")
         self.buscar_btn.setIcon(QIcon(str(icono_buscar)))
@@ -221,7 +228,7 @@ class MenuPrincipal(QMainWindow):
         nuevo_widget = QWidget()
         nuevo_widget.setLayout(layout_nuevo)
         central_layout.addWidget(nuevo_widget)
-        icono_nuevo = base_dir.parent / "assets" /"nuevo_icon.png"
+        icono_nuevo = "assets/nuevo_icon.png"
         self.nuevo_btn = QToolButton()
         self.nuevo_btn.setText("Nuevo Registro")
         self.nuevo_btn.setIcon(QIcon(str(icono_nuevo)))
@@ -250,7 +257,7 @@ class MenuPrincipal(QMainWindow):
         editar_widget = QWidget()
         editar_widget.setLayout(layout_editar)
         central_layout.addWidget(editar_widget)
-        icono_editar = base_dir.parent / "assets" /"editar_icon.png"
+        icono_editar = "assets/editar_icon.png"
         self.editar_btn = QToolButton()
         self.editar_btn.setText("Editar")
         self.editar_btn.setIcon(QIcon(str(icono_editar)))
@@ -281,7 +288,7 @@ class MenuPrincipal(QMainWindow):
         dash_widget = QWidget()
         dash_widget.setLayout(layout_dash)
         central_layout.addWidget(dash_widget)
-        icono_dashboard = base_dir.parent / "assets" /"dashboard_icon.png"
+        icono_dashboard = "assets/dashboard_icon.png"
         self.dashboard_btn = QToolButton()
         self.dashboard_btn.setText("Dashboard")
         self.dashboard_btn.setIcon(QIcon(str(icono_dashboard)))
@@ -312,7 +319,7 @@ class MenuPrincipal(QMainWindow):
         salir_widget = QWidget()
         salir_widget.setLayout(layout_salir)
         central_layout.addWidget(salir_widget)
-        icono_salir = base_dir.parent / "assets" /"salir_icon.png"
+        icono_salir = "assets/salir_icon.png"
         self.salir_btn = QToolButton()
         self.salir_btn.setText("Salir")
         self.salir_btn.setIcon(QIcon(str(icono_salir)))
@@ -369,6 +376,15 @@ class MenuPrincipal(QMainWindow):
         self.stack.setCurrentWidget(self.page_home)
         self.actualizar_titulo(self.stack.currentIndex())
 
+    def cerrar_por_inactividad(self):
+        print("Cerrando por inactividad...")
+        QApplication.quit()
+
+    def event(self, event):
+        if event.type() in (QEvent.MouseMove, QEvent.KeyPress, QEvent.MouseButtonPress):
+            self.timer_inactividad.start(self.max_inactividad)
+        return super().event(event)
+
     def actualizar_titulo(self, idx: int):
         w = self.stack.widget(idx)
         texto = self.titulos_por_pagina.get(w, "Aplicación")
@@ -421,7 +437,7 @@ class MenuPrincipal(QMainWindow):
         self.login.setFixedSize(400, 600)
 
         base_dir = Path(__file__).resolve().parent
-        icono = base_dir.parent / "assets" / "login icon.ico"
+        icono = "assets/login icon.ico"
         self.login.setWindowIcon(QIcon(str(icono)))
 
         screen = QGuiApplication.primaryScreen().availableGeometry()
@@ -448,7 +464,7 @@ class MenuPrincipal(QMainWindow):
         self.login.setFixedSize(400, 600)
 
         base_dir = Path(__file__).resolve().parent
-        icono_ventana = base_dir.parent / "assets" / "login icon.ico"
+        icono_ventana = "assets/login icon.ico"
         self.login.setWindowIcon(QIcon(str(icono_ventana)))
 
         screen = QGuiApplication.primaryScreen().availableGeometry()
@@ -488,12 +504,14 @@ class MenuPrincipal(QMainWindow):
             b.setStyleSheet("font-size: 14px;")
         msg.exec()
         return msg.clickedButton() is si
+    
+    #desmarcar comentarios siguientes para activar el diálogo de confirmación al cerrar:
 
-    def closeEvent(self, event: QCloseEvent):
-        if self.salir_app():
-            event.accept()
-        else:
-            event.ignore()
+    #def closeEvent(self, event: QCloseEvent):
+        #if self.salir_app():
+            #event.accept()
+        #else:
+            #event.ignore()
     
     def mostrar_acerca_de(self):
         QMessageBox.about(
@@ -504,7 +522,7 @@ class MenuPrincipal(QMainWindow):
             "Desarrollado por Juan Javier Velázquez Escalante - Inspección Técnica""<br>"
             "Refinería Madero<br>"
             "Versión 1.0<br>"
-            "© 2025 PlumeSoft"
+            "© 2025 JJVE"
         )
         
         
@@ -554,7 +572,9 @@ if __name__ == "__main__":
             }
         """)
 
+    icono_ventana = "assets/app_icon_2.ico"
     ventana = MenuPrincipal(app)
+    ventana.setWindowIcon(QIcon(str(icono_ventana)))
     ventana.show()
 
     screen = QGuiApplication.primaryScreen().availableGeometry()
@@ -563,8 +583,6 @@ if __name__ == "__main__":
         (screen.height() - ventana.height()) // 2
     )
 
-    base_dir = Path(__file__).resolve().parent
-    icono_ventana = base_dir.parent / "assets" / "app_icon_2.ico"
-    ventana.setWindowIcon(QIcon(str(icono_ventana)))
+   
 
     sys.exit(app.exec())

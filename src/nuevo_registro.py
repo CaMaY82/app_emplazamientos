@@ -65,12 +65,12 @@ class UI_Nuevo(QWidget):
         seleccion_box = QGroupBox("Selecciona")
         seleccion_box.setFixedHeight(100)
         seleccion_layout = QHBoxLayout()
-        base_dir = Path(__file__).resolve().parent
+        #base_dir = Path(__file__).resolve().parent
 
         if darkdetect.isDark():
-         logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo_dark.png")
+         logoIT = QPixmap("assets/inspeccion_logo_dark.png")
         else:
-         logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo.png")
+         logoIT = QPixmap("assets/inspeccion_logo.png")
 
         
         # Agregando botones de seleccion emp y sf
@@ -94,7 +94,7 @@ class UI_Nuevo(QWidget):
 
         
         #Sustitucion de logo IT por el icono de regresar
-        icono_regresar = base_dir.parent / "assets" /"regresar_icon.png"       
+        icono_regresar = "assets/regresar_icon.png"       
         self.regresar = QToolButton()
         #self.regresar.setText("Regresar")
         self.regresar.setIcon(QIcon(str(icono_regresar)))
@@ -595,16 +595,5 @@ class UI_Nuevo(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = UI_Nuevo(app)
-    base_dir = Path(__file__).resolve().parent   
-
-    if darkdetect.isDark():
-        
-        icono_ventana = base_dir.parent / "assets" / "new_file_icon_light.ico"
-    else:
-        
-        icono_ventana = base_dir.parent / "assets" / "new_file_icon_light.ico"    
-    
-    window.setWindowIcon(QIcon(str(icono_ventana)))
-
     window.show()
     sys.exit(app.exec())

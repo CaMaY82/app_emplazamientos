@@ -83,14 +83,14 @@ class login_nuevoUI(QWidget):
        
         # Imagen de Login
 
-        base_dir = Path(__file__).resolve().parent
-        assets = base_dir.parent / "assets"
+        #base_dir = Path(__file__).resolve().parent
+        #assets = base_dir.parent / "assets"
 
         self.imagen_usuario = QLabel()
         self.imagen_usuario.setFixedSize(170, 170)
         self.imagen_usuario.setScaledContents(True)
         self.layout_principal.addWidget(self.imagen_usuario, alignment=Qt.AlignCenter)
-        self.imagen_usuario.setPixmap(QPixmap(str(assets / "user_image.png")))
+        self.imagen_usuario.setPixmap(QPixmap("assets/user_image.png"))
         self.layout_principal.addSpacerItem(QSpacerItem(10, 50, QSizePolicy.Preferred, QSizePolicy.Preferred))
         
 
@@ -134,8 +134,9 @@ class login_nuevoUI(QWidget):
         "345838": "JJVE.png",
         "433086": "RRG.png",
         }
-        img_path = self.assets / mapping.get(user_id, "user_image.png")
-        self.imagen_usuario.setPixmap(QPixmap(str(img_path)))
+        img_name = mapping.get(user_id, "user_image.png")
+        img_path = f"assets/{img_name}"
+        self.imagen_usuario.setPixmap(QPixmap(img_path))
 
     def iniciar_sesion(self):
         usuario = self.usuario.text()
@@ -165,9 +166,9 @@ class login_nuevoUI(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     ventana = login_nuevoUI(app)
-    ventana.setWindowTitle("SAESF MADERO")    
-    base_dir = Path(__file__).resolve().parent
-    icono_ventana = base_dir.parent / "assets" / "login icon.ico"    
+    ventana.setWindowTitle("SAESMA MADERO")    
+    #base_dir = Path(__file__).resolve().parent
+    icono_ventana = "assets/login icon.ico"    
     ventana.setWindowIcon(QIcon(str(icono_ventana)))    
     ventana.show()
 

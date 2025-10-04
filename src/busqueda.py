@@ -306,11 +306,11 @@ class UI_Busqueda(QWidget):
 
 
         if darkdetect.isDark():
-         logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo_dark.png")
-         logoIT = base_dir.parent / "assets" / "inspeccion_logo_dark.png"
+         logoIT = QPixmap("assets/inspeccion_logo_dark.png")
+         
         else:
-         logoIT = QPixmap(base_dir.parent / "assets" / "inspeccion_logo.png")
-         logoIT = base_dir.parent / "assets" / "inspeccion_logo.png"
+         logoIT = QPixmap("assets/inspeccion_logo.png")
+         
          
         logo_inspeccion = QLabel()
         logo_inspeccion.setFixedSize(150, 75)
@@ -319,7 +319,7 @@ class UI_Busqueda(QWidget):
         pixmap = QPixmap(str(logoIT))
         logo_inspeccion.setPixmap(pixmap)
 
-        icono_regresar = base_dir.parent / "assets" /"regresar_icon.png"       
+        icono_regresar = "assets/regresar_icon.png"       
         self.regresar = QToolButton()
         #self.regresar.setText("Regresar")
         self.regresar.setIcon(QIcon(str(icono_regresar)))
@@ -351,7 +351,7 @@ class UI_Busqueda(QWidget):
        
         # Agreganbdo botones con icono para ver el archivo del emplazamiento y las notificaciones de ejecución:
 
-        icono_reporte = base_dir.parent / "assets" /"pdf_icon.png"
+        icono_reporte = "assets/pdf_icon.png"
         self.reporte_btn = QToolButton()
         self.reporte_btn.setText("Ver Reporte")
         self.reporte_btn.setIcon(QIcon(str(icono_reporte)))
@@ -374,7 +374,7 @@ class UI_Busqueda(QWidget):
         self.reporte_btn.setVisible(False)
         
        
-        icono_notificacion = base_dir.parent / "assets" /"notificacion_icon.png"
+        icono_notificacion = "assets/notificacion_icon.png"
         self.notificacion_btn = QToolButton()
         self.notificacion_btn.setText("Ver Notificación")
         self.notificacion_btn.setIcon(QIcon(str(icono_notificacion)))
@@ -394,7 +394,7 @@ class UI_Busqueda(QWidget):
             """)
         self.notificacion_btn.setVisible(False)
 
-        icono_excel = base_dir.parent / "assets" /"excel.png"
+        icono_excel = "assets/excel.png"
         self.excel_btn = QToolButton()
         self.excel_btn.setText("Exportar a Excel")
         self.excel_btn.setIcon(QIcon(str(icono_excel)))
@@ -461,9 +461,9 @@ class UI_Busqueda(QWidget):
 
         self.etiqueta_item.setText(tipo_item)
 
-        #Ruta de la base de datos
+        #Ruta de la base de datos si se usa de manera local:
 
-        self.db_path = str(Path(__file__).resolve().parent.parent / "db" / "EMP.db")
+        #self.db_path = str(Path(__file__).resolve().parent.parent / "db" / "EMP.db")
 
         # A continuación se usa VISTA_EMP o VISTA_SF como tablas de busqueda de la bd porque en esas vistas estan calculadas la columna ESTADO en base a las fechas 
 
@@ -815,14 +815,13 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     ventana = QMainWindow()
-    ventana.setWindowTitle("Búsqueda EMP o SF")
-    base_dir = Path(__file__).resolve().parent
-    icono_ventana = base_dir.parent / "assets" / "search_icon.ico"
+    ventana.setWindowTitle("Buscar")
+    
+    
     
     # Pasa `app` al crear UI_Busqueda
     ui = UI_Busqueda(app)
     ventana.setCentralWidget(ui)
-    ventana.setWindowIcon(QIcon(str(icono_ventana)))
     ventana.show()
     
     sys.exit(app.exec())

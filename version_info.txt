@@ -1,0 +1,23 @@
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    filevers=(1, 0, 0, 0),
+    prodvers=(1, 0, 0, 0),
+    mask=0x3f,
+    flags=0x0,
+    OS=0x40004,
+    fileType=0x1,
+    subtype=0x0
+  ),
+  kids=[
+    StringFileInfo([StringTable('040904B0', [
+      StringStruct('CompanyName', 'Refineria Madero'),
+      StringStruct('FileDescription', 'SAESMA - Sistema de Administración de Emplazamientos y Solicitudes de Fabricacion Madero'),
+      StringStruct('FileVersion', '1.0.0'),
+      StringStruct('InternalName', 'SAESMA'),
+      StringStruct('OriginalFilename', 'SAESMA.exe'),
+      StringStruct('ProductName', 'SAESMA'),
+      StringStruct('ProductVersion', '1.0.0'),
+    ])]),
+    VarFileInfo([VarStruct('Translation', [1033, 1200])])
+  ]
+)
